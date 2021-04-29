@@ -1,7 +1,12 @@
 const colors = require("tailwindcss/colors");
 
 module.exports = {
-  purge: ["./pages/**/*.{js,ts,jsx,tsx}", "./components/**/*.{js,ts,jsx,tsx}"],
+  mode: "jit",
+  purge: [
+    "./pages/**/*.{js,ts,jsx,tsx}",
+    "./dataxelio.react-ui/**/*.{js,ts,jsx,tsx}",
+    "./local-components/**/*.{js,ts,jsx,tsx}",
+  ],
   darkMode: "class", // false or 'media' or 'class'
   theme: {
     colors: {
@@ -12,7 +17,7 @@ module.exports = {
       gray: colors.coolGray,
       brand: colors.cyan,
       primary: colors.lightBlue,
-      success: colors.green,
+      success: colors.emerald,
       warning: colors.orange,
       danger: colors.red,
     },
@@ -21,5 +26,5 @@ module.exports = {
   variants: {
     extend: {},
   },
-  plugins: [],
+  plugins: [require("@tailwindcss/forms")],
 };
