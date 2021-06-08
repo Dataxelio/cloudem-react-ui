@@ -1,793 +1,751 @@
 import {
-  IntentTheme,
   IntentState,
-  IntentSelection,
-  IntentElement,
   IntentColor,
+  BackgroundOpacityType,
+  ForegroundOpacityType,
+  BorderOpacityType,
+  RingOpacityType,
+  CursorType,
 } from "@dataxelio/react-ui.utils.prop-types";
 
-export type StateIntentStyleBuilderInput = {
-  useDarkTheme?: boolean;
-  useDefaultState?: boolean;
-  useHoverState?: boolean;
-  useFocusState?: boolean;
-  useActiveState?: boolean;
-  minimal?: boolean;
+export type IntentStyleBuilderInput = {
+  intentColor?: IntentColor;
+  useDarkGrayAsDefaultIntent?: boolean;
   outlined?: boolean;
   ringed?: boolean;
+  minimal?: boolean;
+  backgroundOpacity?: BackgroundOpacityType;
+  backgroundFade?: boolean;
+  foregroundOpacity?: ForegroundOpacityType;
+  foregroundFade?: boolean;
+  borderOpacity?: BorderOpacityType;
+  borderFade?: boolean;
+  ringOpacity?: RingOpacityType;
   ringedFade?: boolean;
-  withForeground?: boolean;
-  intentColor?: IntentColor;
+  intentAtDefaultState?: boolean;
+  forceLowGrayBackgroundAtHoverState?: boolean;
+  forceLowGrayOutlineAtHoverState?: boolean;
+  forceLowGrayForeground?: boolean;
+  forceLowBrandBackgroundAtHoverState?: boolean;
+  forceLowBrandOutlineAtHoverState?: boolean;
+  forceLowBrandForeground?: boolean;
+  forceSharpBackground?: boolean;
+  forceSharpForeground?: boolean;
+  forceSharpBorder?: boolean;
+  forceSharpRing?: boolean;
+  forceInvertedSharpBackground?: boolean;
+  forceInvertedSharpForeground?: boolean;
+  forceInvertedSharpBorder?: boolean;
+  forceInvertedSharpRing?: boolean;
+  withFocusRing?: boolean;
+  withPlaceholder?: boolean;
+  disablePointerEvents?: boolean;
+  removeDefaultBrowserAppearance?: boolean;
+  cursor?: CursorType;
 };
 
-export type SelectionIntentStyleBuilderInput = {
-  useDarkTheme?: boolean;
-  flyOver?: boolean;
-  selected?: boolean;
-  disabled?: boolean;
-  intentColor?: IntentColor;
-};
+// Background
+/*const backgroundLowIntent = [
+  "bg-gray-200 dark:bg-gray-700",
+  "bg-brand-200 dark:bg-brand-700",
+  "bg-primary-200 dark:bg-primary-700",
+  "bg-success-200 dark:bg-success-700",
+  "bg-warning-200 dark:bg-warning-700",
+  "bg-danger-200 dark:bg-danger-700",
+  "bg-white dark:bg-gray-900", // Sharp
+  "bg-gray-900 dark:bg-gray-100", // Inverted Sharp
+  "bg-transparent", // Transparent
+];*/
 
-// Number of colors per element = 6
-// Number of elements per state = 4*6 = 24
-// Number of states per theme = 7*24 = 168
-// Number of themes = 2*168 = 336
-const gThemeStride = 168;
-const gStateStride = 24;
-const gElementStride = 6;
-
-const stateIntentClassnames = [
-  //Theme=LIGHT - State=NONE - Element=TEXT
-  "text-gray-500",
-  "text-brand-500",
-  "text-primary-500",
-  "text-success-500",
-  "text-warning-500",
-  "text-danger-500",
-  //Theme=LIGHT - State=NONE - Element=BACKGROUND
-  "bg-gray-600",
-  "bg-brand-600",
-  "bg-primary-600",
-  "bg-success-600",
-  "bg-warning-600",
-  "bg-danger-600",
-  //Theme=LIGHT - State=NONE - Element=BORDER
-  "border-gray-500",
-  "border-brand-500",
-  "border-primary-500",
-  "border-success-500",
-  "border-warning-500",
-  "border-danger-500",
-  //Theme=LIGHT - State=NONE - Element=RING
-  "ring-gray-500",
-  "ring-brand-500",
-  "ring-primary-500",
-  "ring-success-500",
-  "ring-warning-500",
-  "ring-danger-500",
-
-  //Theme=LIGHT - State=HOVER - Element=TEXT
-  "hover:text-gray-600",
-  "hover:text-brand-600",
-  "hover:text-primary-600",
-  "hover:text-success-600",
-  "hover:text-warning-600",
-  "hover:text-danger-600",
-  //Theme=LIGHT - State=HOVER - Element=BACKGROUND
-  "hover:bg-gray-700",
-  "hover:bg-brand-700",
-  "hover:bg-primary-700",
-  "hover:bg-success-700",
-  "hover:bg-warning-700",
-  "hover:bg-danger-700",
-  //Theme=LIGHT - State=HOVER - Element=BORDER
-  "hover:border-gray-600",
-  "hover:border-brand-600",
-  "hover:border-primary-600",
-  "hover:border-success-600",
-  "hover:border-warning-600",
-  "hover:border-danger-600",
-  //Theme=LIGHT - State=HOVER - Element=RING
-  "hover:ring-gray-600",
-  "hover:ring-brand-600",
-  "hover:ring-primary-600",
-  "hover:ring-success-600",
-  "hover:ring-warning-600",
-  "hover:ring-danger-600",
-
-  //Theme=LIGHT - State=GROUP_HOVER - Element=TEXT
-  "group-hover:text-gray-600",
-  "group-hover:text-brand-600",
-  "group-hover:text-primary-600",
-  "group-hover:text-success-600",
-  "group-hover:text-warning-600",
-  "group-hover:text-danger-600",
-  //Theme=LIGHT - State=GROUP_HOVER - Element=BACKGROUND
-  "group-hover:bg-gray-700",
-  "group-hover:bg-brand-700",
-  "group-hover:bg-primary-700",
-  "group-hover:bg-success-700",
-  "group-hover:bg-warning-700",
-  "group-hover:bg-danger-700",
-  //Theme=LIGHT - State=GROUP_HOVER - Element=BORDER
-  "group-hover:border-gray-600",
-  "group-hover:border-brand-600",
-  "group-hover:border-primary-600",
-  "group-hover:border-success-600",
-  "group-hover:border-warning-600",
-  "group-hover:border-danger-600",
-  //Theme=LIGHT - State=GROUP_HOVER - Element=RING
-  "group-hover:ring-gray-600",
-  "group-hover:ring-brand-600",
-  "group-hover:ring-primary-600",
-  "group-hover:ring-success-600",
-  "group-hover:ring-warning-600",
-  "group-hover:ring-danger-600",
-
-  //Theme=LIGHT - State=FOCUS - Element=TEXT
-  "focus:text-gray-600",
-  "focus:text-brand-600",
-  "focus:text-primary-600",
-  "focus:text-success-600",
-  "focus:text-warning-600",
-  "focus:text-danger-600",
-  //Theme=LIGHT - State=FOCUS - Element=BACKGROUND
-  "focus:bg-gray-700",
-  "focus:bg-brand-700",
-  "focus:bg-primary-700",
-  "focus:bg-success-700",
-  "focus:bg-warning-700",
-  "focus:bg-danger-700",
-  //Theme=LIGHT - State=FOCUS - Element=BORDER
-  "focus:border-gray-600",
-  "focus:border-brand-600",
-  "focus:border-primary-600",
-  "focus:border-success-600",
-  "focus:border-warning-600",
-  "focus:border-danger-600",
-  //Theme=LIGHT - State=FOCUS - Element=RING
-  "focus:ring-gray-600",
-  "focus:ring-brand-600",
-  "focus:ring-primary-600",
-  "focus:ring-success-600",
-  "focus:ring-warning-600",
-  "focus:ring-danger-600",
-
-  //Theme=LIGHT - State=GROUP_FOCUS - Element=TEXT
-  "group-focus:text-gray-600",
-  "group-focus:text-brand-600",
-  "group-focus:text-primary-600",
-  "group-focus:text-success-600",
-  "group-focus:text-warning-600",
-  "group-focus:text-danger-600",
-  //Theme=LIGHT - State=GROUP_FOCUS - Element=BACKGROUND
-  "group-focus:bg-gray-700",
-  "group-focus:bg-brand-700",
-  "group-focus:bg-primary-700",
-  "group-focus:bg-success-700",
-  "group-focus:bg-warning-700",
-  "group-focus:bg-danger-700",
-  //Theme=LIGHT - State=GROUP_FOCUS - Element=BORDER
-  "group-focus:border-gray-600",
-  "group-focus:border-brand-600",
-  "group-focus:border-primary-600",
-  "group-focus:border-success-600",
-  "group-focus:border-warning-600",
-  "group-focus:border-danger-600",
-  //Theme=LIGHT - State=GROUP_FOCUS - Element=RING
-  "group-focus:ring-gray-600",
-  "group-focus:ring-brand-600",
-  "group-focus:ring-primary-600",
-  "group-focus:ring-success-600",
-  "group-focus:ring-warning-600",
-  "group-focus:ring-danger-600",
-
-  //Theme=LIGHT - State=FOCUS_WITHIN - Element=TEXT
-  "focus-within:text-gray-600",
-  "focus-within:text-brand-600",
-  "focus-within:text-primary-600",
-  "focus-within:text-success-600",
-  "focus-within:text-warning-600",
-  "focus-within:text-danger-600",
-  //Theme=LIGHT - State=FOCUS_WITHIN - Element=BACKGROUND
-  "focus-within:bg-gray-700",
-  "focus-within:bg-brand-700",
-  "focus-within:bg-primary-700",
-  "focus-within:bg-success-700",
-  "focus-within:bg-warning-700",
-  "focus-within:bg-danger-700",
-  //Theme=LIGHT - State=FOCUS_WITHIN - Element=BORDER
-  "focus-within:border-gray-600",
-  "focus-within:border-brand-600",
-  "focus-within:border-primary-600",
-  "focus-within:border-success-600",
-  "focus-within:border-warning-600",
-  "focus-within:border-danger-600",
-  //Theme=LIGHT - State=FOCUS_WITHIN - Element=RING
-  "focus-within:ring-gray-600",
-  "focus-within:ring-brand-600",
-  "focus-within:ring-primary-600",
-  "focus-within:ring-success-600",
-  "focus-within:ring-warning-600",
-  "focus-within:ring-danger-600",
-
-  //Theme=LIGHT - State=ACTIVE - Element=TEXT
-  "active:text-gray-700",
-  "active:text-brand-700",
-  "active:text-primary-700",
-  "active:text-success-700",
-  "active:text-warning-700",
-  "active:text-danger-700",
-  //Theme=LIGHT - State=ACTIVE - Element=BACKGROUND
-  "active:bg-gray-800",
-  "active:bg-brand-800",
-  "active:bg-primary-800",
-  "active:bg-success-800",
-  "active:bg-warning-800",
-  "active:bg-danger-800",
-  //Theme=LIGHT - State=ACTIVE - Element=BORDER
-  "active:border-gray-700",
-  "active:border-brand-700",
-  "active:border-primary-700",
-  "active:border-success-700",
-  "active:border-warning-700",
-  "active:border-danger-700",
-  //Theme=LIGHT - State=ACTIVE - Element=RING
-  "active:ring-gray-700",
-  "active:ring-brand-700",
-  "active:ring-primary-700",
-  "active:ring-success-700",
-  "active:ring-warning-700",
-  "active:ring-danger-700",
-
-  //Theme=DARK - State=NONE - Element=TEXT
-  "dark:text-gray-400",
-  "dark:text-brand-400",
-  "dark:text-primary-400",
-  "dark:text-success-400",
-  "dark:text-warning-400",
-  "dark:text-danger-400",
-  //Theme=DARK - State=NONE - Element=BACKGROUND
-  "dark:bg-gray-300",
-  "dark:bg-brand-300",
-  "dark:bg-primary-300",
-  "dark:bg-success-300",
-  "dark:bg-warning-300",
-  "dark:bg-danger-300",
-  //Theme=DARK - State=NONE - Element=BORDER
-  "dark:border-gray-400",
-  "dark:border-brand-400",
-  "dark:border-primary-400",
-  "dark:border-success-400",
-  "dark:border-warning-400",
-  "dark:border-danger-400",
-  //Theme=DARK - State=NONE - Element=RING
-  "dark:ring-gray-200",
-  "dark:ring-brand-400",
-  "dark:ring-primary-400",
-  "dark:ring-success-400",
-  "dark:ring-warning-400",
-  "dark:ring-danger-400",
-
-  //Theme=DARK - State=HOVER - Element=TEXT
-  "dark:hover:text-gray-300",
-  "dark:hover:text-brand-300",
-  "dark:hover:text-primary-300",
-  "dark:hover:text-success-300",
-  "dark:hover:text-warning-300",
-  "dark:hover:text-danger-300",
-  //Theme=DARK - State=HOVER - Element=BACKGROUND
-  "dark:hover:bg-gray-200",
-  "dark:hover:bg-brand-200",
-  "dark:hover:bg-primary-200",
-  "dark:hover:bg-success-200",
-  "dark:hover:bg-warning-200",
-  "dark:hover:bg-danger-200",
-  //Theme=DARK - State=HOVER - Element=BORDER
-  "dark:hover:border-gray-300",
-  "dark:hover:border-brand-300",
-  "dark:hover:border-primary-300",
-  "dark:hover:border-success-300",
-  "dark:hover:border-warning-300",
-  "dark:hover:border-danger-300",
-  //Theme=DARK - State=HOVER - Element=RING
-  "dark:hover:ring-gray-300",
-  "dark:hover:ring-brand-300",
-  "dark:hover:ring-primary-300",
-  "dark:hover:ring-success-300",
-  "dark:hover:ring-warning-300",
-  "dark:hover:ring-danger-300",
-
-  //Theme=DARK - State=GROUP_HOVER - Element=TEXT
-  "dark:group-hover:text-gray-300",
-  "dark:group-hover:text-brand-300",
-  "dark:group-hover:text-primary-300",
-  "dark:group-hover:text-success-300",
-  "dark:group-hover:text-warning-300",
-  "dark:group-hover:text-danger-300",
-  //Theme=DARK - State=GROUP_HOVER - Element=BACKGROUND
-  "dark:group-hover:bg-gray-200",
-  "dark:group-hover:bg-brand-200",
-  "dark:group-hover:bg-primary-200",
-  "dark:group-hover:bg-success-200",
-  "dark:group-hover:bg-warning-200",
-  "dark:group-hover:bg-danger-200",
-  //Theme=DARK - State=GROUP_HOVER - Element=BORDER
-  "dark:group-hover:border-gray-300",
-  "dark:group-hover:border-brand-300",
-  "dark:group-hover:border-primary-300",
-  "dark:group-hover:border-success-300",
-  "dark:group-hover:border-warning-300",
-  "dark:group-hover:border-danger-300",
-  //Theme=DARK - State=GROUP_HOVER - Element=RING
-  "dark:group-hover:ring-gray-300",
-  "dark:group-hover:ring-brand-300",
-  "dark:group-hover:ring-primary-300",
-  "dark:group-hover:ring-success-300",
-  "dark:group-hover:ring-warning-300",
-  "dark:group-hover:ring-danger-300",
-
-  //Theme=DARK - State=FOCUS - Element=TEXT
-  "dark:focus:text-gray-300",
-  "dark:focus:text-brand-300",
-  "dark:focus:text-primary-300",
-  "dark:focus:text-success-300",
-  "dark:focus:text-warning-300",
-  "dark:focus:text-danger-300",
-  //Theme=DARK - State=FOCUS - Element=BACKGROUND
-  "dark:focus:bg-gray-200",
-  "dark:focus:bg-brand-200",
-  "dark:focus:bg-primary-200",
-  "dark:focus:bg-success-200",
-  "dark:focus:bg-warning-200",
-  "dark:focus:bg-danger-200",
-  //Theme=DARK - State=FOCUS - Element=BORDER
-  "dark:focus:border-gray-300",
-  "dark:focus:border-brand-300",
-  "dark:focus:border-primary-300",
-  "dark:focus:border-success-300",
-  "dark:focus:border-warning-300",
-  "dark:focus:border-danger-300",
-  //Theme=DARK - State=FOCUS - Element=RING
-  "dark:focus:ring-gray-300",
-  "dark:focus:ring-brand-300",
-  "dark:focus:ring-primary-300",
-  "dark:focus:ring-success-300",
-  "dark:focus:ring-warning-300",
-  "dark:focus:ring-danger-300",
-
-  //Theme=DARK - State=GROUP_FOCUS - Element=TEXT
-  "dark:group-focus:text-gray-300",
-  "dark:group-focus:text-brand-300",
-  "dark:group-focus:text-primary-300",
-  "dark:group-focus:text-success-300",
-  "dark:group-focus:text-warning-300",
-  "dark:group-focus:text-danger-300",
-  //Theme=DARK - State=GROUP_FOCUS - Element=BACKGROUND
-  "dark:group-focus:bg-gray-200",
-  "dark:group-focus:bg-brand-200",
-  "dark:group-focus:bg-primary-200",
-  "dark:group-focus:bg-success-200",
-  "dark:group-focus:bg-warning-200",
-  "dark:group-focus:bg-danger-200",
-  //Theme=DARK - State=GROUP_FOCUS - Element=BORDER
-  "dark:group-focus:border-gray-300",
-  "dark:group-focus:border-brand-300",
-  "dark:group-focus:border-primary-300",
-  "dark:group-focus:border-success-300",
-  "dark:group-focus:border-warning-300",
-  "dark:group-focus:border-danger-300",
-  //Theme=DARK - State=GROUP_FOCUS - Element=RING
-  "dark:group-focus:ring-gray-300",
-  "dark:group-focus:ring-brand-300",
-  "dark:group-focus:ring-primary-300",
-  "dark:group-focus:ring-success-300",
-  "dark:group-focus:ring-warning-300",
-  "dark:group-focus:ring-danger-300",
-
-  //Theme=DARK - State=FOCUS_WITHIN - Element=TEXT
-  "dark:focus-within:text-gray-300",
-  "dark:focus-within:text-brand-300",
-  "dark:focus-within:text-primary-300",
-  "dark:focus-within:text-success-300",
-  "dark:focus-within:text-warning-300",
-  "dark:focus-within:text-danger-300",
-  //Theme=DARK - State=FOCUS_WITHIN - Element=BACKGROUND
-  "dark:focus-within:bg-gray-200",
-  "dark:focus-within:bg-brand-200",
-  "dark:focus-within:bg-primary-200",
-  "dark:focus-within:bg-success-200",
-  "dark:focus-within:bg-warning-200",
-  "dark:focus-within:bg-danger-200",
-  //Theme=DARK - State=FOCUS_WITHIN - Element=BORDER
-  "dark:focus-within:border-gray-300",
-  "dark:focus-within:border-brand-300",
-  "dark:focus-within:border-primary-300",
-  "dark:focus-within:border-success-300",
-  "dark:focus-within:border-warning-300",
-  "dark:focus-within:border-danger-300",
-  //Theme=DARK - State=FOCUS_WITHIN - Element=RING
-  "dark:focus-within:ring-gray-300",
-  "dark:focus-within:ring-brand-300",
-  "dark:focus-within:ring-primary-300",
-  "dark:focus-within:ring-success-300",
-  "dark:focus-within:ring-warning-300",
-  "dark:focus-within:ring-danger-300",
-
-  //Theme=DARK - State=ACTIVE - Element=TEXT
-  "dark:active:text-gray-200",
-  "dark:active:text-brand-200",
-  "dark:active:text-primary-200",
-  "dark:active:text-success-200",
-  "dark:active:text-warning-200",
-  "dark:active:text-danger-200",
-  //Theme=DARK - State=ACTIVE - Element=BACKGROUND
-  "dark:active:bg-gray-100",
-  "dark:active:bg-brand-100",
-  "dark:active:bg-primary-100",
-  "dark:active:bg-success-100",
-  "dark:active:bg-warning-100",
-  "dark:active:bg-danger-100",
-  //Theme=DARK - State=ACTIVE - Element=BORDER
-  "dark:active:border-gray-200",
-  "dark:active:border-brand-200",
-  "dark:active:border-primary-200",
-  "dark:active:border-success-200",
-  "dark:active:border-warning-200",
-  "dark:active:border-danger-200",
-  //Theme=DARK - State=ACTIVE - Element=RING
-  "dark:active:ring-gray-200",
-  "dark:active:ring-brand-200",
-  "dark:active:ring-primary-200",
-  "dark:active:ring-success-200",
-  "dark:active:ring-warning-200",
-  "dark:active:ring-danger-200",
+const backgroundMediumIntent = [
+  "bg-gray-50 dark:bg-gray-900",
+  "bg-gray-100 dark:bg-gray-800",
+  "bg-gray-600 dark:bg-gray-300",
+  "bg-gray-700 dark:bg-gray-200",
+  "bg-brand-600 dark:bg-brand-300",
+  "bg-primary-600 dark:bg-primary-300",
+  "bg-success-600 dark:bg-success-300",
+  "bg-warning-600 dark:bg-warning-300",
+  "bg-danger-600 dark:bg-danger-300",
+  "bg-black dark:bg-white",
+  "bg-gray-50 dark:bg-gray-800", // Low Gray
+  "bg-brand-50 dark:bg-brand-800", // Low Brand
+  "bg-white dark:bg-gray-800", // Sharp
+  "bg-gray-800 dark:bg-gray-100", // Inverted Sharp
+  "bg-transparent", // Transparent
 ];
 
-// Number of colors per element = 2
-// Number of elements per selection = 3*2 = 6
-// Number of selections per theme = 4*6 = 24
-// Number of themes = 2*24 = 48
-const sThemeStride = 24;
-const sSelectionStride = 24;
-const sElementStride = 6;
-const selectionIntentClassnames = [
-  //Theme=LIGHT - Selection=NONE - Element=TEXT
-  "text-gray-600",
-  "text-gray-600",
-  //Theme=LIGHT - Selection=NONE - Element=BACKGROUND
-  "bg-transparent",
-  "bg-transparent",
-  //Theme=LIGHT - Selection=NONE - Element=BORDER
-  "border-transparent",
-  "border-transparent",
-  //Theme=LIGHT - Selection=FLYOVER - Element=TEXT
-  "text-gray-600",
-  "text-brand-500",
-  //Theme=LIGHT - Selection=FLYOVER - Element=BACKGROUND
-  "bg-gray-200",
-  "bg-transparent",
-  //Theme=LIGHT - Selection=FLYOVER - Element=BORDER
-  "border-gray-200",
-  "border-transparent",
-  //Theme=LIGHT - Selection=SELECTED - Element=TEXT
-  "text-gray-700",
-  "text-brand-600",
-  //Theme=LIGHT - Selection=SELECTED - Element=BACKGROUND
-  "bg-gray-200",
-  "bg-transparent",
-  //Theme=LIGHT - Selection=SELECTED - Element=BORDER
-  "border-gray-200",
-  "border-transparent",
-  //Theme=LIGHT - Selection=DISABLED - Element=TEXT
-  "text-gray-300",
-  "text-gray-300",
-  //Theme=LIGHT - Selection=DISABLED - Element=BACKGROUND
-  "bg-transparent",
-  "bg-transparent",
-  //Theme=LIGHT - Selection=DISABLED - Element=BORDER
-  "border-transparent",
-  "border-transparent",
-
-  //Theme=DARK - Selection=NONE - Element=TEXT
-  "text-gray-100",
-  "text-gray-100",
-  //Theme=DARK - Selection=NONE - Element=BACKGROUND
-  "bg-transparent",
-  "bg-transparent",
-  //Theme=DARK - Selection=NONE - Element=BORDER
-  "border-transparent",
-  "border-transparent",
-  //Theme=DARK - Selection=FLYOVER - Element=TEXT
-  "text-gray-100",
-  "text-brand-300",
-  //Theme=DARK - Selection=FLYOVER - Element=BACKGROUND
-  "bg-gray-700",
-  "bg-transparent",
-  //Theme=DARK - Selection=FLYOVER - Element=BORDER
-  "border-gray-700",
-  "border-transparent",
-  //Theme=DARK - Selection=SELECTED - Element=TEXT
-  "text-white",
-  "text-brand-200",
-  //Theme=DARK - Selection=SELECTED - Element=BACKGROUND
-  "bg-gray-700",
-  "bg-transparent",
-  //Theme=DARK - Selection=SELECTED - Element=BORDER
-  "border-gray-700",
-  "border-transparent",
-  //Theme=DARK - Selection=DISABLED - Element=TEXT
-  "text-gray-600",
-  "text-gray-600",
-  //Theme=DARK - Selection=DISABLED - Element=BACKGROUND
-  "bg-transparent",
-  "bg-transparent",
-  //Theme=DARK - Selection=DISABLED - Element=BORDER
-  "border-transparent",
-  "border-transparent",
+const backgroundHighIntent = [
+  "bg-gray-100 dark:bg-gray-800",
+  "bg-gray-200 dark:bg-gray-700",
+  "bg-gray-700 dark:bg-gray-200",
+  "bg-gray-800 dark:bg-gray-100",
+  "bg-brand-700 dark:bg-brand-200",
+  "bg-primary-700 dark:bg-primary-200",
+  "bg-success-700 dark:bg-success-200",
+  "bg-warning-700 dark:bg-warning-200",
+  "bg-danger-700 dark:bg-danger-200",
+  "bg-black dark:bg-white",
+  "bg-gray-50 dark:bg-gray-800", // Low Gray
+  "bg-brand-50 dark:bg-brand-800", // Low Brand
+  "bg-white dark:bg-gray-800", // Sharp
+  "bg-gray-800 dark:bg-gray-100", // Inverted Sharp
+  "bg-transparent", // Transparent
 ];
 
+const backgroundHighestIntent = [
+  "bg-gray-200 dark:bg-gray-700",
+  "bg-gray-300 dark:bg-gray-600",
+  "bg-gray-800 dark:bg-gray-100",
+  "bg-gray-900 dark:bg-gray-50",
+  "bg-brand-800 dark:bg-brand-100",
+  "bg-primary-800 dark:bg-primary-100",
+  "bg-success-800 dark:bg-success-100",
+  "bg-warning-800 dark:bg-warning-100",
+  "bg-danger-800 dark:bg-danger-100",
+  "bg-black dark:bg-white",
+  "bg-gray-50 dark:bg-gray-800", // Low Gray
+  "bg-brand-50 dark:bg-brand-800", // Low Brand
+  "bg-white dark:bg-gray-800", // Sharp
+  "bg-gray-800 dark:bg-gray-100", // Inverted Sharp
+  "bg-transparent", // Transparent
+];
+
+// Foreground
+/*const foregroundLowIntent = [
+  "text-gray-400 dark:text-gray-600",
+  "text-brand-400 dark:text-brand-600",
+  "text-primary-400 dark:text-primary-600",
+  "text-success-400 dark:text-success-600",
+  "text-warning-400 dark:text-warning-600",
+  "text-danger-400 dark:text-danger-600",
+  "text-gray-900 dark:text-white", // Sharp
+  "text-white dark:text-gray-900", // Inverted Sharp
+  "text-transparent", // Transparent
+];*/
+
+const foregroundMediumIntent = [
+  "text-gray-50 dark:text-gray-900",
+  "text-gray-100 dark:text-gray-800",
+  "text-gray-500 dark:text-gray-400",
+  "text-gray-700 dark:text-gray-200",
+  "text-brand-500 dark:text-brand-400",
+  "text-primary-500 dark:text-primary-400",
+  "text-success-500 dark:text-success-400",
+  "text-warning-500 dark:text-warning-400",
+  "text-danger-500 dark:text-danger-400",
+  "text-black dark:text-white",
+  "text-gray-300 dark:text-gray-600", // Low Gray
+  "text-brand-300 dark:text-brand-600", // Low Brand
+  "text-gray-900 dark:text-white", // Sharp
+  "text-white dark:text-gray-900", // Inverted Sharp
+  "text-transparent", // Transparent
+];
+
+const foregroundHighIntent = [
+  "text-gray-100 dark:text-gray-800",
+  "text-gray-200 dark:text-gray-700",
+  "text-gray-600 dark:text-gray-300",
+  "text-gray-800 dark:text-gray-100",
+  "text-brand-600 dark:text-brand-300",
+  "text-primary-600 dark:text-primary-300",
+  "text-success-600 dark:text-success-300",
+  "text-warning-600 dark:text-warning-300",
+  "text-danger-600 dark:text-danger-300",
+  "text-black dark:text-white",
+  "text-gray-300 dark:text-gray-600", // Low Gray
+  "text-brand-300 dark:text-brand-600", // Low Brand
+  "text-gray-900 dark:text-white", // Sharp
+  "text-white dark:text-gray-900", // Inverted Sharp
+  "text-transparent", // Transparent
+];
+
+const foregroundHighestIntent = [
+  "text-gray-200 dark:text-gray-700",
+  "text-gray-300 dark:text-gray-600",
+  "text-gray-700 dark:text-gray-200",
+  "text-gray-900 dark:text-gray-50",
+  "text-brand-700 dark:text-brand-300",
+  "text-primary-700 dark:text-primary-200",
+  "text-success-700 dark:text-success-200",
+  "text-warning-700 dark:text-warning-200",
+  "text-danger-700 dark:text-danger-200",
+  "text-black dark:text-white",
+  "text-gray-300 dark:text-gray-600", // Low Gray
+  "text-brand-300 dark:text-brand-600", // Low Brand
+  "text-gray-900 dark:text-white", // Sharp
+  "text-white dark:text-gray-900", // Inverted Sharp
+  "text-transparent", // Transparent
+];
+
+// Border
+/*const borderLowIntent = [
+  "border-gray-400 dark:border-gray-600",
+  "border-brand-400 dark:border-brand-600",
+  "border-primary-400 dark:border-primary-600",
+  "border-success-400 dark:border-success-600",
+  "border-warning-400 dark:border-warning-600",
+  "border-danger-400 dark:border-danger-600",
+  "border-gray-900 dark:border-white", // Sharp
+  "border-white dark:border-gray-900", // Inverted Sharp
+  "border-transparent", // Transparent
+];*/
+
+const borderMediumIntent = [
+  "border-gray-50 dark:border-gray-900",
+  "border-gray-100 dark:border-gray-800",
+  "border-gray-500 dark:border-gray-400",
+  "border-gray-700 dark:border-gray-200",
+  "border-brand-500 dark:border-brand-400",
+  "border-primary-500 dark:border-primary-400",
+  "border-success-500 dark:border-success-400",
+  "border-warning-500 dark:border-warning-400",
+  "border-danger-500 dark:border-danger-400",
+  "border-black dark:border-white",
+  "border-gray-300 dark:border-gray-600", // Low Gray
+  "border-brand-300 dark:border-brand-600", // Low Brand
+  "border-gray-800 dark:border-white", // Sharp
+  "border-white dark:border-gray-800", // Inverted Sharp
+  "border-transparent", // Transparent
+];
+
+const borderHighIntent = [
+  "border-gray-100 dark:border-gray-800",
+  "border-gray-200 dark:border-gray-700",
+  "border-gray-600 dark:border-gray-300",
+  "border-gray-800 dark:border-gray-100",
+  "border-brand-600 dark:border-brand-300",
+  "border-primary-600 dark:border-primary-300",
+  "border-success-600 dark:border-success-300",
+  "border-warning-600 dark:border-warning-300",
+  "border-danger-600 dark:border-danger-300",
+  "border-black dark:border-white",
+  "border-gray-300 dark:border-gray-600", // Low Gray
+  "border-brand-300 dark:border-brand-600", // Low Brand
+  "border-gray-800 dark:border-white", // Sharp
+  "border-white dark:border-gray-800", // Inverted Sharp
+  "border-transparent", // Transparent
+];
+
+const borderHighestIntent = [
+  "border-gray-200 dark:border-gray-700",
+  "border-gray-300 dark:border-gray-600",
+  "border-gray-700 dark:border-gray-200",
+  "border-gray-900 dark:border-gray-50",
+  "border-brand-700 dark:border-brand-300",
+  "border-primary-700 dark:border-primary-200",
+  "border-success-700 dark:border-success-200",
+  "border-warning-700 dark:border-warning-200",
+  "border-danger-700 dark:border-danger-200",
+  "border-black dark:border-white",
+  "border-gray-300 dark:border-gray-600", // Low Gray
+  "border-brand-300 dark:border-brand-600", // Low Brand
+  "border-gray-800 dark:border-white", // Sharp
+  "border-white dark:border-gray-800", // Inverted Sharp
+  "border-transparent", // Transparent
+];
+
+// Ring
+/*const ringLowIntent = [
+  "ring-gray-400 dark:ring-gray-600",
+  "ring-brand-400 dark:ring-brand-600",
+  "ring-primary-400 dark:ring-primary-600",
+  "ring-success-400 dark:ring-success-600",
+  "ring-warning-400 dark:ring-warning-600",
+  "ring-danger-400 dark:ring-danger-600",
+  "ring-gray-900 dark:ring-white", // Sharp
+  "ring-white dark:ring-gray-900", // Inverted Sharp
+  "ring-transparent", // Transparent
+];*/
+
+const ringMediumIntent = [
+  "ring-gray-50 dark:ring-gray-900",
+  "ring-gray-100 dark:ring-gray-800",
+  "ring-gray-500 dark:ring-gray-400",
+  "ring-gray-700 dark:ring-gray-200",
+  "ring-brand-500 dark:ring-brand-400",
+  "ring-primary-500 dark:ring-primary-400",
+  "ring-success-500 dark:ring-success-400",
+  "ring-warning-500 dark:ring-warning-400",
+  "ring-danger-500 dark:ring-danger-400",
+  "ring-black dark:ring-white",
+  "ring-gray-300 dark:ring-gray-600", // Low Gray
+  "ring-brand-300 dark:ring-brand-600", // Low Brand
+  "ring-gray-800 dark:ring-white", // Sharp
+  "ring-white dark:ring-gray-800", // Inverted Sharp
+  "ring-transparent", // Transparent
+];
+
+const ringHighIntent = [
+  "ring-gray-100 dark:ring-gray-800",
+  "ring-gray-200 dark:ring-gray-700",
+  "ring-gray-600 dark:ring-gray-300",
+  "ring-gray-800 dark:ring-gray-100",
+  "ring-brand-600 dark:ring-brand-300",
+  "ring-primary-600 dark:ring-primary-300",
+  "ring-success-600 dark:ring-success-300",
+  "ring-warning-600 dark:ring-warning-300",
+  "ring-danger-600 dark:ring-danger-300",
+  "ring-black dark:ring-white",
+  "ring-gray-300 dark:ring-gray-600", // Low Gray
+  "ring-brand-300 dark:ring-brand-600", // Low Brand
+  "ring-gray-800 dark:ring-white", // Sharp
+  "ring-white dark:ring-gray-800", // Inverted Sharp
+  "ring-transparent", // Transparent
+];
+
+const ringHighestIntent = [
+  "ring-gray-200 dark:ring-gray-700",
+  "ring-gray-300 dark:ring-gray-600",
+  "ring-gray-700 dark:ring-gray-200",
+  "ring-gray-900 dark:ring-gray-50",
+  "ring-brand-700 dark:ring-brand-300",
+  "ring-primary-700 dark:ring-primary-200",
+  "ring-success-700 dark:ring-success-200",
+  "ring-warning-700 dark:ring-warning-200",
+  "ring-danger-700 dark:ring-danger-200",
+  "ring-black dark:ring-white",
+  "ring-gray-300 dark:ring-gray-600", // Low Gray
+  "ring-brand-300 dark:ring-brand-600", // Low Brand
+  "ring-gray-800 dark:ring-white", // Sharp
+  "ring-white dark:ring-gray-800", // Inverted Sharp
+  "ring-transparent", // Transparent
+];
+
+// Low Gray Index
+const INDEX_LOW_GRAY = 10;
+
+// Low Brand Index
+const INDEX_LOW_BRAND = 11;
+
+// Sharp Index
+const INDEX_SHARP = 12;
+
+// Inverted Sharp Index
+const INDEX_INVERTED_SHARP = 13;
+
+// Transparent Index
+const INDEX_TRANSPARENT = 14;
+
 /**
- * Build state intent style given the intent theme, state, element, and color
- * @param intentTheme - The intent theme to use for the style generation
- * @param intentState - The intent state to use for the style generation
- * @param intentElement - The intent element to use for the style generation
- * @param intentColor - The intent color to use for the style generation
- * @returns the corresponding intent style
+ * Compute the component style given the style entry
+ * @param intentColor - The intent color
+ * @param outlined - Tells if component is outlined
+ * @param ringed - Tells if component is ringed
+ * @param minimal - Tells if component is minimal (without background, without border and without ring)
+ * @param backgroundOpacity - Background opacity (Take precedence over Background fade)
+ * @param backgroundFade - Tells if component background is fade
+ * @param foregroundOpacity - Foreground opacity (Take precedence over Foreground fade)
+ * @param foregroundFade - Tells if component foreground is fade
+ * @param borderOpacity - Border opacity (Take precedence over Border fade)
+ * @param borderFade - Tells if component border is fade
+ * @param ringOpacity - Ring opacity (Take precedence over Ring fade)
+ * @param ringedFade - Tells if component ring is fade
+ * @param forceLowGrayBackground - Force component background to low gray even if minimal
+ * @param forceLowGrayForeground - Force component foreground to low gray
+ * @param forceLowGrayOutline - Force component outline to low gray even if minimal
+ * @param forceLowBrandBackground - Force component background to low brand even if minimal
+ * @param forceLowBrandForeground - Force component foreground to low brand
+ * @param forceLowBrandOutline - Force component outline to low brand even if minimal
+ * @param forceSharpBackground - Force component sharp background
+ * @param forceSharpForeground - Force component sharp foreground
+ * @param forceSharpBorder - Force component sharp border
+ * @param forceSharpRing - Force component sharp ring
+ * @param forceInvertedSharpBackground - Force component inverted sharp background
+ * @param forceInvertedSharpForeground - Force component inverted sharp foreground
+ * @param forceInvertedSharpBorder - Force component inverted sharp border
+ * @param forceInvertedSharpRing - Force component sharp inverted ring
+ * @param withFocusRing - Add a focus ring (typically low intent border)
+ * @param withPlaceholder - Add placeholder style
+ * @param disablePointerEvents - Disable pointer events
+ * @param removeDefaultBrowserAppearance - Remove default browser appearance
+ * @param cursor - Cursor
+ * @param backgroundIntentData - Background intent data
+ * @param foregroundIntentData - Foreground intent data
+ * @param borderIntentData - Border intent data
+ * @param ringIntentData - Ring intent data
+ * @returns the computed component style
  */
-export function stateIntentStyleBuilderAtomic(
-  intentTheme: IntentTheme,
-  intentState: IntentState,
-  intentElement: IntentElement,
-  intentColor: IntentColor
-): string {
-  const globalIndex =
-    Number(intentTheme) * gThemeStride +
-    Number(intentState) * gStateStride +
-    Number(intentElement) * gElementStride +
-    Number(intentColor);
-
-  return stateIntentClassnames[globalIndex];
-}
-
-/**
- * Build selection intent style given the intent theme, state, element, and color
- * @param intentTheme - The intent theme to use for the style generation
- * @param intentSelection - The intent selection to use for the style generation
- * @param intentElement - The intent element to use for the style generation
- * @param intentColor - The intent color to use for the style generation
- * @returns the corresponding intent style
- */
-export function selectionIntentStyleBuilderAtomic(
-  intentTheme: IntentTheme,
-  intentSelection: IntentSelection,
-  intentElement: IntentElement,
-  intentColor: IntentColor
-): string {
-  const intentColorFinal = Math.min(Math.abs(Number(intentColor)), 1);
-  const intentElementFinal = Math.min(Math.abs(Number(intentElement)), 2);
-  const selectionIndex =
-    Number(intentTheme) * sThemeStride +
-    Number(intentSelection) * sSelectionStride +
-    intentElementFinal * sElementStride +
-    intentColorFinal;
-
-  return selectionIntentClassnames[selectionIndex];
-}
-
-/**
- * Build state intent style given the intent theme list, state list, element list, and color
- * @param intentThemes - The list of intent theme to use for the style generation
- * @param intentStates - The list of intent state to use for the style generation
- * @param intentElements - The list of intent element to use for the style generation
- * @param intentColor - The intent color to use for the style generation
- * @returns the corresponding intent style
- */
-export function stateIntentStyleBuilderCustom(
-  intentThemes: IntentTheme[],
-  intentStates: IntentState[],
-  intentElements: IntentElement[],
-  intentColor: IntentColor
+export function computeComponentStyle(
+  intentColor: IntentColor,
+  outlined: boolean,
+  ringed: boolean,
+  minimal: boolean,
+  backgroundOpacity: BackgroundOpacityType,
+  backgroundFade: boolean,
+  foregroundOpacity: ForegroundOpacityType,
+  foregroundFade: boolean,
+  borderOpacity: BorderOpacityType,
+  borderFade: boolean,
+  ringOpacity: RingOpacityType,
+  ringedFade: boolean,
+  forceLowGrayBackground: boolean,
+  forceLowGrayForeground: boolean,
+  forceLowGrayOutline: boolean,
+  forceLowBrandBackground: boolean,
+  forceLowBrandForeground: boolean,
+  forceLowBrandOutline: boolean,
+  forceSharpBackground: boolean,
+  forceSharpForeground: boolean,
+  forceSharpBorder: boolean,
+  forceSharpRing: boolean,
+  forceInvertedSharpBackground: boolean,
+  forceInvertedSharpForeground: boolean,
+  forceInvertedSharpBorder: boolean,
+  forceInvertedSharpRing: boolean,
+  withFocusRing: boolean,
+  withPlaceholder: boolean,
+  disablePointerEvents: boolean,
+  removeDefaultBrowserAppearance: boolean,
+  cursor: CursorType,
+  backgroundIntentData: string[],
+  foregroundIntentData: string[],
+  borderIntentData: string[],
+  ringIntentData: string[]
 ): string {
   const res: string[] = [];
-
-  intentThemes.forEach(intentTheme => {
-    intentStates.forEach(intentState => {
-      intentElements.forEach(intentElement =>
-        res.push(
-          stateIntentStyleBuilderAtomic(intentTheme, intentState, intentElement, intentColor)
-        )
-      );
-    });
-  });
-
-  return res.join(" ");
-}
-
-/**
- * Build selection intent style given the intent theme list, state list, element list, and color
- * @param intentThemes - The list of intent theme to use for the style generation
- * @param intentSelections - The list of intent selection to use for the style generation
- * @param intentElements - The list of intent element to use for the style generation
- * @param intentColor - The intent color to use for the style generation
- * @returns the corresponding intent style
- */
-export function selectionIntentStyleBuilderCustom(
-  intentThemes: IntentTheme[],
-  intentSelections: IntentSelection[],
-  intentElements: IntentElement[],
-  intentColor: IntentColor
-): string {
-  const res: string[] = [];
-
-  intentThemes.forEach(intentTheme => {
-    intentSelections.forEach(intentState => {
-      intentElements.forEach(intentElement =>
-        res.push(
-          selectionIntentStyleBuilderAtomic(intentTheme, intentState, intentElement, intentColor)
-        )
-      );
-    });
-  });
-
-  return res.join(" ");
-}
-
-/**
- * Build state intent style given the intent style input
- * @param input - The intent style builder input to use for the style generation
- * @returns the corresponding state intent style
- */
-export function stateIntentStyleBuilder(input: StateIntentStyleBuilderInput): string {
-  const res: string[] = [];
-
-  const itentColorFinal = input.intentColor ?? IntentColor.GRAY;
-  const intentThemes: IntentTheme[] = [IntentTheme.LIGHT];
-  const intentStates = [];
-
-  // Dark Theme
-  if (input.useDarkTheme) {
-    intentThemes.push(IntentTheme.DARK);
-  }
-
-  // Default state
-  if (input.useDefaultState) {
-    intentStates.push(IntentState.NONE);
-  }
-
-  // Hover state
-  if (input.useHoverState) {
-    intentStates.push(IntentState.HOVER);
-  }
-
-  // Focus state
-  if (input.useFocusState) {
-    intentStates.push(IntentState.FOCUS);
-  }
-
-  // Active state
-  if (input.useActiveState) {
-    intentStates.push(IntentState.ACTIVE);
-  }
 
   // Background Element
-  if (!input.minimal && !input.outlined) {
-    const intentElements = [IntentElement.BACKGROUND];
+  const bgIndex =
+    forceSharpBackground || outlined
+      ? INDEX_SHARP
+      : forceInvertedSharpBackground
+      ? INDEX_INVERTED_SHARP
+      : forceLowGrayBackground
+      ? INDEX_LOW_GRAY
+      : forceLowBrandBackground
+      ? INDEX_LOW_BRAND
+      : !minimal && !outlined
+      ? Number(intentColor)
+      : INDEX_TRANSPARENT;
 
-    res.push(
-      stateIntentStyleBuilderCustom(intentThemes, intentStates, intentElements, itentColorFinal)
-    );
-  }
+  res.push(backgroundIntentData[bgIndex]);
+
+  // Background Opacity & Fade
+  (backgroundOpacity !== "bg-opacity-100" || backgroundFade) &&
+    res.push(backgroundOpacity !== "bg-opacity-100" ? backgroundOpacity : "bg-opacity-50");
+
+  // Foreground Element
+  const fgIndex = forceSharpForeground
+    ? INDEX_SHARP
+    : forceInvertedSharpForeground
+    ? INDEX_INVERTED_SHARP
+    : forceLowGrayForeground
+    ? INDEX_LOW_GRAY
+    : forceLowBrandForeground
+    ? INDEX_LOW_BRAND
+    : minimal || outlined
+    ? Number(intentColor)
+    : Number(intentColor) >= Number(IntentColor.GRAY)
+    ? INDEX_INVERTED_SHARP
+    : INDEX_SHARP;
+
+  res.push(foregroundIntentData[fgIndex]);
+
+  // Foreground Opacity & Fade
+  (foregroundOpacity !== "text-opacity-100" || foregroundFade) &&
+    res.push(foregroundOpacity !== "text-opacity-100" ? foregroundOpacity : "text-opacity-50");
 
   // Border Element
-  if (!input.minimal && input.outlined) {
-    const intentElements = [IntentElement.BORDER];
+  if (
+    (!minimal && outlined) ||
+    forceSharpBorder ||
+    forceInvertedSharpBorder ||
+    forceLowGrayOutline
+  ) {
+    const brdIndex = forceSharpBorder
+      ? INDEX_SHARP
+      : forceInvertedSharpBorder
+      ? INDEX_INVERTED_SHARP
+      : forceLowGrayOutline
+      ? INDEX_LOW_GRAY
+      : forceLowBrandOutline
+      ? INDEX_LOW_BRAND
+      : outlined
+      ? Number(intentColor)
+      : INDEX_INVERTED_SHARP;
 
-    res.push(
-      stateIntentStyleBuilderCustom(intentThemes, intentStates, intentElements, itentColorFinal)
-    );
+    res.push(borderIntentData[brdIndex]);
   }
+
+  // Border Opacity & Fade
+  (borderOpacity !== "border-opacity-100" || borderFade) &&
+    res.push(borderOpacity !== "border-opacity-100" ? borderOpacity : "border-opacity-50");
 
   // Ring Element
-  if (!input.minimal && input.ringed) {
-    const intentElements = [IntentElement.RING];
+  if ((!minimal && ringed) || forceSharpRing || forceInvertedSharpRing || withFocusRing) {
+    const ringIndex = forceSharpRing
+      ? INDEX_SHARP
+      : forceInvertedSharpRing
+      ? INDEX_INVERTED_SHARP
+      : withFocusRing
+      ? INDEX_LOW_GRAY
+      : ringed
+      ? Number(intentColor)
+      : INDEX_INVERTED_SHARP;
 
-    res.push(
-      stateIntentStyleBuilderCustom(intentThemes, intentStates, intentElements, itentColorFinal)
-    );
-
-    if (input.ringedFade) {
-      const className = "ring-opacity-50";
-      res.push(className);
-    }
+    res.push(ringIntentData[ringIndex]);
   }
 
-  // Foreground (Text) Element
-  if (input.withForeground) {
-    if (input.minimal || input.outlined) {
-      const intentElements = [IntentElement.TEXT];
+  // Ring Opacity & Fade
+  (ringOpacity !== "ring-opacity-100" || ringedFade) &&
+    res.push(ringOpacity !== "ring-opacity-100" ? ringOpacity : "ring-opacity-50");
 
-      res.push(
-        stateIntentStyleBuilderCustom(intentThemes, intentStates, intentElements, itentColorFinal)
-      );
-    } else {
-      res.push("text-white");
-      if (input.useDarkTheme) {
-        res.push("dark:text-gray-700");
-      }
-    }
-  }
+  // Placeholder style
+  withPlaceholder &&
+    res.push("placeholder-gray-900 dark:placeholder-gray-100 placeholder-opacity-30");
+
+  // Disable pointer events
+  disablePointerEvents && res.push("pointer-events-none");
+
+  // Default browser appearance removal
+  removeDefaultBrowserAppearance && res.push("appearance-none outline-none focus:outline-none");
+
+  // Cursor
+  cursor !== "cursor-auto" && res.push(cursor);
 
   return res.join(" ");
 }
 
 /**
- * Build selection intent style given the intent style input
+ * Build intent style given the component state and the intent style input
+ * @param state - The component current state
  * @param input - The intent style builder input to use for the style generation
- * @returns the corresponding state intent style
+ * @returns the generated intent style
  */
-export function selectionIntentStyleBuilder(input: SelectionIntentStyleBuilderInput): string {
-  const res: string[] = [];
+export function intentStyleBuilder(state: IntentState, input: IntentStyleBuilderInput): string {
+  let res: string = "";
+  const defaultIntentAtDefaultState = input.intentAtDefaultState ?? true;
+  const defaultIntentColor = input.useDarkGrayAsDefaultIntent
+    ? IntentColor.GRAY_DARK
+    : IntentColor.GRAY;
+  const intentColorFinal = input.intentColor ?? defaultIntentColor;
 
-  const itentColorFinal = input.intentColor ?? IntentColor.GRAY;
-  const intentThemes: IntentTheme[] = [IntentTheme.LIGHT];
-  const intentSelections = [];
+  switch (state) {
+    case IntentState.DEFAULT:
+      res = computeComponentStyle(
+        defaultIntentAtDefaultState ? intentColorFinal : defaultIntentColor,
+        input.outlined ?? false,
+        input.ringed ?? false,
+        input.minimal ?? false,
+        input.backgroundOpacity ?? "bg-opacity-100",
+        input.backgroundFade ?? false,
+        input.foregroundOpacity ?? "text-opacity-100",
+        input.foregroundFade ?? false,
+        input.borderOpacity ?? "border-opacity-100",
+        input.borderFade ?? false,
+        input.ringOpacity ?? "ring-opacity-100",
+        input.ringedFade ?? false,
+        false,
+        input.forceLowGrayForeground ?? false,
+        false,
+        false,
+        input.forceLowBrandForeground ?? false,
+        false,
+        input.forceSharpBackground ?? false,
+        input.forceSharpForeground ?? false,
+        input.forceSharpBorder ?? false,
+        input.forceSharpRing ?? false,
+        input.forceInvertedSharpBackground ?? false,
+        input.forceInvertedSharpForeground ?? false,
+        input.forceInvertedSharpBorder ?? false,
+        input.forceInvertedSharpRing ?? false,
+        input.withFocusRing ?? false,
+        input.withPlaceholder ?? false,
+        input.disablePointerEvents ?? false,
+        input.removeDefaultBrowserAppearance ?? false,
+        input.cursor ?? "cursor-auto",
+        backgroundMediumIntent,
+        foregroundMediumIntent,
+        borderMediumIntent,
+        ringMediumIntent
+      );
+      break;
 
-  if (input.flyOver) {
-    intentSelections.push(IntentSelection.FLYOVER);
-  } else if (input.selected) {
-    intentSelections.push(IntentSelection.SELECTED);
-  } else if (input.disabled) {
-    intentSelections.push(IntentSelection.DISABLED);
-  } else {
-    intentSelections.push(IntentSelection.NONE);
+    case IntentState.HOVER:
+      res = computeComponentStyle(
+        intentColorFinal,
+        input.outlined ?? false,
+        input.ringed ?? false,
+        input.minimal ?? false,
+        input.backgroundOpacity ?? "bg-opacity-100",
+        input.backgroundFade ?? false,
+        input.foregroundOpacity ?? "text-opacity-100",
+        input.foregroundFade ?? false,
+        input.borderOpacity ?? "border-opacity-100",
+        input.borderFade ?? false,
+        input.ringOpacity ?? "ring-opacity-100",
+        input.ringedFade ?? false,
+        input.forceLowGrayBackgroundAtHoverState ?? false,
+        input.forceLowGrayForeground ?? false,
+        input.forceLowGrayOutlineAtHoverState ?? false,
+        input.forceLowBrandBackgroundAtHoverState ?? false,
+        input.forceLowBrandForeground ?? false,
+        input.forceLowBrandOutlineAtHoverState ?? false,
+        input.forceSharpBackground ?? false,
+        input.forceSharpForeground ?? false,
+        input.forceSharpBorder ?? false,
+        input.forceSharpRing ?? false,
+        input.forceInvertedSharpBackground ?? false,
+        input.forceInvertedSharpForeground ?? false,
+        input.forceInvertedSharpBorder ?? false,
+        input.forceInvertedSharpRing ?? false,
+        input.withFocusRing ?? false,
+        input.withPlaceholder ?? false,
+        input.disablePointerEvents ?? false,
+        input.removeDefaultBrowserAppearance ?? false,
+        input.cursor ?? "cursor-auto",
+        backgroundHighIntent,
+        foregroundHighIntent,
+        borderHighIntent,
+        ringHighIntent
+      );
+      break;
+
+    case IntentState.FOCUS:
+      res = computeComponentStyle(
+        intentColorFinal,
+        input.outlined ?? false,
+        input.ringed ?? false,
+        input.minimal ?? false,
+        input.backgroundOpacity ?? "bg-opacity-100",
+        input.backgroundFade ?? false,
+        input.foregroundOpacity ?? "text-opacity-100",
+        input.foregroundFade ?? false,
+        input.borderOpacity ?? "border-opacity-100",
+        input.borderFade ?? false,
+        input.ringOpacity ?? "ring-opacity-100",
+        input.ringedFade ?? false,
+        input.forceLowGrayBackgroundAtHoverState ?? false,
+        input.forceLowGrayForeground ?? false,
+        input.forceLowGrayOutlineAtHoverState ?? false,
+        input.forceLowBrandBackgroundAtHoverState ?? false,
+        input.forceLowBrandForeground ?? false,
+        input.forceLowBrandOutlineAtHoverState ?? false,
+        input.forceSharpBackground ?? false,
+        input.forceSharpForeground ?? false,
+        input.forceSharpBorder ?? false,
+        input.forceSharpRing ?? false,
+        input.forceInvertedSharpBackground ?? false,
+        input.forceInvertedSharpForeground ?? false,
+        input.forceInvertedSharpBorder ?? false,
+        input.forceInvertedSharpRing ?? false,
+        input.withFocusRing ?? false,
+        input.withPlaceholder ?? false,
+        input.disablePointerEvents ?? false,
+        input.removeDefaultBrowserAppearance ?? false,
+        input.cursor ?? "cursor-auto",
+        backgroundHighIntent,
+        foregroundHighIntent,
+        borderHighIntent,
+        ringHighIntent
+      );
+      break;
+
+    case IntentState.PRESSED:
+      res = computeComponentStyle(
+        intentColorFinal,
+        input.outlined ?? false,
+        input.ringed ?? false,
+        input.minimal ?? false,
+        input.backgroundOpacity ?? "bg-opacity-100",
+        input.backgroundFade ?? false,
+        input.foregroundOpacity ?? "text-opacity-100",
+        input.foregroundFade ?? false,
+        input.borderOpacity ?? "border-opacity-100",
+        input.borderFade ?? false,
+        input.ringOpacity ?? "ring-opacity-100",
+        input.ringedFade ?? false,
+        input.forceLowGrayBackgroundAtHoverState ?? false,
+        input.forceLowGrayForeground ?? false,
+        input.forceLowGrayOutlineAtHoverState ?? false,
+        input.forceLowBrandBackgroundAtHoverState ?? false,
+        input.forceLowBrandForeground ?? false,
+        input.forceLowBrandOutlineAtHoverState ?? false,
+        input.forceSharpBackground ?? false,
+        input.forceSharpForeground ?? false,
+        input.forceSharpBorder ?? false,
+        input.forceSharpRing ?? false,
+        input.forceInvertedSharpBackground ?? false,
+        input.forceInvertedSharpForeground ?? false,
+        input.forceInvertedSharpBorder ?? false,
+        input.forceInvertedSharpRing ?? false,
+        input.withFocusRing ?? false,
+        input.withPlaceholder ?? false,
+        input.disablePointerEvents ?? false,
+        input.removeDefaultBrowserAppearance ?? false,
+        input.cursor ?? "cursor-auto",
+        backgroundHighestIntent,
+        foregroundHighestIntent,
+        borderHighestIntent,
+        ringHighestIntent
+      );
+      break;
+
+    case IntentState.DISABLED:
+      res = computeComponentStyle(
+        defaultIntentAtDefaultState ? intentColorFinal : defaultIntentColor,
+        input.outlined ?? false,
+        input.ringed ?? false,
+        input.minimal ?? false,
+        input.backgroundOpacity ?? "bg-opacity-100",
+        true,
+        input.foregroundOpacity ?? "text-opacity-100",
+        true,
+        input.borderOpacity ?? "border-opacity-100",
+        true,
+        input.ringOpacity ?? "ring-opacity-100",
+        true,
+        false,
+        input.forceLowGrayForeground ?? false,
+        false,
+        false,
+        input.forceLowBrandForeground ?? false,
+        false,
+        input.forceSharpBackground ?? false,
+        input.forceSharpForeground ?? false,
+        input.forceSharpBorder ?? false,
+        input.forceSharpRing ?? false,
+        input.forceInvertedSharpBackground ?? false,
+        input.forceInvertedSharpForeground ?? false,
+        input.forceInvertedSharpBorder ?? false,
+        input.forceInvertedSharpRing ?? false,
+        input.withFocusRing ?? false,
+        input.withPlaceholder ?? false,
+        true,
+        input.removeDefaultBrowserAppearance ?? false,
+        input.cursor ?? "cursor-auto",
+        backgroundMediumIntent,
+        foregroundMediumIntent,
+        borderMediumIntent,
+        ringMediumIntent
+      );
+      break;
   }
 
-  // Dark Theme
-  if (input.useDarkTheme) {
-    intentThemes.push(IntentTheme.DARK);
-  }
-
-  // Background Element
-  {
-    const intentElements = [IntentElement.BACKGROUND];
-
-    res.push(
-      selectionIntentStyleBuilderCustom(
-        intentThemes,
-        intentSelections,
-        intentElements,
-        itentColorFinal
-      )
-    );
-  }
-
-  // Border Element
-  {
-    const intentElements = [IntentElement.BORDER];
-
-    res.push(
-      selectionIntentStyleBuilderCustom(
-        intentThemes,
-        intentSelections,
-        intentElements,
-        itentColorFinal
-      )
-    );
-  }
-
-  // Text Element
-  {
-    const intentElements = [IntentElement.TEXT];
-
-    res.push(
-      selectionIntentStyleBuilderCustom(
-        intentThemes,
-        intentSelections,
-        intentElements,
-        itentColorFinal
-      )
-    );
-  }
-  return res.join(" ");
+  return res;
 }
+
+/**
+ * Build debug intent style given the debug intent style input
+ * @param debugMode - Tell if debug mode is activated
+ * @param intentColor - The debug intent color
+ * @returns the generated debug intent style
+ */
+export function debugIntentStyleBuilder(debugMode: boolean, intentColor: IntentColor): string {
+  let res = "";
+
+  if (debugMode) {
+    res = borderMediumIntent[Number(intentColor)];
+  }
+
+  return res;
+}
+
+/**
+ * Build default browser appearance removal intent style
+ * @returns the generated default appearance removal intent style
+ */
+// export function defaultAppearanceRemovalIntentStyleBuilder(): string {
+//   return "appearance-none outline-none focus:outline-none";
+// }

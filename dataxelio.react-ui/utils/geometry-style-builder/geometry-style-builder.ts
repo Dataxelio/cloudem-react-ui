@@ -1,13 +1,13 @@
 import {
   WidthType,
+  MaxWidthType,
+  MinWidthType,
   HeightType,
+  MaxHeightType,
+  MinHeightType,
   BorderWidthType,
-  HoverBorderWidthType,
-  FocusBorderWidthType,
   BorderRadiusType,
   RingWidthType,
-  HoverRingWidthType,
-  FocusRingWidthType,
   LeftPaddingType,
   RightPaddingType,
   HorizontalPaddingType,
@@ -15,23 +15,30 @@ import {
   BottomPaddingType,
   VerticalPaddingType,
   BoxShadowType,
+  TransformOriginType,
+  TransformScaleType,
+  TransformRotateType,
+  TransformTranslateType,
 } from "@dataxelio/react-ui.utils.prop-types";
 
 export type GeometryStyleBuilderInput = {
+  fixed?: boolean;
   fill?: boolean;
   minimal?: boolean;
   outlined?: boolean;
   ringed?: boolean;
 
   width?: WidthType;
+  maxWidth?: MaxWidthType;
+  minWidth?: MinWidthType;
   height?: HeightType;
+  maxHeight?: MaxHeightType;
+  minHeight?: MinHeightType;
   borderWidth?: BorderWidthType;
-  hoverBorderWidth?: HoverBorderWidthType;
-  focusBorderWidth?: FocusBorderWidthType;
+  forceOutline?: boolean;
   borderRadius?: BorderRadiusType;
   ringWidth?: RingWidthType;
-  hoverRingWidth?: HoverRingWidthType;
-  focusRingWidth?: FocusRingWidthType;
+  forceRing?: boolean;
   leftPadding?: LeftPaddingType;
   rightPadding?: RightPaddingType;
   horizontalPadding?: HorizontalPaddingType;
@@ -39,6 +46,10 @@ export type GeometryStyleBuilderInput = {
   bottomPadding?: BottomPaddingType;
   verticalPadding?: VerticalPaddingType;
   boxShadow?: BoxShadowType;
+  transformOrigin?: TransformOriginType;
+  transformScale?: TransformScaleType;
+  transformRotate?: TransformRotateType;
+  transformTranslate?: TransformTranslateType;
 };
 
 /**
@@ -50,78 +61,97 @@ export function geometryStyleBuilder(input: GeometryStyleBuilderInput): string {
   const res: string[] = [];
 
   // Width & Height
-  {
-    const classNameW = input.fill ? "w-full" : input.width || "w-auto";
-    const classNameH = input.height || "h-auto";
-    res.push(classNameW, classNameH);
-  }
+  res.push(
+    input.fixed ? "container" : input.fill ? "w-full" : input.width ?? "w-auto",
+    input.height ?? "h-auto"
+  );
+
+  // Max Width
+  !!input.maxWidth && res.push(input.maxWidth);
+
+  // Min Width
+  !!input.minWidth && res.push(input.minWidth);
+
+  // Max Height
+  !!input.maxHeight && res.push(input.maxHeight);
+
+  // Min Height
+  !!input.minHeight && res.push(input.minHeight);
 
   // Border width
-  if (input.outlined && !input.minimal) {
-    // Default state
-    if (input.borderWidth) {
-      res.push(input.borderWidth);
-    } else {
-      res.push("border-0");
-    }
-
-    // Hover state
-    if (input.hoverBorderWidth) {
-      res.push(input.hoverBorderWidth);
-    }
-
-    // Focus state
-    if (input.focusBorderWidth) {
-      res.push(input.focusBorderWidth);
-    }
+  if (input.forceOutline || (input.outlined && !input.minimal)) {
+    res.push(input.borderWidth ?? "border");
+  } else {
+    res.push("border-0");
   }
 
   // Border radius
-  {
-    const className = input.borderRadius || "rounded-sm";
-    res.push(className);
-  }
+  res.push(input.borderRadius ?? "rounded-sm");
 
   // Ring width
-  if (input.ringed && !input.minimal) {
-    // Default state
-    if (input.ringWidth) {
-      res.push(input.ringWidth);
-    } else {
-      res.push("ring-0");
-    }
-
-    // Hover state
-    if (input.hoverRingWidth) {
-      res.push(input.hoverRingWidth);
-    }
-
-    // Focus state
-    if (input.focusRingWidth) {
-      res.push(input.focusRingWidth);
-    }
+  if (input.forceRing || (input.ringed && !input.minimal)) {
+    res.push(input.ringWidth ?? "ring-2");
+  } else {
+    res.push("ring-0");
   }
 
-  // Horizontal & Vertical padding
-  {
-    if (input.leftPadding || input.rightPadding) {
-      res.push(input.leftPadding || "", input.rightPadding || "");
-    } else {
-      res.push(input.horizontalPadding || "px-5");
-    }
+  // Left padding
+  !!input.leftPadding && res.push(input.leftPadding);
 
-    if (input.topPadding || input.bottomPadding) {
-      res.push(input.topPadding || "", input.bottomPadding || "");
-    } else {
-      res.push(input.verticalPadding || "py-2");
-    }
-  }
+  // Right padding
+  !!input.rightPadding && res.push(input.rightPadding);
+
+  // Horizontal padding
+  !!input.horizontalPadding && res.push(input.horizontalPadding);
+
+  // Top padding
+  !!input.topPadding && res.push(input.topPadding);
+
+  // Bottom padding
+  !!input.bottomPadding && res.push(input.bottomPadding);
+
+  // Vertical padding
+  !!input.verticalPadding && res.push(input.verticalPadding);
 
   // Box shadow
-  {
-    const className = input.boxShadow || "shadow-none";
-    res.push(className);
+  res.push(input.boxShadow ?? "shadow-none");
+
+  // Transform
+  if (
+    !!input.transformOrigin ||
+    !!input.transformScale ||
+    !!input.transformRotate ||
+    !!input.transformTranslate
+  ) {
+    res.push("transform");
+
+    // Transform origin
+    !!input.transformOrigin && res.push(input.transformOrigin);
+
+    // Scale
+    !!input.transformScale && res.push(input.transformScale);
+
+    // Rotate
+    !!input.transformRotate && res.push(input.transformRotate);
+
+    // Translate
+    !!input.transformTranslate && res.push(input.transformTranslate);
   }
 
   return res.join(" ");
+}
+
+/**
+ * Build debug geometry style given the debug geometry style input
+ * @param debugMode - Tell if debug mode is activated
+ * @returns the generated debug geometry style
+ */
+export function debugGeometryStyleBuilder(debugMode: boolean): string {
+  let res = "";
+
+  if (debugMode) {
+    res = "border";
+  }
+
+  return res;
 }

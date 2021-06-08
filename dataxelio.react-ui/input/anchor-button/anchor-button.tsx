@@ -1,72 +1,18 @@
-import React from "react";
-import { IconName } from "@fortawesome/fontawesome-svg-core";
+import React, { useRef, useImperativeHandle } from "react";
+import { useButton, useHover, useFocusRing, mergeProps } from "react-aria";
+import { AriaButtonProps } from "@react-types/button";
 
-import {
-  BorderRadiusType,
-  BorderWidthType,
-  BoxShadowType,
-  LineHeightType,
-  FontSizeType,
-  FontWeightType,
-  LetterSpacingType,
-  IntentColor,
-  HorizontalPaddingType,
-  RingWidthType,
-  VerticalPaddingType,
-  IconAnimation,
-  IconTransform,
-  IconStyle,
-} from "@dataxelio/react-ui.utils.prop-types";
+import { IntentState, ButtonStyleProps } from "@dataxelio/react-ui.utils.prop-types";
 
-import { stateIntentStyleBuilder } from "@dataxelio/react-ui.utils.intent-style-builder";
+import { intentStyleBuilder } from "@dataxelio/react-ui.utils.intent-style-builder";
+import { layoutStyleBuilder } from "@dataxelio/react-ui.utils.layout-style-builder";
 import { geometryStyleBuilder } from "@dataxelio/react-ui.utils.geometry-style-builder";
 import { typographyStyleBuilder } from "@dataxelio/react-ui.utils.typography-style-builder";
 import { Icon } from "@dataxelio/react-ui.element.icon";
 import { Text } from "@dataxelio/react-ui.element.text";
 
-export interface AnchorButtonProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
-  // Intent Style
-  fill?: boolean;
-  minimal?: boolean;
-  outlined?: boolean;
-  ringed?: boolean;
-  ringedFade?: boolean;
-  intent?: IntentColor;
-
-  // Geometry Style
-  borderWidth?: BorderWidthType;
-  borderRadius?: BorderRadiusType;
-  ringWidth?: RingWidthType;
-  horizontalPadding?: HorizontalPaddingType;
-  verticalPadding?: VerticalPaddingType;
-  boxShadow?: BoxShadowType;
-
-  // Typography Style
-  fontHeight?: LineHeightType;
-  fontSize?: FontSizeType;
-  fontWeight?: FontWeightType;
-  letterSpacing?: LetterSpacingType;
-
-  // Left Icon
-  leftIcon?: IconName;
-  leftIconTransform?: IconTransform;
-  leftIconStyle?: IconStyle;
-
-  // Right Icon
-  rightIcon?: IconName;
-  rightIconTransform?: IconTransform;
-  rightIconStyle?: IconStyle;
-
-  // Loading Icon
-  loading?: boolean;
-  loadingIcon?: IconName;
-  loadingIconAnimation?: IconAnimation;
-  loadingIconTransform?: IconTransform;
-  loadingIconStyle?: IconStyle;
-
-  // Text
-  text?: string;
-}
+export type AnchorButtonProps = AriaButtonProps<"a"> &
+  ButtonStyleProps & { onClick?: React.MouseEventHandler };
 
 export const AnchorButton = React.forwardRef<HTMLAnchorElement, AnchorButtonProps>(
   (
@@ -78,12 +24,34 @@ export const AnchorButton = React.forwardRef<HTMLAnchorElement, AnchorButtonProp
       ringedFade,
       intent,
 
+      position,
+      leftPlacement,
+      rightPlacement,
+      topPlacement,
+      bottomPlacement,
+      visibility,
+      flexItemResizing,
+      flexItemGrow,
+      flexItemShrink,
+      gridItemInlineAxisAlignment,
+      flexGridItemCrossAxisAlignment,
+      leftMargin,
+      rightMargin,
+      horizontalMargin,
+      topMargin,
+      bottomMargin,
+      verticalMargin,
+
       borderWidth,
       borderRadius,
       ringWidth,
       horizontalPadding,
       verticalPadding,
       boxShadow,
+      transformOrigin,
+      transformScale,
+      transformRotate,
+      transformTranslate,
 
       fontHeight,
       fontSize,
@@ -106,60 +74,120 @@ export const AnchorButton = React.forwardRef<HTMLAnchorElement, AnchorButtonProp
 
       text,
 
-      children,
       className: bClassName,
-      href,
+
+      tooltipTriggerDomProps,
+      textDomProps,
       onClick,
+
+      children,
+      isDisabled,
+      href,
+      autoFocus,
       ...rest
     }: AnchorButtonProps,
     ref
   ) => {
     const defaultBorderWidth = borderWidth ?? "border";
     const defaultRingWidth = ringWidth ?? "ring-2";
+    const defaultRingFade = ringedFade ?? true;
+    const finalHorizontalPadding = horizontalPadding ?? "px-5";
+    const finalVerticalPadding = verticalPadding ?? "py-2";
+    const finalPosition = position ?? "relative";
+
+    const innerRef = useRef<HTMLAnchorElement>(null);
+    useImperativeHandle(ref, () => innerRef.current as HTMLAnchorElement);
+
+    const { isHovered, hoverProps } = useHover({ isDisabled });
+    const { isFocused, isFocusVisible, focusProps } = useFocusRing({
+      autoFocus,
+      isTextInput: false,
+    });
+
+    const { isPressed, buttonProps } = useButton({ isDisabled, autoFocus, ...rest }, innerRef);
+
+    const intentClassName = intentStyleBuilder(
+      isDisabled
+        ? IntentState.DISABLED
+        : isPressed
+        ? IntentState.PRESSED
+        : isFocused
+        ? IntentState.FOCUS
+        : isHovered
+        ? IntentState.HOVER
+        : IntentState.DEFAULT,
+      {
+        intentColor: intent,
+        outlined,
+        ringed: isFocused || isFocusVisible,
+        minimal,
+        ringedFade: defaultRingFade,
+        disablePointerEvents: loading,
+        removeDefaultBrowserAppearance: true,
+      }
+    );
+
+    const layoutClassName = layoutStyleBuilder({
+      layout: "inline-flex",
+      display: "inline",
+      position: finalPosition,
+      leftPlacement,
+      rightPlacement,
+      topPlacement,
+      bottomPlacement,
+      visibility,
+      flexGridMainAxisAlignment: "justify-center",
+      flexGridCrossAxisAlignment: "items-center",
+      flexGridGap: "gap-3",
+      flexItemResizing,
+      flexItemGrow,
+      flexItemShrink,
+      gridItemInlineAxisAlignment,
+      flexGridItemCrossAxisAlignment,
+      leftMargin,
+      rightMargin,
+      horizontalMargin,
+      topMargin,
+      bottomMargin,
+      verticalMargin,
+      customClassName: bClassName,
+    });
+
+    const geometryClassName = geometryStyleBuilder({
+      fill,
+      minimal,
+      outlined,
+      ringed: isFocused || isFocusVisible,
+      borderWidth: defaultBorderWidth,
+      borderRadius,
+      ringWidth: defaultRingWidth,
+      horizontalPadding: finalHorizontalPadding,
+      verticalPadding: finalVerticalPadding,
+      boxShadow,
+      transformOrigin,
+      transformScale,
+      transformRotate,
+      transformTranslate,
+    });
+
+    const typographyClassName = typographyStyleBuilder({
+      fontSize,
+      fontWeight,
+      letterSpacing,
+      fontHeight,
+    });
+
     return (
       <a
         href={href}
-        ref={ref}
+        ref={innerRef}
+        className={`${intentClassName} ${layoutClassName} ${geometryClassName} ${typographyClassName}`}
         onClick={onClick}
-        className={`${bClassName} inline-flex justify-center items-center ${
-          loading ? "pointer-events-none" : "space-x-3"
-        } relative appearance-none outline-none focus:outline-none disabled:opacity-50 disabled:pointer-events-none ${stateIntentStyleBuilder(
-          {
-            useDarkTheme: true,
-            useDefaultState: true,
-            useHoverState: true,
-            useFocusState: true,
-            useActiveState: true,
-            minimal,
-            outlined,
-            ringed,
-            ringedFade,
-            withForeground: true,
-            intentColor: intent,
-          }
-        )} ${geometryStyleBuilder({
-          fill,
-          minimal,
-          outlined,
-          ringed,
-          borderWidth: defaultBorderWidth,
-          borderRadius,
-          ringWidth: defaultRingWidth,
-          horizontalPadding,
-          verticalPadding,
-          boxShadow,
-        })} ${typographyStyleBuilder({
-          fontSize,
-          fontWeight,
-          letterSpacing,
-          fontHeight,
-        })} `}
-        {...rest}
+        {...mergeProps(buttonProps, focusProps, hoverProps, tooltipTriggerDomProps ?? {})}
       >
-        {!loading && !leftIcon && !text && !rightIcon && children}
         {leftIcon && (
           <Icon
-            className="flex-none"
+            flexItemResizing="flex-none"
             iName={leftIcon}
             inheritStyle
             invisible={loading ?? false}
@@ -167,10 +195,26 @@ export const AnchorButton = React.forwardRef<HTMLAnchorElement, AnchorButtonProp
             iStyle={leftIconStyle}
           />
         )}
-        {text && <Text tText={text} inheritStyle invisible={loading ?? false} />}
+        {!text && !!children && typeof children === "string" && (
+          <Text
+            tText={children}
+            inheritStyle
+            invisible={loading ?? false}
+            injectedDomProps={textDomProps}
+          />
+        )}
+        {!text && !!children && typeof children !== "string" && children}
+        {!!text && (
+          <Text
+            tText={text}
+            inheritStyle
+            invisible={loading ?? false}
+            injectedDomProps={textDomProps}
+          />
+        )}
         {rightIcon && (
           <Icon
-            className="flex-none"
+            flexItemResizing="flex-none"
             iName={rightIcon}
             inheritStyle
             invisible={loading ?? false}
@@ -180,11 +224,17 @@ export const AnchorButton = React.forwardRef<HTMLAnchorElement, AnchorButtonProp
         )}
         {loading && (
           <Icon
-            className="absolute m-auto"
-            iName={loadingIcon || "spinner"}
+            position="absolute"
+            leftPlacement="left-0"
+            rightPlacement="right-0"
+            topPlacement="top-0"
+            bottomPlacement="bottom-0"
+            horizontalMargin="mx-auto"
+            verticalMargin="my-auto"
+            iName={loadingIcon ?? "spinner"}
             inheritStyle
             invisible={!loading}
-            iAnimation={loadingIconAnimation}
+            iAnimation={loadingIconAnimation ?? "pulse"}
             iTransform={loadingIconTransform}
             iStyle={loadingIconStyle}
           />

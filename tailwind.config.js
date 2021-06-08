@@ -10,6 +10,7 @@ module.exports = {
   darkMode: "class", // false or 'media' or 'class'
   theme: {
     colors: {
+      inherit: "inherit",
       transparent: "transparent",
       current: "currentColor",
       black: colors.black,
@@ -20,11 +21,12 @@ module.exports = {
       success: colors.emerald,
       warning: colors.orange,
       danger: colors.red,
+      blueGray: colors.blueGray,
     },
     extend: {},
   },
   variants: {
     extend: {},
   },
-  plugins: [require("@tailwindcss/forms")],
+  //plugins: [require("@tailwindcss/forms")],
 };

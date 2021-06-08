@@ -1,43 +1,120 @@
-import React from "react";
-import { Popup } from "reactjs-popup";
+import React, { cloneElement, useRef, FunctionComponent } from "react";
+import { useTransition, animated, config } from "@react-spring/web";
+import {
+  useTooltip,
+  useTooltipTrigger,
+  useOverlayPosition,
+  OverlayProvider,
+  OverlayContainer,
+  useIsSSR,
+} from "react-aria";
+import { useTooltipTriggerState } from "react-stately";
+import { TooltipTriggerProps } from "@react-types/tooltip";
+import { Placement } from "@react-types/overlays";
 
-export interface TooltipProps extends React.HTMLAttributes<HTMLDivElement> {
+import { IntentColor } from "@dataxelio/react-ui.utils.prop-types";
+
+import { ButtonProps } from "@dataxelio/react-ui.input.button";
+import { AnchorButtonProps } from "@dataxelio/react-ui.input.anchor-button";
+import { Label } from "@dataxelio/react-ui.element.label";
+
+export interface TooltipProps extends TooltipTriggerProps {
   content: string;
-  triggerElement: JSX.Element;
-  dark?: boolean;
+  intent?: IntentColor;
+  placement?: Placement;
+  offset?: number;
+  withArrow?: boolean;
+  arrowSize?: number;
 }
 
-export const Tooltip = ({ content, triggerElement, dark }: TooltipProps) => {
-  const contentStyle: React.CSSProperties = {
-    background: dark ? "#F8FAFC" : "#475569",
-    color: dark ? "#475569" : "white",
-    paddingLeft: "0.75rem",
-    paddingRight: "0.75rem",
-    paddingTop: "0.5rem",
-    paddingBottom: "0.5rem",
-    marginLeft: "0.25rem",
-    borderRadius: "0.125rem",
-    boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
-    fontSize: "0.75rem",
-    fontWeight: 600,
-    lineHeight: "1rem",
-  };
-  const overlayStyle: React.CSSProperties = { background: "rgba(0,0,0,0.5)" };
-  const arrowStyle: React.CSSProperties = {
-    color: dark ? "#F8FAFC" : "#475569",
-    padding: "0.125rem",
-  };
+export const Tooltip: FunctionComponent<TooltipProps> = ({
+  content,
+  intent,
+  placement,
+  offset,
+  withArrow,
+  arrowSize,
+  children,
+  ...rest
+}) => {
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
+
+  const isSSR = useIsSSR();
+
+  const state = useTooltipTriggerState({ ...rest });
+  const { triggerProps, tooltipProps } = useTooltipTrigger({ ...rest }, state, triggerRef);
+
+  const { tooltipProps: tooltipPropsFinal } = useTooltip(tooltipProps, state);
+
+  const {
+    overlayProps,
+    arrowProps,
+    placement: finalPlacement,
+  } = useOverlayPosition({
+    targetRef: triggerRef,
+    overlayRef,
+    placement,
+    offset: offset ?? 10,
+  });
+
+  const transitions = useTransition(state.isOpen, {
+    from: { transform: "scale(0.95)", opacity: 0 },
+    enter: { transform: "scale(1.0)", opacity: 1 },
+    leave: { transform: "scale(0.95)", opacity: 0 },
+    reverse: state.isOpen,
+    delay: 100,
+    config: config.default,
+  });
+
+  const finalIntent = intent ?? IntentColor.GRAY;
+
+  const AnimatedLabel = animated(Label);
+
+  // useEffect(() => {
+  //   console.log(`Tooltip isOpen = ${state.isOpen}`);
+  //   console.log(overlayProps);
+  // });
 
   return (
-    <Popup
-      trigger={triggerElement}
-      position={["right center", "top center", "bottom center"]}
-      on={["hover", "focus"]}
-      contentStyle={contentStyle}
-      overlayStyle={overlayStyle}
-      arrowStyle={arrowStyle}
-    >
-      <span>{content}</span>
-    </Popup>
+    <>
+      {!isSSR && (
+        <OverlayProvider>
+          {React.isValidElement<
+            (ButtonProps | AnchorButtonProps) & { ref: React.ForwardedRef<HTMLButtonElement> }
+          >(children) &&
+            cloneElement(children, {
+              ref: triggerRef,
+              tooltipTriggerDomProps: triggerProps,
+            })}
+          {transitions(
+            (styles, item) =>
+              item && (
+                <OverlayContainer>
+                  <AnimatedLabel
+                    style={{ transform: styles.transform, opacity: styles.opacity }}
+                    ref={overlayRef}
+                    intent={finalIntent}
+                    borderRadius="rounded-sm"
+                    horizontalPadding="px-3"
+                    verticalPadding="py-2"
+                    boxShadow="shadow-md"
+                    fontSize="text-xs"
+                    fontWeight="font-semibold"
+                    text={content}
+                    overlayPrimaryDomProps={tooltipProps}
+                    overlaySecondaryDomProps={tooltipPropsFinal}
+                    overlayPositionDomProps={overlayProps}
+                    overlayPlacementAxis={finalPlacement}
+                    withArrow={withArrow}
+                    arrowSize={arrowSize}
+                    arrowPositionDomProps={arrowProps}
+                  />
+                </OverlayContainer>
+              )
+          )}
+        </OverlayProvider>
+      )}
+    </>
   );
 };

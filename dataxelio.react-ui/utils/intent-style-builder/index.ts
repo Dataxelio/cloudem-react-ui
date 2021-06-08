@@ -1,13 +1,7 @@
 export {
-  stateIntentStyleBuilderAtomic,
-  stateIntentStyleBuilderCustom,
-  stateIntentStyleBuilder,
-  selectionIntentStyleBuilderAtomic,
-  selectionIntentStyleBuilderCustom,
-  selectionIntentStyleBuilder,
+  computeComponentStyle,
+  intentStyleBuilder,
+  debugIntentStyleBuilder,
 } from "./intent-style-builder";
 
-export type {
-  StateIntentStyleBuilderInput,
-  SelectionIntentStyleBuilderInput,
-} from "./intent-style-builder";
+export type { IntentStyleBuilderInput } from "./intent-style-builder";

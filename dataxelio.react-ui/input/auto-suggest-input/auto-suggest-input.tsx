@@ -7,8 +7,6 @@ import { useComboBoxState } from "@react-stately/combobox";
 import {
   BorderRadiusType,
   BorderWidthType,
-  HoverBorderWidthType,
-  FocusBorderWidthType,
   BoxShadowType,
   LineHeightType,
   FontSizeType,
@@ -18,8 +16,6 @@ import {
   LeftPaddingType,
   RightPaddingType,
   RingWidthType,
-  HoverRingWidthType,
-  FocusRingWidthType,
   VerticalPaddingType,
   WidthType,
   HeightType,
@@ -27,7 +23,7 @@ import {
   DataGridView,
 } from "@dataxelio/react-ui.utils.prop-types";
 
-import { stateIntentStyleBuilder } from "@dataxelio/react-ui.utils.intent-style-builder";
+import { intentStyleBuilder } from "@dataxelio/react-ui.utils.intent-style-builder";
 import { geometryStyleBuilder } from "@dataxelio/react-ui.utils.geometry-style-builder";
 import { typographyStyleBuilder } from "@dataxelio/react-ui.utils.typography-style-builder";
 
@@ -50,12 +46,8 @@ export interface AutoSuggestInputProps extends React.InputHTMLAttributes<HTMLInp
   width?: WidthType;
   height?: HeightType;
   borderWidth?: BorderWidthType;
-  hoverBorderWidth?: HoverBorderWidthType;
-  focusBorderWidth?: FocusBorderWidthType;
   borderRadius?: BorderRadiusType;
   ringWidth?: RingWidthType;
-  hoverRingWidth?: HoverRingWidthType;
-  focusRingWidth?: FocusRingWidthType;
   leftPadding?: LeftPaddingType;
   rightPadding?: RightPaddingType;
   verticalPadding?: VerticalPaddingType;
@@ -86,12 +78,8 @@ export const AutoSuggestInput = ({
   intentAtDefaultState,
 
   borderWidth,
-  hoverBorderWidth,
-  focusBorderWidth,
   borderRadius,
   ringWidth,
-  hoverRingWidth,
-  focusRingWidth,
   leftPadding,
   rightPadding,
   verticalPadding,
@@ -117,7 +105,7 @@ export const AutoSuggestInput = ({
   const defaultVerticalPadding = verticalPadding ?? "py-1.5";
   const defaultFontSize = fontSize ?? "text-sm";
   const defaultBorderWidth = borderWidth ?? "border";
-  const defaultFocusRingWidth = focusRingWidth ?? "focus:ring-1";
+  const defaultRingWidth = ringWidth ?? "focus:ring-1";
   const defaultSearchIconTransform = searchIconTransform ?? { y: 2, size: 14 };
 
   const [inValue, setInValue] = useState<string>("");

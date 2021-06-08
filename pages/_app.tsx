@@ -9,8 +9,10 @@ import { fab } from "@fortawesome/free-brands-svg-icons";
 import {
   faBatteryThreeQuarters,
   faFolder,
-  faCaretDown,
+  faCaretLeft,
+  faCaretRight,
   faCaretUp,
+  faCaretDown,
   faSpinner,
   faCircleNotch,
   faPlus,
@@ -18,12 +20,21 @@ import {
   faSearch,
   faEye,
   faEyeSlash,
+  faTimes,
+  faTimesCircle,
+  faCheck,
+  faCheckCircle,
+  faMinus,
+  faMinusSquare,
 } from "@fortawesome/free-solid-svg-icons";
 
 import {
   faFolder as faFolderRegular,
   faEye as faEyeRegular,
   faEyeSlash as faEyeSlashRegular,
+  faTimesCircle as faTimesCircleRegular,
+  faCheckCircle as faCheckCircleRegular,
+  faMinusSquare as faMinusSquareRegular,
 } from "@fortawesome/free-regular-svg-icons";
 
 function App({ Component, pageProps }: AppProps) {
@@ -32,8 +43,10 @@ function App({ Component, pageProps }: AppProps) {
     faBatteryThreeQuarters,
     faFolder,
     faFolderRegular,
-    faCaretDown,
+    faCaretLeft,
+    faCaretRight,
     faCaretUp,
+    faCaretDown,
     faSpinner,
     faCircleNotch,
     faPlus,
@@ -42,7 +55,16 @@ function App({ Component, pageProps }: AppProps) {
     faEye,
     faEyeRegular,
     faEyeSlash,
-    faEyeSlashRegular
+    faEyeSlashRegular,
+    faTimes,
+    faTimesCircle,
+    faTimesCircleRegular,
+    faCheck,
+    faCheckCircle,
+    faCheckCircleRegular,
+    faMinus,
+    faMinusSquare,
+    faMinusSquareRegular
   );
 
   const { locale } = useLocale();
