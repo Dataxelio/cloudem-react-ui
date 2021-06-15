@@ -22,6 +22,10 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       ringed,
       ringedFade,
       intent,
+      intentAtDefaultState,
+      useDarkGrayAsDefaultIntent,
+      backgroundOpacity,
+      foregroundOpacity,
 
       position,
       leftPlacement,
@@ -41,6 +45,8 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       bottomMargin,
       verticalMargin,
 
+      width,
+      height,
       borderWidth,
       borderRadius,
       ringWidth,
@@ -115,9 +121,13 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         : IntentState.DEFAULT,
       {
         intentColor: intent,
+        intentAtDefaultState,
+        useDarkGrayAsDefaultIntent,
         outlined,
         ringed: isFocused || isFocusVisible,
         minimal,
+        backgroundOpacity,
+        foregroundOpacity,
         ringedFade: defaultRingFade,
         disablePointerEvents: loading,
         removeDefaultBrowserAppearance: true,
@@ -133,7 +143,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       topPlacement,
       bottomPlacement,
       visibility,
-      flexGridMainAxisAlignment: "justify-center",
+      flexGridMainAxisAlignment: !!width ? "justify-between" : "justify-center",
       flexGridCrossAxisAlignment: "items-center",
       flexGridGap: "gap-3",
       flexItemResizing,
@@ -155,6 +165,8 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       minimal,
       outlined,
       ringed: isFocused || isFocusVisible,
+      width,
+      height,
       borderWidth: defaultBorderWidth,
       borderRadius,
       ringWidth: defaultRingWidth,
@@ -195,6 +207,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             tText={children}
             inheritStyle
             invisible={loading ?? false}
+            textOverflow="truncate"
             injectedDomProps={textDomProps}
           />
         )}
@@ -204,6 +217,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             tText={text}
             inheritStyle
             invisible={loading ?? false}
+            textOverflow="truncate"
             injectedDomProps={textDomProps}
           />
         )}

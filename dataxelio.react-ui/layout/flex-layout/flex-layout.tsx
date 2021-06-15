@@ -65,7 +65,10 @@ import {
 } from "@dataxelio/react-ui.utils.intent-style-builder";
 import { layoutStyleBuilder } from "@dataxelio/react-ui.utils.layout-style-builder";
 import { geometryStyleBuilder } from "@dataxelio/react-ui.utils.geometry-style-builder";
-import { typographyStyleBuilder } from "@dataxelio/react-ui.utils.typography-style-builder";
+import {
+  typographyStyleBuilder,
+  typographyListStyleRemoval,
+} from "@dataxelio/react-ui.utils.typography-style-builder";
 
 export interface FlexLayoutProps extends React.HTMLAttributes<HTMLElement> {
   // Intent Style
@@ -311,6 +314,8 @@ export const FlexLayout = React.forwardRef<HTMLElement, FlexLayoutProps>(
             fontHeight,
           });
 
+    const typographyListClassName = domElement === "ul" ? typographyListStyleRemoval() : "";
+
     const debugIntentClassName = debugIntentStyleBuilder(
       debugMode ?? false,
       debugIntent ?? IntentColor.WARNING
@@ -319,7 +324,7 @@ export const FlexLayout = React.forwardRef<HTMLElement, FlexLayoutProps>(
     return React.createElement(
       finalDomElement,
       {
-        className: `${intentClassName} ${layoutClassName} ${geometryClassName} ${typographyClassName} ${debugIntentClassName}`,
+        className: `${intentClassName} ${layoutClassName} ${geometryClassName} ${typographyClassName} ${typographyListClassName} ${debugIntentClassName}`,
         ref,
         ...rest,
       },

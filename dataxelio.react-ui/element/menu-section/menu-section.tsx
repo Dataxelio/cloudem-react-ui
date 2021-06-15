@@ -3,10 +3,11 @@ import { IconName } from "@fortawesome/fontawesome-svg-core";
 
 import { useMenuSection } from "@react-aria/menu";
 import { TreeState } from "@react-stately/tree";
+import { TreeNode } from "@react-stately/data";
 import { Node } from "@react-types/shared";
 
 import {
-  MenuItemData,
+  TreeItem,
   IntentColor,
   CursorType,
   ForegroundOpacityType,
@@ -33,6 +34,7 @@ export interface MenuSectionProps {
   minimal: boolean;
   intent: IntentColor;
   intentAtDefaultState: boolean;
+  applyIntentOnGroup: boolean;
   sectionOpacity: ForegroundOpacityType;
   groupOpacity: ForegroundOpacityType;
   forceLowGrayBackgroundAtHoverState: boolean;
@@ -45,7 +47,7 @@ export interface MenuSectionProps {
   marginBetweenLeavesAndGroup: TopMarginType;
 
   // Geometry Style
-  verticalItemBackgroundPadding: VerticalPaddingType;
+  itemBackgroundverticalPadding: VerticalPaddingType;
 
   // Typography Style
   leafFontHeight: LineHeightType;
@@ -64,8 +66,8 @@ export interface MenuSectionProps {
   wordBreak: WordBreakType;
 
   // Collection
-  section: Node<MenuItemData>;
-  state: TreeState<MenuItemData>;
+  section: Node<TreeNode<TreeItem>>;
+  state: TreeState<TreeNode<TreeItem>>;
 
   // Tree
   initialIndent: number;
@@ -83,6 +85,7 @@ export const MenuSection = ({
   minimal,
   intent,
   intentAtDefaultState,
+  applyIntentOnGroup,
   sectionOpacity,
   groupOpacity,
   forceLowGrayBackgroundAtHoverState,
@@ -93,7 +96,7 @@ export const MenuSection = ({
   marginBetweenItemsAndSection,
   marginBetweenLeavesAndGroup,
 
-  verticalItemBackgroundPadding,
+  itemBackgroundverticalPadding,
 
   leafFontHeight,
   leafFontSize,
@@ -177,13 +180,14 @@ export const MenuSection = ({
               minimal={minimal}
               intent={intent}
               intentAtDefaultState={intentAtDefaultState}
+              applyIntentOnGroup={applyIntentOnGroup}
               groupOpacity={groupOpacity}
               forceLowGrayBackgroundAtHoverState={forceLowGrayBackgroundAtHoverState}
               forceLowBrandBackgroundAtHoverState={forceLowBrandBackgroundAtHoverState}
               cursor={cursor}
               gapBetweenItems={gapBetweenItems}
               marginBetweenLeavesAndGroup={marginBetweenLeavesAndGroup}
-              verticalItemBackgroundPadding={verticalItemBackgroundPadding}
+              itemBackgroundverticalPadding={itemBackgroundverticalPadding}
               leafFontHeight={leafFontHeight}
               leafFontSize={leafFontSize}
               leafFontWeight={leafFontWeight}

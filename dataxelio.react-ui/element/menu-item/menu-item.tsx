@@ -6,10 +6,11 @@ import { useFocusRing } from "@react-aria/focus";
 import { useMenuItem } from "@react-aria/menu";
 import { mergeProps } from "@react-aria/utils";
 import { TreeState } from "@react-stately/tree";
+import { TreeNode } from "@react-stately/data";
 import { Node } from "@react-types/shared";
 
 import {
-  MenuItemData,
+  TreeItem,
   IntentState,
   IntentColor,
   ForegroundOpacityType,
@@ -39,6 +40,7 @@ export interface MenuItemProps {
   minimal: boolean;
   intent: IntentColor;
   intentAtDefaultState: boolean;
+  applyIntentOnGroup: boolean;
   groupOpacity: ForegroundOpacityType;
   forceLowGrayBackgroundAtHoverState: boolean;
   forceLowBrandBackgroundAtHoverState: boolean;
@@ -49,7 +51,7 @@ export interface MenuItemProps {
   marginBetweenLeavesAndGroup: TopMarginType;
 
   // Geometry Style
-  verticalItemBackgroundPadding: VerticalPaddingType;
+  itemBackgroundverticalPadding: VerticalPaddingType;
 
   // Typography Style
   leafFontHeight: LineHeightType;
@@ -64,8 +66,8 @@ export interface MenuItemProps {
   wordBreak: WordBreakType;
 
   // Collection
-  item: Node<MenuItemData>;
-  state: TreeState<MenuItemData>;
+  item: Node<TreeNode<TreeItem>>;
+  state: TreeState<TreeNode<TreeItem>>;
 
   // Tree
   initialIndent: number;
@@ -83,6 +85,7 @@ export const MenuItem = ({
   minimal,
   intent,
   intentAtDefaultState,
+  applyIntentOnGroup,
   groupOpacity,
   forceLowGrayBackgroundAtHoverState,
   forceLowBrandBackgroundAtHoverState,
@@ -91,7 +94,7 @@ export const MenuItem = ({
   gapBetweenItems,
   marginBetweenLeavesAndGroup,
 
-  verticalItemBackgroundPadding,
+  itemBackgroundverticalPadding,
 
   leafFontHeight,
   leafFontSize,
@@ -118,7 +121,7 @@ export const MenuItem = ({
 }: MenuItemProps) => {
   const isDisabled = state.disabledKeys.has(item.key);
   const isSelected = state.selectionManager.isSelected(item.key);
-  const isGroup = item.hasChildNodes;
+  const isGroup = item.hasChildNodes && !!item.value?.value?.children;
   const isExpanded = isGroup && state.expandedKeys.has(item.key);
   const containerLeftPadding = `${parentIndent * sizePerIndent}rem`;
   const containerRightPadding = `${initialIndent * sizePerIndent}rem`;
@@ -131,7 +134,7 @@ export const MenuItem = ({
     rightIcon,
     rightIconTransform,
     rightIconStyle,
-  } = item.value ?? {};
+  } = item.value?.value ?? {};
 
   const innerRef = useRef<HTMLDivElement>(null);
 
@@ -154,7 +157,7 @@ export const MenuItem = ({
 
   const intentState = isDisabled
     ? IntentState.DISABLED
-    : isGroup
+    : isGroup && !applyIntentOnGroup
     ? IntentState.DEFAULT
     : isSelected
     ? IntentState.PRESSED
@@ -190,7 +193,7 @@ export const MenuItem = ({
 
   const geometryClassName = geometryStyleBuilder({
     fill: true,
-    verticalPadding: verticalItemBackgroundPadding,
+    verticalPadding: itemBackgroundverticalPadding,
     borderRadius: "rounded-sm",
   });
 
@@ -292,13 +295,14 @@ export const MenuItem = ({
               minimal={minimal}
               intent={intent}
               intentAtDefaultState={intentAtDefaultState}
+              applyIntentOnGroup={applyIntentOnGroup}
               groupOpacity={groupOpacity}
               forceLowGrayBackgroundAtHoverState={forceLowGrayBackgroundAtHoverState}
               forceLowBrandBackgroundAtHoverState={forceLowBrandBackgroundAtHoverState}
               cursor={cursor}
               gapBetweenItems={gapBetweenItems}
               marginBetweenLeavesAndGroup={marginBetweenLeavesAndGroup}
-              verticalItemBackgroundPadding={verticalItemBackgroundPadding}
+              itemBackgroundverticalPadding={itemBackgroundverticalPadding}
               leafFontHeight={leafFontHeight}
               leafFontSize={leafFontSize}
               leafFontWeight={leafFontWeight}

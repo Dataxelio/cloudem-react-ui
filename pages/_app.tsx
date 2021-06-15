@@ -26,6 +26,7 @@ import {
   faCheckCircle,
   faMinus,
   faMinusSquare,
+  faEdit,
 } from "@fortawesome/free-solid-svg-icons";
 
 import {
@@ -35,6 +36,7 @@ import {
   faTimesCircle as faTimesCircleRegular,
   faCheckCircle as faCheckCircleRegular,
   faMinusSquare as faMinusSquareRegular,
+  faEdit as faEditRegular,
 } from "@fortawesome/free-regular-svg-icons";
 
 function App({ Component, pageProps }: AppProps) {
@@ -64,7 +66,9 @@ function App({ Component, pageProps }: AppProps) {
     faCheckCircleRegular,
     faMinus,
     faMinusSquare,
-    faMinusSquareRegular
+    faMinusSquareRegular,
+    faEdit,
+    faEditRegular
   );
 
   const { locale } = useLocale();

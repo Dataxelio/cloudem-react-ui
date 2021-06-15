@@ -9,7 +9,9 @@ import { Placement, PlacementAxis } from "@react-types/overlays";
  ******************************************************/
 export type LayoutElementType = "header" | "title" | "content-text" | "content" | "footer";
 
-export type DomElementType = "div" | "label" | "form";
+export type NavbarGroupAlignmentType = "heading" | "left" | "center" | "right";
+
+export type DomElementType = "div" | "label" | "form" | "ul" | "li";
 
 export type DividerDomElementType = "div" | "li";
 
@@ -23,6 +25,10 @@ export type PopoverType = "dialog" | "grid" | "listbox" | "menu" | "tree";
 
 export type LayoutElementProps = {
   __LAYOUT_ELEMENT?: LayoutElementType;
+};
+
+export type NavbarGroupAlignmentProps = {
+  alignment: NavbarGroupAlignmentType;
 };
 
 /******************************************************
@@ -61,7 +67,7 @@ export type TooltipTriggerDomProps = React.HTMLAttributes<HTMLElement> &
  * Button Types
  ******************************************************/
 
-export type ButtonStyleProps = {
+export type ButtonTriggerStyleProps = {
   // Intent Style
   fill?: boolean;
   minimal?: boolean;
@@ -69,6 +75,10 @@ export type ButtonStyleProps = {
   ringed?: boolean;
   ringedFade?: boolean;
   intent?: IntentColor;
+  intentAtDefaultState?: boolean;
+  useDarkGrayAsDefaultIntent?: boolean;
+  backgroundOpacity?: BackgroundOpacityType;
+  foregroundOpacity?: ForegroundOpacityType;
 
   // Layout Style
   position?: PositionType;
@@ -90,6 +100,8 @@ export type ButtonStyleProps = {
   verticalMargin?: VerticalMarginType;
 
   // Geometry Style
+  width?: WidthType;
+  height?: HeightType;
   borderWidth?: BorderWidthType;
   borderRadius?: BorderRadiusType;
   ringWidth?: RingWidthType;
@@ -107,6 +119,20 @@ export type ButtonStyleProps = {
   fontWeight?: FontWeightType;
   letterSpacing?: LetterSpacingType;
 
+  // Custom Style
+  className?: string;
+
+  // Custom Tooltip Trigger DOM Props
+  tooltipTriggerDomProps?: TooltipTriggerDomProps;
+
+  // Custom Text value DOM Props
+  textDomProps?: React.HTMLAttributes<HTMLElement>;
+};
+
+export type ButtonStyleProps = ButtonTriggerStyleProps & {
+  // Text
+  text?: string;
+
   // Left Icon
   leftIcon?: IconName;
   leftIconTransform?: IconTransform;
@@ -123,18 +149,6 @@ export type ButtonStyleProps = {
   loadingIconAnimation?: IconAnimation;
   loadingIconTransform?: IconTransform;
   loadingIconStyle?: IconStyle;
-
-  // Text
-  text?: string;
-
-  // Custom Style
-  className?: string;
-
-  // Custom Tooltip Trigger DOM Props
-  tooltipTriggerDomProps?: TooltipTriggerDomProps;
-
-  // Custom Text value DOM Props
-  textDomProps?: React.HTMLAttributes<HTMLElement>;
 };
 
 /******************************************************
@@ -220,13 +234,19 @@ export type PopoverTriggerStyleProps = {
   isMenuVirtualized?: boolean;
   menuAutoFocus?: boolean | "first" | "last";
   shouldMenuFocusWrap?: boolean;
-  menuItems: MenuItemData[];
-  menuItemSelectedIds?: Iterable<string>;
-  menuItemDisabledIds?: Iterable<string>;
+  menuInitialItems: TreeItem[];
+  // menuItemSelectedIds?: Iterable<string>;
+  // menuItemDisabledIds?: Iterable<string>;
   menuItemExpandedIds?: Iterable<string>;
   onMenuItemAction?: (key: React.Key) => void;
   onMenuItemExpandedChange?: (keys: Set<React.Key>) => any;
   // onMenuItemSelectionChange?: (keys: "all" | Set<React.Key>) => any;
+  selectedMenuItem?: TreeItem;
+  setSelectedMenuItem?: (selectedItem: TreeItem | undefined) => void;
+
+  customDialogContent?: React.ReactNode;
+  customDialogFooter?: React.ReactNode;
+
   "aria-label"?: string;
   "aria-labelledby"?: string;
   "aria-describedby"?: string;
@@ -243,6 +263,7 @@ export type MenuStyleProps = {
   minimal?: boolean;
   intent?: IntentColor;
   itemIntentAtDefaultState?: boolean;
+  itemApplyIntentOnGroup?: boolean;
   sectionOpacity?: ForegroundOpacityType;
   groupOpacity?: ForegroundOpacityType;
   forceItemLowGrayBackgroundAtHoverState?: boolean;
@@ -255,7 +276,8 @@ export type MenuStyleProps = {
   marginBetweenLeavesAndGroup?: TopMarginType;
 
   // Geometry Style
-  verticalItemBackgroundPadding?: VerticalPaddingType;
+  fill?: boolean;
+  itemBackgroundverticalPadding?: VerticalPaddingType;
 
   // Typography Style
   leafFontHeight?: LineHeightType;
@@ -1268,6 +1290,7 @@ export type RingWidthType = "ring-0" | "ring" | "ring-1" | "ring-2" | "ring-4" |
  */
 export type LeftPaddingType =
   | "pl-0"
+  | "pl-0.5"
   | "pl-1"
   | "pl-1.5"
   | "pl-2"
@@ -1291,6 +1314,7 @@ export type LeftPaddingType =
  */
 export type RightPaddingType =
   | "pr-0"
+  | "pr-0.5"
   | "pr-1"
   | "pr-1.5"
   | "pr-2"
@@ -1314,6 +1338,7 @@ export type RightPaddingType =
  */
 export type HorizontalPaddingType =
   | "px-0"
+  | "px-0.5"
   | "px-1"
   | "px-1.5"
   | "px-2"
@@ -1337,6 +1362,7 @@ export type HorizontalPaddingType =
  */
 export type TopPaddingType =
   | "pt-0"
+  | "pt-0.5"
   | "pt-1"
   | "pt-1.5"
   | "pt-2"
@@ -1360,6 +1386,7 @@ export type TopPaddingType =
  */
 export type BottomPaddingType =
   | "pb-0"
+  | "pb-0.5"
   | "pb-1"
   | "pb-1.5"
   | "pb-2"
@@ -1383,6 +1410,7 @@ export type BottomPaddingType =
  */
 export type VerticalPaddingType =
   | "py-0"
+  | "py-0.5"
   | "py-1"
   | "py-1.5"
   | "py-2"
@@ -1776,10 +1804,24 @@ export type ResourceProperty = {
  * Item Types
  ********************************************************/
 
-export type MenuItemData = {
+export type ListItem = {
+  section?: string;
+  label: string;
+  path?: string;
+  disabled?: boolean;
+  leftIcon?: IconName;
+  leftIconTransform?: IconTransform;
+  leftIconStyle?: IconStyle;
+  rightIcon?: IconName;
+  rightIconTransform?: IconTransform;
+  rightIconStyle?: IconStyle;
+};
+
+export type TreeItem = {
   id: string;
   name: string;
   label: string;
+  disabled?: boolean;
 
   // Left Icon
   leftIcon?: IconName;
@@ -1792,7 +1834,7 @@ export type MenuItemData = {
   rightIconStyle?: IconStyle;
 
   // Children
-  children?: MenuItemData[];
+  children?: TreeItem[];
 };
 
 /**

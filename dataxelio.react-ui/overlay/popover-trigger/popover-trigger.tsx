@@ -1,4 +1,5 @@
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
+import { useTransition, animated, config } from "@react-spring/web";
 
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import {
@@ -11,21 +12,21 @@ import {
 } from "@react-aria/overlays";
 import { useIsSSR } from "@react-aria/ssr";
 import { FocusScopeProps } from "@react-aria/focus";
-
 import { Item, Section } from "@react-stately/collections";
+import { useTreeData, TreeNode } from "@react-stately/data";
 
 import {
   PopoverStyleProps,
   CardStyleProps,
   MenuStyleProps,
   PopoverTriggerStyleProps,
-  MenuItemData,
+  TreeItem,
 } from "@dataxelio/react-ui.utils.prop-types";
 
 import { ButtonProps } from "@dataxelio/react-ui.input.button";
 import { Popover } from "@dataxelio/react-ui.overlay.popover";
 import { Menu } from "@dataxelio/react-ui.element.menu";
-import { useSelectedMenuItem } from "@dataxelio/react-ui.utils.use-selected-menu-item";
+import { useDisabledMenuItem } from "@dataxelio/react-ui.utils.use-disabled-menu-item";
 import { Content } from "@dataxelio/react-ui.element.content";
 
 export type PopoverTriggerProps = OverlayProps &
@@ -69,6 +70,7 @@ export const PopoverTrigger = ({
 
   darkMode,
   itemIntentAtDefaultState,
+  itemApplyIntentOnGroup,
   sectionOpacity,
   groupOpacity,
   forceItemLowGrayBackgroundAtHoverState,
@@ -87,6 +89,7 @@ export const PopoverTrigger = ({
   debugMode,
   debugIntent,
 
+  fill,
   fixed,
   fluid,
   width,
@@ -111,7 +114,7 @@ export const PopoverTrigger = ({
   marginBetweenItemsAndSection,
   marginBetweenLeavesAndGroup,
 
-  verticalItemBackgroundPadding,
+  itemBackgroundverticalPadding,
 
   leafFontHeight,
   leafFontSize,
@@ -148,13 +151,18 @@ export const PopoverTrigger = ({
   isMenuVirtualized,
   menuAutoFocus,
   shouldMenuFocusWrap,
-  menuItems,
-  menuItemSelectedIds,
-  menuItemDisabledIds,
+  menuInitialItems,
+  // menuItemSelectedIds,
+  // menuItemDisabledIds,
   menuItemExpandedIds,
   onMenuItemAction,
   onMenuItemExpandedChange,
   // onMenuItemSelectionChange,
+  selectedMenuItem,
+  setSelectedMenuItem,
+
+  customDialogContent,
+  customDialogFooter,
 
   children,
   ...rest
@@ -162,13 +170,7 @@ export const PopoverTrigger = ({
   const triggerRef = useRef<HTMLButtonElement>(null);
   const popoverRef = useRef<HTMLElement>(null);
 
-  const [selectedMenuItemKey, setSelectedMenuItemKey] = useState<string>("");
-
-  const selectedMenuItem = useSelectedMenuItem(
-    syncTriggerLabelWithSelectedItem,
-    menuItems,
-    selectedMenuItemKey
-  );
+  // const [selectedMenuItem, setSelectedMenuItem] = useState<TreeItem | undefined>(undefined);
 
   const isSSR = useIsSSR();
 
@@ -190,21 +192,41 @@ export const PopoverTrigger = ({
     offset,
   });
 
-  const sectionRender = (section: MenuItemData) => (
-    <Section key={section.id} title={section.label} items={section.children}>
+  const disabledMenuItemIds = useDisabledMenuItem(menuInitialItems);
+
+  const tree = useTreeData<TreeItem>({
+    initialItems: menuInitialItems,
+    initialSelectedKeys: [],
+    getKey: item => item.id,
+    getChildren: item => item.children ?? [],
+  });
+
+  const sectionRender = (section: TreeNode<TreeItem>) => (
+    <Section key={section.key} title={section.value.label} items={section.children}>
       {item => (
-        <Item key={item.id} childItems={item.children}>
-          {item.label}
+        <Item key={item.key} childItems={item.children}>
+          {item.value.label}
         </Item>
       )}
     </Section>
   );
 
-  const itemRender = (item: MenuItemData) => (
-    <Item key={item.id} childItems={item.children}>
-      {item.label}
+  const itemRender = (item: TreeNode<TreeItem>) => (
+    <Item key={item.key} childItems={item.children}>
+      {item.value.label}
     </Item>
   );
+
+  const transitions = useTransition(state.isOpen, {
+    from: { transform: "scale(0.95)", opacity: 0 },
+    enter: { transform: "scale(1.0)", opacity: 1 },
+    leave: { transform: "scale(0.95)", opacity: 0 },
+    reverse: state.isOpen,
+    delay: 1,
+    config: config.stiff,
+  });
+
+  const AnimatedPopover = animated(Popover);
 
   return (
     <>
@@ -220,124 +242,139 @@ export const PopoverTrigger = ({
                 ? { text: selectedMenuItem.label }
                 : {}),
             })}
-          {state.isOpen && (
-            <OverlayContainer className={darkMode ? "dark" : undefined}>
-              <Popover
-                ref={popoverRef}
-                isOpen
-                isDismissable
-                shouldCloseOnBlur={shouldCloseOnBlur}
-                isKeyboardDismissDisabled={false}
-                onClose={onClose}
-                shouldCloseOnInteractOutside={shouldCloseOnInteractOutside}
-                contain={contain}
-                restoreFocus={restoreFocus}
-                autoFocus={autoFocus}
-                isModal={isModal}
-                preventScroll={preventScroll}
-                contentOrientation={contentOrientation}
-                contentAlignment={contentAlignment}
-                footerAlignment={footerAlignment}
-                dividerAfterHeader={dividerAfterHeader}
-                dividerAfterContentText={dividerAfterContentText}
-                dividerAfterContent={dividerAfterContent}
-                minimal={minimal}
-                outlined={outlined}
-                intent={intent}
-                backgroundOpacity={backgroundOpacity}
-                borderOpacity={borderOpacity}
-                contentGap={contentGap}
-                leftMargin={leftMargin}
-                rightMargin={rightMargin}
-                horizontalMargin={horizontalMargin}
-                internalHorizontalMargin={internalHorizontalMargin}
-                topMargin={topMargin}
-                bottomMargin={bottomMargin}
-                verticalMargin={verticalMargin}
-                internalVerticalMargin={internalVerticalMargin}
-                debugMode={debugMode}
-                debugIntent={debugIntent}
-                fixed={fixed}
-                fluid={fluid}
-                width={width}
-                maxWidth={maxWidth}
-                minWidth={minWidth}
-                height={height}
-                maxHeight={maxHeight}
-                minHeight={minHeight}
-                borderWidth={borderWidth}
-                borderRadius={borderRadius}
-                horizontalPadding={horizontalPadding}
-                verticalPadding={verticalPadding}
-                boxShadow={boxShadow}
-                asForm={asForm}
-                onSubmit={onSubmit}
-                overlayPrimaryDomProps={overlayProps}
-                overlayPositionDomProps={overlayPositionProps}
-                overlayPlacementAxis={finalPlacement}
-                withArrow={withArrow}
-                arrowSize={arrowSize}
-                arrowPositionDomProps={arrowProps}
-              >
-                <Content>
-                  <Menu
-                    darkMode={darkMode}
+          {transitions(
+            (styles, item) =>
+              item && (
+                <OverlayContainer className={darkMode ? "dark" : undefined}>
+                  <AnimatedPopover
+                    style={{ transform: styles.transform, opacity: styles.opacity }}
+                    ref={popoverRef}
+                    isOpen
+                    isDismissable
+                    shouldCloseOnBlur={shouldCloseOnBlur}
+                    isKeyboardDismissDisabled={false}
+                    onClose={onClose}
+                    shouldCloseOnInteractOutside={shouldCloseOnInteractOutside}
+                    contain={contain}
+                    restoreFocus={restoreFocus}
+                    autoFocus={autoFocus}
+                    isModal={isModal}
+                    preventScroll={preventScroll}
+                    contentOrientation={contentOrientation}
+                    contentAlignment={contentAlignment}
+                    footerAlignment={footerAlignment}
+                    dividerAfterHeader={dividerAfterHeader}
+                    dividerAfterContentText={dividerAfterContentText}
+                    dividerAfterContent={dividerAfterContent}
                     minimal={minimal}
+                    outlined={outlined}
                     intent={intent}
-                    itemIntentAtDefaultState={itemIntentAtDefaultState}
-                    sectionOpacity={sectionOpacity}
-                    groupOpacity={groupOpacity}
-                    forceItemLowGrayBackgroundAtHoverState={forceItemLowGrayBackgroundAtHoverState}
-                    forceItemLowBrandBackgroundAtHoverState={
-                      forceItemLowBrandBackgroundAtHoverState
-                    }
-                    itemCursor={itemCursor}
-                    gapBetweenItems={gapBetweenItems}
-                    marginBetweenItemsAndSection={marginBetweenItemsAndSection}
-                    marginBetweenLeavesAndGroup={marginBetweenLeavesAndGroup}
-                    verticalItemBackgroundPadding={verticalItemBackgroundPadding}
-                    leafFontHeight={leafFontHeight}
-                    leafFontSize={leafFontSize}
-                    leafFontWeight={leafFontWeight}
-                    leafLetterSpacing={leafLetterSpacing}
-                    groupFontHeight={groupFontHeight}
-                    groupFontSize={groupFontSize}
-                    groupFontWeight={groupFontWeight}
-                    groupLetterSpacing={groupLetterSpacing}
-                    sectionFontHeight={sectionFontHeight}
-                    sectionFontSize={sectionFontSize}
-                    sectionFontWeight={sectionFontWeight}
-                    sectionLetterSpacing={sectionLetterSpacing}
-                    itemTextOverflow={itemTextOverflow}
-                    itemWordBreak={itemWordBreak}
-                    itemInitialIndent={itemInitialIndent}
-                    groupSelfIndent={groupSelfIndent}
-                    itemSizePerIndent={itemSizePerIndent}
-                    groupExpandedIcon={groupExpandedIcon}
-                    groupCollapsedIcon={groupCollapsedIcon}
-                    isVirtualized={isMenuVirtualized}
-                    autoFocus={menuAutoFocus}
-                    shouldFocusWrap={shouldMenuFocusWrap}
-                    items={menuItems}
-                    selectedKeys={menuItemSelectedIds}
-                    disabledKeys={menuItemDisabledIds}
-                    expandedKeys={menuItemExpandedIds}
-                    selectionMode="single"
-                    disallowEmptySelection
-                    onAction={onMenuItemAction}
-                    onExpandedChange={onMenuItemExpandedChange}
-                    onSelectionChange={keys =>
-                      keys === "all" || keys.size > 1
-                        ? setSelectedMenuItemKey("")
-                        : setSelectedMenuItemKey(keys.values().next().value)
-                    }
-                    {...rest}
+                    backgroundOpacity={backgroundOpacity}
+                    borderOpacity={borderOpacity}
+                    contentGap={contentGap}
+                    leftMargin={leftMargin}
+                    rightMargin={rightMargin}
+                    horizontalMargin={horizontalMargin}
+                    internalHorizontalMargin={internalHorizontalMargin}
+                    topMargin={topMargin}
+                    bottomMargin={bottomMargin}
+                    verticalMargin={verticalMargin}
+                    internalVerticalMargin={internalVerticalMargin}
+                    debugMode={debugMode}
+                    debugIntent={debugIntent}
+                    fixed={fixed}
+                    fluid={fill || fluid}
+                    width={width}
+                    maxWidth={maxWidth}
+                    minWidth={minWidth}
+                    height={height}
+                    maxHeight={maxHeight}
+                    minHeight={minHeight}
+                    borderWidth={borderWidth}
+                    borderRadius={borderRadius}
+                    horizontalPadding={horizontalPadding}
+                    verticalPadding={verticalPadding}
+                    boxShadow={boxShadow}
+                    asForm={asForm}
+                    onSubmit={onSubmit}
+                    overlayPrimaryDomProps={overlayProps}
+                    overlayPositionDomProps={overlayPositionProps}
+                    overlayPlacementAxis={finalPlacement}
+                    withArrow={withArrow}
+                    arrowSize={arrowSize}
+                    arrowPositionDomProps={arrowProps}
                   >
-                    {menuHaveSection ? sectionRender : itemRender}
-                  </Menu>
-                </Content>
-              </Popover>
-            </OverlayContainer>
+                    {type !== "dialog" && (
+                      <Content>
+                        <Menu
+                          darkMode={darkMode}
+                          minimal={minimal}
+                          intent={intent}
+                          itemIntentAtDefaultState={itemIntentAtDefaultState}
+                          itemApplyIntentOnGroup={itemApplyIntentOnGroup}
+                          sectionOpacity={sectionOpacity}
+                          groupOpacity={groupOpacity}
+                          forceItemLowGrayBackgroundAtHoverState={
+                            forceItemLowGrayBackgroundAtHoverState
+                          }
+                          forceItemLowBrandBackgroundAtHoverState={
+                            forceItemLowBrandBackgroundAtHoverState
+                          }
+                          itemCursor={itemCursor}
+                          gapBetweenItems={gapBetweenItems}
+                          marginBetweenItemsAndSection={marginBetweenItemsAndSection}
+                          marginBetweenLeavesAndGroup={marginBetweenLeavesAndGroup}
+                          itemBackgroundverticalPadding={itemBackgroundverticalPadding}
+                          leafFontHeight={leafFontHeight}
+                          leafFontSize={leafFontSize}
+                          leafFontWeight={leafFontWeight}
+                          leafLetterSpacing={leafLetterSpacing}
+                          groupFontHeight={groupFontHeight}
+                          groupFontSize={groupFontSize}
+                          groupFontWeight={groupFontWeight}
+                          groupLetterSpacing={groupLetterSpacing}
+                          sectionFontHeight={sectionFontHeight}
+                          sectionFontSize={sectionFontSize}
+                          sectionFontWeight={sectionFontWeight}
+                          sectionLetterSpacing={sectionLetterSpacing}
+                          itemTextOverflow={itemTextOverflow}
+                          itemWordBreak={itemWordBreak}
+                          itemInitialIndent={itemInitialIndent}
+                          groupSelfIndent={groupSelfIndent}
+                          itemSizePerIndent={itemSizePerIndent}
+                          groupExpandedIcon={groupExpandedIcon}
+                          groupCollapsedIcon={groupCollapsedIcon}
+                          isVirtualized={isMenuVirtualized}
+                          autoFocus={menuAutoFocus}
+                          shouldFocusWrap={shouldMenuFocusWrap}
+                          items={tree.items}
+                          selectedKeys={tree.selectedKeys}
+                          disabledKeys={disabledMenuItemIds}
+                          expandedKeys={menuItemExpandedIds}
+                          selectionMode="single"
+                          disallowEmptySelection
+                          onAction={onMenuItemAction}
+                          onExpandedChange={onMenuItemExpandedChange}
+                          onSelectionChange={keys => {
+                            if (keys === "all" || keys.size <= 0) {
+                              !!setSelectedMenuItem && setSelectedMenuItem(undefined);
+                            } else {
+                              tree.setSelectedKeys(keys);
+                              !!setSelectedMenuItem &&
+                                setSelectedMenuItem(tree.getItem(keys.values().next().value).value);
+                            }
+                          }}
+                          {...rest}
+                        >
+                          {menuHaveSection ? sectionRender : itemRender}
+                        </Menu>
+                      </Content>
+                    )}
+                    {type === "dialog" && customDialogContent}
+                    {type === "dialog" && customDialogFooter}
+                  </AnimatedPopover>
+                </OverlayContainer>
+              )
           )}
         </OverlayProvider>
       )}

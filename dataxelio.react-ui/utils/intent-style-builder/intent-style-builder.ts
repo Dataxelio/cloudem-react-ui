@@ -68,7 +68,7 @@ const backgroundMediumIntent = [
   "bg-warning-600 dark:bg-warning-300",
   "bg-danger-600 dark:bg-danger-300",
   "bg-black dark:bg-white",
-  "bg-gray-50 dark:bg-gray-800", // Low Gray
+  "bg-gray-50 dark:bg-gray-700", // Low Gray
   "bg-brand-50 dark:bg-brand-800", // Low Brand
   "bg-white dark:bg-gray-800", // Sharp
   "bg-gray-800 dark:bg-gray-100", // Inverted Sharp
@@ -86,7 +86,7 @@ const backgroundHighIntent = [
   "bg-warning-700 dark:bg-warning-200",
   "bg-danger-700 dark:bg-danger-200",
   "bg-black dark:bg-white",
-  "bg-gray-50 dark:bg-gray-800", // Low Gray
+  "bg-gray-50 dark:bg-gray-700", // Low Gray
   "bg-brand-50 dark:bg-brand-800", // Low Brand
   "bg-white dark:bg-gray-800", // Sharp
   "bg-gray-800 dark:bg-gray-100", // Inverted Sharp
@@ -104,7 +104,7 @@ const backgroundHighestIntent = [
   "bg-warning-800 dark:bg-warning-100",
   "bg-danger-800 dark:bg-danger-100",
   "bg-black dark:bg-white",
-  "bg-gray-50 dark:bg-gray-800", // Low Gray
+  "bg-gray-50 dark:bg-gray-700", // Low Gray
   "bg-brand-50 dark:bg-brand-800", // Low Brand
   "bg-white dark:bg-gray-800", // Sharp
   "bg-gray-800 dark:bg-gray-100", // Inverted Sharp
@@ -423,7 +423,11 @@ export function computeComponentStyle(
 
   // Background Opacity & Fade
   (backgroundOpacity !== "bg-opacity-100" || backgroundFade) &&
-    res.push(backgroundOpacity !== "bg-opacity-100" ? backgroundOpacity : "bg-opacity-50");
+    res.push(
+      backgroundOpacity !== "bg-opacity-100"
+        ? `${backgroundOpacity} dark:${backgroundOpacity}`
+        : "bg-opacity-50 dark:bg-opacity-50"
+    );
 
   // Foreground Element
   const fgIndex = forceSharpForeground
@@ -444,7 +448,11 @@ export function computeComponentStyle(
 
   // Foreground Opacity & Fade
   (foregroundOpacity !== "text-opacity-100" || foregroundFade) &&
-    res.push(foregroundOpacity !== "text-opacity-100" ? foregroundOpacity : "text-opacity-50");
+    res.push(
+      foregroundOpacity !== "text-opacity-100"
+        ? `${foregroundOpacity} dark:${foregroundOpacity}`
+        : "text-opacity-50 dark:text-opacity-50"
+    );
 
   // Border Element
   if (
@@ -470,7 +478,11 @@ export function computeComponentStyle(
 
   // Border Opacity & Fade
   (borderOpacity !== "border-opacity-100" || borderFade) &&
-    res.push(borderOpacity !== "border-opacity-100" ? borderOpacity : "border-opacity-50");
+    res.push(
+      borderOpacity !== "border-opacity-100"
+        ? `${borderOpacity} dark:${borderOpacity}`
+        : "border-opacity-50 dark:border-opacity-50"
+    );
 
   // Ring Element
   if ((!minimal && ringed) || forceSharpRing || forceInvertedSharpRing || withFocusRing) {
@@ -489,11 +501,17 @@ export function computeComponentStyle(
 
   // Ring Opacity & Fade
   (ringOpacity !== "ring-opacity-100" || ringedFade) &&
-    res.push(ringOpacity !== "ring-opacity-100" ? ringOpacity : "ring-opacity-50");
+    res.push(
+      ringOpacity !== "ring-opacity-100"
+        ? `${ringOpacity} dark:${ringOpacity}`
+        : "ring-opacity-50 dark:ring-opacity-50"
+    );
 
   // Placeholder style
   withPlaceholder &&
-    res.push("placeholder-gray-900 dark:placeholder-gray-100 placeholder-opacity-30");
+    res.push(
+      "placeholder-gray-900 dark:placeholder-gray-100 placeholder-opacity-30 dark:placeholder-opacity-30"
+    );
 
   // Disable pointer events
   disablePointerEvents && res.push("pointer-events-none");

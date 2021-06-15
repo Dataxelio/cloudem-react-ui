@@ -4,6 +4,7 @@ import { useSearchFieldState } from "react-stately";
 import { AriaSearchFieldProps } from "@react-types/searchfield";
 
 import {
+  RingOpacityType,
   BorderRadiusType,
   BorderWidthType,
   BoxShadowType,
@@ -36,6 +37,7 @@ export interface SearchBarProps extends AriaSearchFieldProps {
   minimal?: boolean;
   outlined?: boolean;
   ringed?: boolean;
+  ringOpacity?: RingOpacityType;
   ringedFade?: boolean;
   intent?: IntentColor;
   intentAtDefaultState?: boolean;
@@ -74,6 +76,7 @@ export const SearchBar = React.forwardRef<HTMLInputElement, SearchBarProps>(
       minimal,
       outlined,
       ringed,
+      ringOpacity,
       ringedFade,
       intent,
       intentAtDefaultState,
@@ -139,11 +142,12 @@ export const SearchBar = React.forwardRef<HTMLInputElement, SearchBarProps>(
         intentColor: intent,
         outlined: defaultOutlined,
         ringed: isFocused || isFocusVisible,
+        ringOpacity,
         minimal: defaultMinimal,
         ringedFade,
         intentAtDefaultState,
         forceSharpBackground: true,
-        forceSharpForeground: true,
+        forceSharpForeground: state.value !== "" ? true : false,
         withPlaceholder: true,
         removeDefaultBrowserAppearance: true,
       }

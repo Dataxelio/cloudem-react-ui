@@ -2,15 +2,18 @@ import React, { useRef, useImperativeHandle } from "react";
 
 import { useMenu, AriaMenuOptions } from "@react-aria/menu";
 import { useTreeState, TreeProps } from "@react-stately/tree";
+import { TreeNode } from "@react-stately/data";
 
-import { MenuItemData, IntentColor, MenuStyleProps } from "@dataxelio/react-ui.utils.prop-types";
+import { TreeItem, IntentColor, MenuStyleProps } from "@dataxelio/react-ui.utils.prop-types";
 import { layoutStyleBuilder } from "@dataxelio/react-ui.utils.layout-style-builder";
 import { geometryStyleBuilder } from "@dataxelio/react-ui.utils.geometry-style-builder";
 import { typographyListStyleRemoval } from "@dataxelio/react-ui.utils.typography-style-builder";
 import { MenuSection } from "@dataxelio/react-ui.element.menu-section";
 import { MenuItem } from "@dataxelio/react-ui.element.menu-item";
 
-export type MenuProps = AriaMenuOptions<MenuItemData> & TreeProps<MenuItemData> & MenuStyleProps;
+export type MenuProps = AriaMenuOptions<TreeNode<TreeItem>> &
+  TreeProps<TreeNode<TreeItem>> &
+  MenuStyleProps;
 
 export const Menu = React.forwardRef<HTMLUListElement, MenuProps>(
   (
@@ -19,6 +22,7 @@ export const Menu = React.forwardRef<HTMLUListElement, MenuProps>(
       minimal = true,
       intent = IntentColor.BRAND,
       itemIntentAtDefaultState: intentAtDefaultState = false,
+      itemApplyIntentOnGroup: applyIntentOnGroup = true,
       sectionOpacity = "text-opacity-100",
       groupOpacity = "text-opacity-100",
       forceItemLowGrayBackgroundAtHoverState: forceLowGrayBackgroundAtHoverState = false,
@@ -29,7 +33,11 @@ export const Menu = React.forwardRef<HTMLUListElement, MenuProps>(
       marginBetweenItemsAndSection = "mt-4",
       marginBetweenLeavesAndGroup = "mt-3",
 
-      verticalItemBackgroundPadding = forceLowBrandBackgroundAtHoverState ? "py-1" : "py-0",
+      fill = true,
+      itemBackgroundverticalPadding = forceLowGrayBackgroundAtHoverState ||
+      forceLowBrandBackgroundAtHoverState
+        ? "py-1"
+        : "py-0",
 
       leafFontHeight = "leading-normal",
       leafFontSize = "text-sm",
@@ -74,7 +82,7 @@ export const Menu = React.forwardRef<HTMLUListElement, MenuProps>(
       flexGridCrossAxisAlignment: "items-start",
     });
 
-    const geometryClassName = geometryStyleBuilder({ fill: true });
+    const geometryClassName = geometryStyleBuilder({ fill });
 
     const typographyClassName = typographyListStyleRemoval();
 
@@ -92,6 +100,7 @@ export const Menu = React.forwardRef<HTMLUListElement, MenuProps>(
                 minimal={minimal}
                 intent={intent}
                 intentAtDefaultState={intentAtDefaultState}
+                applyIntentOnGroup={applyIntentOnGroup}
                 sectionOpacity={sectionOpacity}
                 groupOpacity={groupOpacity}
                 forceLowGrayBackgroundAtHoverState={forceLowGrayBackgroundAtHoverState}
@@ -100,7 +109,7 @@ export const Menu = React.forwardRef<HTMLUListElement, MenuProps>(
                 gapBetweenItems={gapBetweenItems}
                 marginBetweenItemsAndSection={marginBetweenItemsAndSection}
                 marginBetweenLeavesAndGroup={marginBetweenLeavesAndGroup}
-                verticalItemBackgroundPadding={verticalItemBackgroundPadding}
+                itemBackgroundverticalPadding={itemBackgroundverticalPadding}
                 leafFontHeight={leafFontHeight}
                 leafFontSize={leafFontSize}
                 leafFontWeight={leafFontWeight}
@@ -130,13 +139,14 @@ export const Menu = React.forwardRef<HTMLUListElement, MenuProps>(
                 minimal={minimal}
                 intent={intent}
                 intentAtDefaultState={intentAtDefaultState}
+                applyIntentOnGroup={applyIntentOnGroup}
                 groupOpacity={groupOpacity}
                 forceLowGrayBackgroundAtHoverState={forceLowGrayBackgroundAtHoverState}
                 forceLowBrandBackgroundAtHoverState={forceLowBrandBackgroundAtHoverState}
                 cursor={cursor}
                 gapBetweenItems={gapBetweenItems}
                 marginBetweenLeavesAndGroup={marginBetweenLeavesAndGroup}
-                verticalItemBackgroundPadding={verticalItemBackgroundPadding}
+                itemBackgroundverticalPadding={itemBackgroundverticalPadding}
                 leafFontHeight={leafFontHeight}
                 leafFontSize={leafFontSize}
                 leafFontWeight={leafFontWeight}

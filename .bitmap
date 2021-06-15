@@ -2,280 +2,304 @@
 
 {
     "element/arrow": {
-        "scope": "",
-        "version": "",
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
         "mainFile": "index.ts",
         "rootDir": "dataxelio.react-ui/element/arrow"
     },
     "element/content": {
-        "scope": "",
-        "version": "",
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
         "mainFile": "index.ts",
         "rootDir": "dataxelio.react-ui/element/content"
     },
     "element/content-text": {
-        "scope": "",
-        "version": "",
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
         "mainFile": "index.ts",
         "rootDir": "dataxelio.react-ui/element/content-text"
     },
     "element/divider": {
-        "scope": "",
-        "version": "",
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
         "mainFile": "index.ts",
         "rootDir": "dataxelio.react-ui/element/divider"
     },
     "element/footer": {
-        "scope": "",
-        "version": "",
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
         "mainFile": "index.ts",
         "rootDir": "dataxelio.react-ui/element/footer"
     },
     "element/form": {
-        "scope": "",
-        "version": "",
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
         "mainFile": "index.ts",
         "rootDir": "dataxelio.react-ui/element/form"
     },
     "element/header": {
-        "scope": "",
-        "version": "",
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
         "mainFile": "index.ts",
         "rootDir": "dataxelio.react-ui/element/header"
     },
     "element/icon": {
-        "scope": "",
-        "version": "",
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
         "mainFile": "index.ts",
         "rootDir": "dataxelio.react-ui/element/icon"
     },
     "element/label": {
-        "scope": "",
-        "version": "",
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
         "mainFile": "index.ts",
         "rootDir": "dataxelio.react-ui/element/label"
     },
     "element/menu": {
-        "scope": "",
-        "version": "",
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
         "mainFile": "index.ts",
         "rootDir": "dataxelio.react-ui/element/menu"
     },
     "element/menu-item": {
-        "scope": "",
-        "version": "",
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
         "mainFile": "index.ts",
         "rootDir": "dataxelio.react-ui/element/menu-item"
     },
     "element/menu-section": {
-        "scope": "",
-        "version": "",
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
         "mainFile": "index.ts",
         "rootDir": "dataxelio.react-ui/element/menu-section"
     },
-    "element/paragraph": {
+    "element/navbar-group": {
         "scope": "",
         "version": "",
+        "mainFile": "index.ts",
+        "rootDir": "dataxelio.react-ui/element/navbar-group"
+    },
+    "element/paragraph": {
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
         "mainFile": "index.ts",
         "rootDir": "dataxelio.react-ui/element/paragraph"
     },
     "element/sub-title": {
-        "scope": "",
-        "version": "",
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
         "mainFile": "index.ts",
         "rootDir": "dataxelio.react-ui/element/sub-title"
     },
     "element/text": {
-        "scope": "",
-        "version": "",
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
         "mainFile": "index.ts",
         "rootDir": "dataxelio.react-ui/element/text"
     },
     "element/title": {
-        "scope": "",
-        "version": "",
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
         "mainFile": "index.ts",
         "rootDir": "dataxelio.react-ui/element/title"
     },
     "input/anchor-button": {
-        "scope": "",
-        "version": "",
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
         "mainFile": "index.ts",
         "rootDir": "dataxelio.react-ui/input/anchor-button"
     },
-    "input/auto-suggest-input": {
-        "scope": "",
-        "version": "",
-        "mainFile": "index.ts",
-        "rootDir": "dataxelio.react-ui/input/auto-suggest-input"
-    },
     "input/button": {
-        "scope": "",
-        "version": "",
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
         "mainFile": "index.ts",
         "rootDir": "dataxelio.react-ui/input/button"
     },
     "input/check-box": {
-        "scope": "",
-        "version": "",
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
         "mainFile": "index.ts",
         "rootDir": "dataxelio.react-ui/input/check-box"
     },
-    "input/form-group": {
-        "scope": "",
-        "version": "",
+    "input/picker-select": {
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
         "mainFile": "index.ts",
-        "rootDir": "dataxelio.react-ui/input/form-group"
+        "rootDir": "dataxelio.react-ui/input/picker-select"
+    },
+    "input/property-editor-button": {
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
+        "mainFile": "index.ts",
+        "rootDir": "dataxelio.react-ui/input/property-editor-button"
     },
     "input/search-bar": {
-        "scope": "",
-        "version": "",
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
         "mainFile": "index.ts",
         "rootDir": "dataxelio.react-ui/input/search-bar"
     },
-    "input/select": {
-        "scope": "",
-        "version": "",
-        "mainFile": "index.ts",
-        "rootDir": "dataxelio.react-ui/input/select"
-    },
     "input/text-area": {
-        "scope": "",
-        "version": "",
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
         "mainFile": "index.ts",
         "rootDir": "dataxelio.react-ui/input/text-area"
     },
     "input/text-field": {
-        "scope": "",
-        "version": "",
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
         "mainFile": "index.ts",
         "rootDir": "dataxelio.react-ui/input/text-field"
     },
     "internal/content-impl": {
-        "scope": "",
-        "version": "",
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
         "mainFile": "index.ts",
         "rootDir": "dataxelio.react-ui/internal/content-impl"
     },
     "internal/content-text-impl": {
-        "scope": "",
-        "version": "",
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
         "mainFile": "index.ts",
         "rootDir": "dataxelio.react-ui/internal/content-text-impl"
     },
     "internal/footer-impl": {
-        "scope": "",
-        "version": "",
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
         "mainFile": "index.ts",
         "rootDir": "dataxelio.react-ui/internal/footer-impl"
     },
     "internal/header-impl": {
-        "scope": "",
-        "version": "",
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
         "mainFile": "index.ts",
         "rootDir": "dataxelio.react-ui/internal/header-impl"
     },
     "layout/basic-layout": {
-        "scope": "",
-        "version": "",
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
         "mainFile": "index.ts",
         "rootDir": "dataxelio.react-ui/layout/basic-layout"
     },
     "layout/flex-layout": {
-        "scope": "",
-        "version": "",
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
         "mainFile": "index.ts",
         "rootDir": "dataxelio.react-ui/layout/flex-layout"
     },
     "layout/grid-layout": {
-        "scope": "",
-        "version": "",
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
         "mainFile": "index.ts",
         "rootDir": "dataxelio.react-ui/layout/grid-layout"
     },
-    "overlay/dialog": {
+    "navigation/menu-button": {
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
+        "mainFile": "index.ts",
+        "rootDir": "dataxelio.react-ui/navigation/menu-button"
+    },
+    "navigation/navbar": {
         "scope": "",
         "version": "",
+        "mainFile": "index.ts",
+        "rootDir": "dataxelio.react-ui/navigation/navbar"
+    },
+    "navigation/sidebar": {
+        "scope": "",
+        "version": "",
+        "mainFile": "index.ts",
+        "rootDir": "dataxelio.react-ui/navigation/sidebar"
+    },
+    "overlay/dialog": {
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
         "mainFile": "index.ts",
         "rootDir": "dataxelio.react-ui/overlay/dialog"
     },
     "overlay/popover": {
-        "scope": "",
-        "version": "",
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
         "mainFile": "index.ts",
         "rootDir": "dataxelio.react-ui/overlay/popover"
     },
     "overlay/popover-trigger": {
-        "scope": "",
-        "version": "",
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
         "mainFile": "index.ts",
         "rootDir": "dataxelio.react-ui/overlay/popover-trigger"
     },
     "overlay/tooltip": {
-        "scope": "",
-        "version": "",
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
         "mainFile": "index.ts",
         "rootDir": "dataxelio.react-ui/overlay/tooltip"
     },
     "surface/card": {
-        "scope": "",
-        "version": "",
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
         "mainFile": "index.ts",
         "rootDir": "dataxelio.react-ui/surface/card"
     },
-    "surface/paper": {
-        "scope": "",
-        "version": "",
-        "mainFile": "index.ts",
-        "rootDir": "dataxelio.react-ui/surface/paper"
-    },
     "surface/resource-viewer": {
-        "scope": "",
-        "version": "",
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
         "mainFile": "index.ts",
         "rootDir": "dataxelio.react-ui/surface/resource-viewer"
     },
     "utils/geometry-style-builder": {
-        "scope": "",
-        "version": "",
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
         "mainFile": "index.ts",
         "rootDir": "dataxelio.react-ui/utils/geometry-style-builder"
     },
     "utils/intent-style-builder": {
-        "scope": "",
-        "version": "",
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
         "mainFile": "index.ts",
         "rootDir": "dataxelio.react-ui/utils/intent-style-builder"
     },
     "utils/layout-style-builder": {
-        "scope": "",
-        "version": "",
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
         "mainFile": "index.ts",
         "rootDir": "dataxelio.react-ui/utils/layout-style-builder"
     },
     "utils/prop-types": {
-        "scope": "",
-        "version": "",
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
         "mainFile": "index.ts",
         "rootDir": "dataxelio.react-ui/utils/prop-types"
     },
     "utils/typography-style-builder": {
-        "scope": "",
-        "version": "",
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
         "mainFile": "index.ts",
         "rootDir": "dataxelio.react-ui/utils/typography-style-builder"
     },
+    "utils/use-build-tree": {
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
+        "mainFile": "index.ts",
+        "rootDir": "dataxelio.react-ui/utils/use-build-tree"
+    },
+    "utils/use-disabled-menu-item": {
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
+        "mainFile": "index.ts",
+        "rootDir": "dataxelio.react-ui/utils/use-disabled-menu-item"
+    },
     "utils/use-dom-ref": {
-        "scope": "",
-        "version": "",
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
         "mainFile": "index.ts",
         "rootDir": "dataxelio.react-ui/utils/use-dom-ref"
     },
     "utils/use-selected-menu-item": {
-        "scope": "",
-        "version": "",
+        "scope": "dataxelio.react-ui",
+        "version": "0.0.1",
         "mainFile": "index.ts",
         "rootDir": "dataxelio.react-ui/utils/use-selected-menu-item"
     },
-    "version": "1.0.48"
+    "$schema-version": "14.9.0"
 }

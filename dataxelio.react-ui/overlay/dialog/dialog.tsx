@@ -1,4 +1,5 @@
 import React, { useRef } from "react";
+import { useTransition, animated, config } from "@react-spring/web";
 import { useDialog } from "@react-aria/dialog";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import { useIsSSR } from "@react-aria/ssr";
@@ -155,79 +156,94 @@ export const Dialog = ({
 
   const { dialogProps, titleProps } = useDialog({ ...rest }, popoverRef);
 
+  const transitions = useTransition(state.isOpen, {
+    from: { transform: "scale(0.89", opacity: 0 },
+    enter: { transform: "scale(1.0)", opacity: 1 },
+    leave: { transform: "scale(0.9)", opacity: 0 },
+    reverse: state.isOpen,
+    delay: 100,
+    config: config.stiff,
+  });
+
+  const AnimatedPopover = animated(Popover);
+
   return (
     <>
       {!isSSR && (
         <OverlayProvider>
-          {state.isOpen && (
-            <OverlayContainer>
-              <FlexLayout
-                intent={IntentColor.BLACK}
-                backgroundOpacity="bg-opacity-50"
-                position="fixed"
-                zIndex="z-50"
-                leftPlacement="left-0"
-                rightPlacement="right-0"
-                topPlacement="top-0"
-                bottomPlacement="bottom-0"
-                flexMainAxisAlignment="justify-center"
-                flexCrossAxisAlignment="items-center"
-              >
-                <Popover
-                  ref={popoverRef}
-                  isOpen
-                  isDismissable
-                  shouldCloseOnBlur={shouldCloseOnBlur}
-                  isKeyboardDismissDisabled={false}
-                  onClose={onClose}
-                  shouldCloseOnInteractOutside={shouldCloseOnInteractOutside}
-                  contain
-                  restoreFocus
-                  autoFocus
-                  isModal
-                  preventScroll={preventScroll}
-                  contentOrientation={contentOrientation}
-                  contentAlignment={contentAlignment}
-                  footerAlignment={footerAlignment}
-                  dividerAfterHeader={dividerAfterHeader}
-                  dividerAfterContentText={dividerAfterContentText}
-                  dividerAfterContent={dividerAfterContent}
-                  minimal={minimal}
-                  outlined={outlined}
-                  intent={intent}
-                  backgroundOpacity={backgroundOpacity}
-                  borderOpacity={borderOpacity}
-                  contentGap={contentGap}
-                  leftMargin={leftMargin}
-                  rightMargin={rightMargin}
-                  horizontalMargin={horizontalMargin}
-                  internalHorizontalMargin={internalHorizontalMargin}
-                  topMargin={topMargin}
-                  bottomMargin={bottomMargin}
-                  verticalMargin={verticalMargin}
-                  internalVerticalMargin={internalVerticalMargin}
-                  debugMode={debugMode}
-                  debugIntent={debugIntent}
-                  width={width}
-                  maxWidth={maxWidth}
-                  minWidth={minWidth}
-                  height={height}
-                  maxHeight={maxHeight}
-                  minHeight={minHeight}
-                  borderWidth={borderWidth}
-                  borderRadius={borderRadius}
-                  horizontalPadding={horizontalPadding}
-                  verticalPadding={verticalPadding}
-                  boxShadow={boxShadow}
-                  asForm={asForm}
-                  onSubmit={onSubmit}
-                  titleDomProps={titleProps}
-                  overlayPrimaryDomProps={dialogProps}
-                >
-                  {children}
-                </Popover>
-              </FlexLayout>
-            </OverlayContainer>
+          {transitions(
+            (styles, item) =>
+              item && (
+                <OverlayContainer>
+                  <FlexLayout
+                    intent={IntentColor.BLACK}
+                    backgroundOpacity="bg-opacity-50"
+                    position="fixed"
+                    zIndex="z-50"
+                    leftPlacement="left-0"
+                    rightPlacement="right-0"
+                    topPlacement="top-0"
+                    bottomPlacement="bottom-0"
+                    flexMainAxisAlignment="justify-center"
+                    flexCrossAxisAlignment="items-center"
+                  >
+                    <AnimatedPopover
+                      style={{ transform: styles.transform, opacity: styles.opacity }}
+                      ref={popoverRef}
+                      isOpen
+                      isDismissable
+                      shouldCloseOnBlur={shouldCloseOnBlur}
+                      isKeyboardDismissDisabled={false}
+                      onClose={onClose}
+                      shouldCloseOnInteractOutside={shouldCloseOnInteractOutside}
+                      contain
+                      restoreFocus
+                      autoFocus
+                      isModal
+                      preventScroll={preventScroll}
+                      contentOrientation={contentOrientation}
+                      contentAlignment={contentAlignment}
+                      footerAlignment={footerAlignment}
+                      dividerAfterHeader={dividerAfterHeader}
+                      dividerAfterContentText={dividerAfterContentText}
+                      dividerAfterContent={dividerAfterContent}
+                      minimal={minimal}
+                      outlined={outlined}
+                      intent={intent}
+                      backgroundOpacity={backgroundOpacity}
+                      borderOpacity={borderOpacity}
+                      contentGap={contentGap}
+                      leftMargin={leftMargin}
+                      rightMargin={rightMargin}
+                      horizontalMargin={horizontalMargin}
+                      internalHorizontalMargin={internalHorizontalMargin}
+                      topMargin={topMargin}
+                      bottomMargin={bottomMargin}
+                      verticalMargin={verticalMargin}
+                      internalVerticalMargin={internalVerticalMargin}
+                      debugMode={debugMode}
+                      debugIntent={debugIntent}
+                      width={width}
+                      maxWidth={maxWidth}
+                      minWidth={minWidth}
+                      height={height}
+                      maxHeight={maxHeight}
+                      minHeight={minHeight}
+                      borderWidth={borderWidth}
+                      borderRadius={borderRadius}
+                      horizontalPadding={horizontalPadding}
+                      verticalPadding={verticalPadding}
+                      boxShadow={boxShadow}
+                      asForm={asForm}
+                      onSubmit={onSubmit}
+                      titleDomProps={titleProps}
+                      overlayPrimaryDomProps={dialogProps}
+                    >
+                      {children}
+                    </AnimatedPopover>
+                  </FlexLayout>
+                </OverlayContainer>
+              )
           )}
         </OverlayProvider>
       )}

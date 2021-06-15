@@ -1,13 +1,13 @@
 import { useMemo } from "react";
 
-import { MenuItemData } from "@dataxelio/react-ui.utils.prop-types";
+import { TreeItem } from "@dataxelio/react-ui.utils.prop-types";
 
 export function getMenuItemById(
   active: boolean,
-  items: MenuItemData[],
+  items: TreeItem[],
   key: string
-): MenuItemData | undefined {
-  let res: MenuItemData | undefined = undefined;
+): TreeItem | undefined {
+  let res: TreeItem | undefined = undefined;
 
   if (active) {
     res = items.find(item => item.id === key);
@@ -32,9 +32,9 @@ export function getMenuItemById(
 
 export function useSelectedMenuItem(
   active: boolean,
-  items: MenuItemData[],
+  items: TreeItem[],
   key: string
-): MenuItemData | undefined {
+): TreeItem | undefined {
   const res = useMemo(() => getMenuItemById(active, items, key), [active, items, key]);
 
   return res;
