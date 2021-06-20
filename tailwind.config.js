@@ -3,9 +3,11 @@ const colors = require("tailwindcss/colors");
 module.exports = {
   mode: "jit",
   purge: [
-    "./pages/**/*.{js,ts,jsx,tsx}",
-    "./dataxelio.react-ui/**/*.{js,ts,jsx,tsx}",
-    "./local-components/**/*.{js,ts,jsx,tsx}",
+    "./dataxelio.react-ui/utils/prop-types/prop-types.ts",
+    "./dataxelio.react-ui/utils/geometry-style-builder/geometry-style-builder.ts",
+    "./dataxelio.react-ui/utils/intent-style-builder/intent-style-builder.ts",
+    "./dataxelio.react-ui/utils/layout-style-builder/layout-style-builder.ts",
+    "./dataxelio.react-ui/utils/typography-style-builder/typography-style-builder.ts",
   ],
   darkMode: "class", // false or 'media' or 'class'
   theme: {
@@ -22,6 +24,9 @@ module.exports = {
       warning: colors.orange,
       danger: colors.red,
       blueGray: colors.blueGray,
+    },
+    fontFamily: {
+      sans: ["Tahoma", "Helvetica", "Verdana", "system-ui", "sans-serif"],
     },
     extend: {},
   },

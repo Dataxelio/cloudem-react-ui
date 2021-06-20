@@ -27,8 +27,9 @@ import {
   faMinus,
   faMinusSquare,
   faEdit,
+  faUser,
+  faLock,
 } from "@fortawesome/free-solid-svg-icons";
-
 import {
   faFolder as faFolderRegular,
   faEye as faEyeRegular,
@@ -68,7 +69,9 @@ function App({ Component, pageProps }: AppProps) {
     faMinusSquare,
     faMinusSquareRegular,
     faEdit,
-    faEditRegular
+    faEditRegular,
+    faUser,
+    faLock
   );
 
   const { locale } = useLocale();

@@ -114,6 +114,7 @@ export interface FlexLayoutProps extends React.HTMLAttributes<HTMLElement> {
   // Geometry Style
   fixed?: boolean;
   fluid?: boolean;
+  cross?: boolean;
   width?: WidthType;
   maxWidth?: MaxWidthType;
   minWidth?: MinWidthType;
@@ -191,6 +192,7 @@ export const FlexLayout = React.forwardRef<HTMLElement, FlexLayoutProps>(
 
       fixed,
       fluid,
+      cross,
       width,
       maxWidth,
       minWidth,
@@ -279,6 +281,7 @@ export const FlexLayout = React.forwardRef<HTMLElement, FlexLayoutProps>(
     const geometryClassName = geometryStyleBuilder({
       fixed,
       fill: fluid,
+      cross,
       width,
       maxWidth,
       minWidth,

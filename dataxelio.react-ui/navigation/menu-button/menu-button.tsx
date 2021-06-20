@@ -43,8 +43,13 @@ import { PopoverTrigger } from "@dataxelio/react-ui.overlay.popover-trigger";
 
 export interface MenuButtonProps extends ButtonTriggerStyleProps {
   label: string;
+  useLabelAsButtonText?: boolean;
   isDisabled?: boolean;
-  items: ListItem[];
+  menuItems: ListItem[];
+  menuSortSections?: boolean;
+  menuSortGroups?: boolean;
+  menuSortItems?: boolean;
+  withHandler?: boolean;
   openedIcon?: IconName;
   closedIcon?: IconName;
 
@@ -93,6 +98,7 @@ export interface MenuButtonProps extends ButtonTriggerStyleProps {
   menuItemFontSize?: FontSizeType;
   menuItemFontWeight?: FontWeightType;
   menuItemLetterSpacing?: LetterSpacingType;
+  menuItemUseDarkGrayAsDefaultIntent?: boolean;
   menuSectionFontHeight?: LineHeightType;
   menuSectionFontSize?: FontSizeType;
   menuSectionFontWeight?: FontWeightType;
@@ -105,17 +111,23 @@ export interface MenuButtonProps extends ButtonTriggerStyleProps {
 
 export const MenuButton = ({
   label,
+  useLabelAsButtonText = true,
   isDisabled,
-  items,
+  menuItems,
+  menuSortSections = true,
+  menuSortGroups = true,
+  menuSortItems = true,
+  withHandler = true,
   openedIcon = "caret-up",
   closedIcon = "caret-down",
 
   intentAtDefaultState,
-  width = "w-40",
+  // width = "w-40",
   horizontalPadding = "px-4",
   verticalPadding = "py-1.5",
   fontSize = "text-sm",
   fontWeight = "font-semibold",
+  rightIcon,
 
   syncButtonWithSelectedItem,
   onPopoverOpenChange,
@@ -159,6 +171,7 @@ export const MenuButton = ({
   menuItemFontSize,
   menuItemFontWeight,
   menuItemLetterSpacing,
+  menuItemUseDarkGrayAsDefaultIntent,
   menuSectionFontHeight,
   menuSectionFontSize,
   menuSectionFontWeight,
@@ -173,13 +186,18 @@ export const MenuButton = ({
   const [popoverOpen, setPopoverOpen] = useState<boolean>(false);
   const [selectedMenuItem, setSelectedMenuItem] = useState<TreeItem | undefined>(undefined);
 
-  const { haveSection: menuHaveSection, treeItems: menuTreeItems } = useBuildTree(items);
+  const { haveSection: menuHaveSection, treeItems: menuTreeItems } = useBuildTree(
+    menuItems,
+    menuSortSections,
+    menuSortGroups,
+    menuSortItems
+  );
 
   const router = useRouter();
 
   useEffect(() => {
     if (!!selectedMenuItem && selectedMenuItem.name.length > 0) {
-      console.log("router push");
+      // console.log("router push");
       router.push(selectedMenuItem.name);
     }
   }, [selectedMenuItem?.name]);
@@ -221,6 +239,7 @@ export const MenuButton = ({
       leafFontSize={menuItemFontSize}
       leafFontWeight={menuItemFontWeight}
       leafLetterSpacing={menuItemLetterSpacing}
+      leafUseDarkGrayAsDefaultIntent={menuItemUseDarkGrayAsDefaultIntent}
       sectionFontHeight={menuSectionFontHeight}
       sectionFontSize={menuSectionFontSize}
       sectionFontWeight={menuSectionFontWeight}
@@ -248,16 +267,16 @@ export const MenuButton = ({
       <Button
         isDisabled={isDisabled}
         intentAtDefaultState={!!selectedMenuItem ? true : intentAtDefaultState}
-        width={width}
+        // width={width}
         horizontalPadding={horizontalPadding}
         verticalPadding={verticalPadding}
         fontSize={fontSize}
         fontWeight={fontWeight}
-        rightIcon={popoverOpen ? openedIcon : closedIcon}
+        rightIcon={!withHandler ? rightIcon : popoverOpen ? openedIcon : closedIcon}
         onPress={() => setPopoverOpen(!popoverOpen)}
         {...rest}
       >
-        {label}
+        {useLabelAsButtonText && label}
       </Button>
     </PopoverTrigger>
   );

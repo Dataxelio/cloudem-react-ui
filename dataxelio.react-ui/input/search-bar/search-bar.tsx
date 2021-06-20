@@ -1,10 +1,20 @@
-import React, { useRef, useImperativeHandle } from "react";
-import { useSearchField, useFocusRing, mergeProps } from "react-aria";
-import { useSearchFieldState } from "react-stately";
+import React, { useState, useRef, useImperativeHandle } from "react";
+
+import { useFocus } from "@react-aria/interactions";
+import { useFocusRing } from "@react-aria/focus";
+import { useSearchField } from "@react-aria/searchfield";
+import { mergeProps } from "@react-aria/utils";
+import { useSearchFieldState } from "@react-stately/searchfield";
 import { AriaSearchFieldProps } from "@react-types/searchfield";
 
 import {
   RingOpacityType,
+  LeftMarginType,
+  RightMarginType,
+  HorizontalMarginType,
+  TopMarginType,
+  BottomMarginType,
+  VerticalMarginType,
   BorderRadiusType,
   BorderWidthType,
   BoxShadowType,
@@ -41,6 +51,14 @@ export interface SearchBarProps extends AriaSearchFieldProps {
   ringedFade?: boolean;
   intent?: IntentColor;
   intentAtDefaultState?: boolean;
+
+  // Layout Style
+  leftMargin?: LeftMarginType;
+  rightMargin?: RightMarginType;
+  horizontalMargin?: HorizontalMarginType;
+  topMargin?: TopMarginType;
+  bottomMargin?: BottomMarginType;
+  verticalMargin?: VerticalMarginType;
 
   // Geometry Style
   width?: WidthType;
@@ -81,6 +99,13 @@ export const SearchBar = React.forwardRef<HTMLInputElement, SearchBarProps>(
       intent,
       intentAtDefaultState,
 
+      leftMargin,
+      rightMargin,
+      horizontalMargin,
+      topMargin,
+      bottomMargin,
+      verticalMargin,
+
       borderWidth,
       borderRadius,
       ringWidth,
@@ -120,7 +145,14 @@ export const SearchBar = React.forwardRef<HTMLInputElement, SearchBarProps>(
     const innerRef = useRef<HTMLInputElement>(null);
     useImperativeHandle(ref, () => innerRef.current as HTMLInputElement);
 
-    const { isFocused, isFocusVisible, focusProps } = useFocusRing({
+    const [isFocused, setIsFocused] = useState(false);
+
+    const { focusProps } = useFocus({
+      isDisabled,
+      onFocusChange: focused => setIsFocused(focused),
+    });
+
+    const { isFocusVisible, focusProps: focusRingProps } = useFocusRing({
       autoFocus,
       isTextInput: true,
     });
@@ -178,7 +210,18 @@ export const SearchBar = React.forwardRef<HTMLInputElement, SearchBarProps>(
     });
 
     return (
-      <BasicLayout position="relative" fluid={fill} width={defaultWidth} className={dClassName}>
+      <BasicLayout
+        position="relative"
+        fluid={fill}
+        width={defaultWidth}
+        leftMargin={leftMargin}
+        rightMargin={rightMargin}
+        horizontalMargin={horizontalMargin}
+        topMargin={topMargin}
+        bottomMargin={bottomMargin}
+        verticalMargin={verticalMargin}
+        className={dClassName}
+      >
         <Icon
           position="absolute"
           leftPlacement="left-2"
@@ -194,7 +237,7 @@ export const SearchBar = React.forwardRef<HTMLInputElement, SearchBarProps>(
         <input
           ref={innerRef}
           className={`${intentClassName} ${geometryClassName} ${typographyClassName}`}
-          {...mergeProps(inputProps, focusProps)}
+          {...mergeProps(inputProps, focusProps, focusRingProps)}
         />
         {state.value !== "" && (
           <Button

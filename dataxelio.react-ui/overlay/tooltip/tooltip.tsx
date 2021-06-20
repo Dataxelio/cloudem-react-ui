@@ -63,7 +63,7 @@ export const Tooltip: FunctionComponent<TooltipProps> = ({
     enter: { transform: "scale(1.0)", opacity: 1 },
     leave: { transform: "scale(0.95)", opacity: 0 },
     reverse: state.isOpen,
-    delay: 100,
+    delay: 10,
     config: config.default,
   });
 

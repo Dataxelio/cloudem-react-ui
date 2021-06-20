@@ -31,8 +31,8 @@ export interface TitleProps extends DefaultLayoutElementProps {
 }
 
 export const Title = ({
-  intent,
-  fontSize = "text-lg",
+  intent = IntentColor.GRAY,
+  fontSize = "text-base",
   fontSmoothing,
   fontStyle,
   fontWeight = "font-semibold",

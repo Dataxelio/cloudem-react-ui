@@ -58,10 +58,12 @@ export interface MenuItemProps {
   leafFontSize: FontSizeType;
   leafFontWeight: FontWeightType;
   leafLetterSpacing: LetterSpacingType;
+  leafUseDarkGrayAsDefaultIntent: boolean;
   groupFontHeight: LineHeightType;
   groupFontSize: FontSizeType;
   groupFontWeight: FontWeightType;
   groupLetterSpacing: LetterSpacingType;
+  groupUseDarkGrayAsDefaultIntent: boolean;
   textOverflow: TextOverflowType;
   wordBreak: WordBreakType;
 
@@ -100,10 +102,12 @@ export const MenuItem = ({
   leafFontSize,
   leafFontWeight,
   leafLetterSpacing,
+  leafUseDarkGrayAsDefaultIntent,
   groupFontHeight,
   groupFontSize,
   groupFontWeight,
   groupLetterSpacing,
+  groupUseDarkGrayAsDefaultIntent,
   textOverflow,
   wordBreak,
 
@@ -169,7 +173,9 @@ export const MenuItem = ({
 
   const intentClassName = intentStyleBuilder(intentState, {
     intentColor: intent,
-    useDarkGrayAsDefaultIntent: true,
+    useDarkGrayAsDefaultIntent: isGroup
+      ? groupUseDarkGrayAsDefaultIntent
+      : leafUseDarkGrayAsDefaultIntent,
     minimal,
     forceLowGrayBackgroundAtHoverState: forceLowGrayBackgroundAtHoverState && isHovered,
     forceLowBrandBackgroundAtHoverState: forceLowBrandBackgroundAtHoverState && isHovered,
@@ -255,7 +261,7 @@ export const MenuItem = ({
               inheritStyle
             />
           )}
-          {leftIcon && (
+          {!!leftIcon && (
             <Icon
               flexItemResizing="flex-none"
               iName={leftIcon}
@@ -273,7 +279,7 @@ export const MenuItem = ({
             />
           )}
           {typeof item.rendered !== "string" && item.rendered}
-          {rightIcon && (
+          {!!rightIcon && (
             <Icon
               flexItemResizing="flex-none"
               leftMargin="ml-auto"
@@ -307,10 +313,12 @@ export const MenuItem = ({
               leafFontSize={leafFontSize}
               leafFontWeight={leafFontWeight}
               leafLetterSpacing={leafLetterSpacing}
+              leafUseDarkGrayAsDefaultIntent={leafUseDarkGrayAsDefaultIntent}
               groupFontHeight={groupFontHeight}
               groupFontSize={groupFontSize}
               groupFontWeight={groupFontWeight}
               groupLetterSpacing={groupLetterSpacing}
+              groupUseDarkGrayAsDefaultIntent={groupUseDarkGrayAsDefaultIntent}
               textOverflow={textOverflow}
               wordBreak={wordBreak}
               item={node}

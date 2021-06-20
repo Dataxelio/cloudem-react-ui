@@ -1,6 +1,11 @@
-import React, { useRef, useImperativeHandle } from "react";
-import { useCheckbox, useHover, useFocusRing, VisuallyHidden } from "react-aria";
-import { useToggleState } from "react-stately";
+import React, { useState, useRef, useImperativeHandle } from "react";
+
+import { useHover, useFocus } from "@react-aria/interactions";
+import { useFocusRing } from "@react-aria/focus";
+import { useCheckbox } from "@react-aria/checkbox";
+import { mergeProps } from "@react-aria/utils";
+import { VisuallyHidden } from "@react-aria/visually-hidden";
+import { useToggleState } from "@react-stately/toggle";
 import { AriaCheckboxProps } from "@react-types/checkbox";
 
 import {
@@ -72,8 +77,16 @@ export const CheckBox = React.forwardRef<HTMLInputElement, CheckBoxProps>(
     const innerRef = useRef<HTMLInputElement>(null);
     useImperativeHandle(ref, () => innerRef.current as HTMLInputElement);
 
+    const [isFocused, setIsFocused] = useState(false);
+
     const { isHovered, hoverProps } = useHover({ isDisabled });
-    const { isFocused, isFocusVisible, focusProps } = useFocusRing({
+
+    const { focusProps } = useFocus({
+      isDisabled,
+      onFocusChange: focused => setIsFocused(focused),
+    });
+
+    const { isFocusVisible, focusProps: focusRingProps } = useFocusRing({
       autoFocus,
       isTextInput: false,
     });
@@ -97,7 +110,11 @@ export const CheckBox = React.forwardRef<HTMLInputElement, CheckBoxProps>(
         className={cClassName}
       >
         <VisuallyHidden>
-          <input className="cursor-pointer" ref={innerRef} {...inputProps} {...focusProps} />
+          <input
+            className="cursor-pointer"
+            ref={innerRef}
+            {...mergeProps(inputProps, focusProps, focusRingProps)}
+          />
         </VisuallyHidden>
         <BasicLayout
           position="relative"

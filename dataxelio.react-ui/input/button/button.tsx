@@ -1,5 +1,9 @@
-import React, { useRef, useImperativeHandle } from "react";
-import { useButton, useHover, useFocusRing, mergeProps } from "react-aria";
+import React, { useState, useRef, useImperativeHandle } from "react";
+
+import { useHover, useFocus } from "@react-aria/interactions";
+import { useFocusRing } from "@react-aria/focus";
+import { useButton } from "@react-aria/button";
+import { mergeProps } from "@react-aria/utils";
 import { AriaButtonProps } from "@react-types/button";
 
 import { IntentState, ButtonStyleProps } from "@dataxelio/react-ui.utils.prop-types";
@@ -27,6 +31,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       backgroundOpacity,
       foregroundOpacity,
 
+      gapBetweenElements = "gap-3",
       position,
       leftPlacement,
       rightPlacement,
@@ -101,8 +106,16 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const innerRef = useRef<HTMLButtonElement>(null);
     useImperativeHandle(ref, () => innerRef.current as HTMLButtonElement);
 
+    const [isFocused, setIsFocused] = useState(false);
+
     const { isHovered, hoverProps } = useHover({ isDisabled });
-    const { isFocused, isFocusVisible, focusProps } = useFocusRing({
+
+    const { focusProps } = useFocus({
+      isDisabled,
+      onFocusChange: focused => setIsFocused(focused),
+    });
+
+    const { isFocusVisible, focusProps: focusRingProps } = useFocusRing({
       autoFocus,
       isTextInput: false,
     });
@@ -145,7 +158,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       visibility,
       flexGridMainAxisAlignment: !!width ? "justify-between" : "justify-center",
       flexGridCrossAxisAlignment: "items-center",
-      flexGridGap: "gap-3",
+      flexGridGap: gapBetweenElements,
       flexItemResizing,
       flexItemGrow,
       flexItemShrink,
@@ -190,7 +203,13 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       <button
         ref={innerRef}
         className={`${intentClassName} ${layoutClassName} ${geometryClassName} ${typographyClassName}`}
-        {...mergeProps(buttonProps, focusProps, hoverProps, tooltipTriggerDomProps ?? {})}
+        {...mergeProps(
+          buttonProps,
+          focusProps,
+          focusRingProps,
+          hoverProps,
+          tooltipTriggerDomProps ?? {}
+        )}
       >
         {leftIcon && (
           <Icon

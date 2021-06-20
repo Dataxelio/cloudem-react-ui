@@ -81,6 +81,7 @@ export type ButtonTriggerStyleProps = {
   foregroundOpacity?: ForegroundOpacityType;
 
   // Layout Style
+  gapBetweenElements?: FlexGridGapType;
   position?: PositionType;
   leftPlacement?: LeftPlacementType;
   rightPlacement?: RightPlacementType;
@@ -119,6 +120,16 @@ export type ButtonTriggerStyleProps = {
   fontWeight?: FontWeightType;
   letterSpacing?: LetterSpacingType;
 
+  // Left Icon
+  leftIcon?: IconName;
+  leftIconTransform?: IconTransform;
+  leftIconStyle?: IconStyle;
+
+  // Right Icon
+  rightIcon?: IconName;
+  rightIconTransform?: IconTransform;
+  rightIconStyle?: IconStyle;
+
   // Custom Style
   className?: string;
 
@@ -132,16 +143,6 @@ export type ButtonTriggerStyleProps = {
 export type ButtonStyleProps = ButtonTriggerStyleProps & {
   // Text
   text?: string;
-
-  // Left Icon
-  leftIcon?: IconName;
-  leftIconTransform?: IconTransform;
-  leftIconStyle?: IconStyle;
-
-  // Right Icon
-  rightIcon?: IconName;
-  rightIconTransform?: IconTransform;
-  rightIconStyle?: IconStyle;
 
   // Loading Icon
   loading?: boolean;
@@ -157,6 +158,8 @@ export type ButtonStyleProps = ButtonTriggerStyleProps & {
 
 export type CardStyleProps = {
   // Orientation
+  headerOrientation?: OrientationType;
+  headerAlignment?: AlignmentType;
   contentOrientation?: OrientationType;
   contentAlignment?: AlignmentType;
   footerAlignment?: AlignmentType;
@@ -174,6 +177,7 @@ export type CardStyleProps = {
   borderOpacity?: BorderOpacityType;
 
   // Layout Style
+  headerGap?: FlexGridGapType;
   contentGap?: FlexGridGapType;
   leftMargin?: LeftMarginType;
   rightMargin?: RightMarginType;
@@ -237,9 +241,9 @@ export type PopoverTriggerStyleProps = {
   menuInitialItems: TreeItem[];
   // menuItemSelectedIds?: Iterable<string>;
   // menuItemDisabledIds?: Iterable<string>;
-  menuItemExpandedIds?: Iterable<string>;
+  menuItemExpandedIds?: Set<React.Key>;
   onMenuItemAction?: (key: React.Key) => void;
-  onMenuItemExpandedChange?: (keys: Set<React.Key>) => any;
+  setMenuItemExpandedIds?: (expandedIds: Set<React.Key>) => void;
   // onMenuItemSelectionChange?: (keys: "all" | Set<React.Key>) => any;
   selectedMenuItem?: TreeItem;
   setSelectedMenuItem?: (selectedItem: TreeItem | undefined) => void;
@@ -284,10 +288,12 @@ export type MenuStyleProps = {
   leafFontSize?: FontSizeType;
   leafFontWeight?: FontWeightType;
   leafLetterSpacing?: LetterSpacingType;
+  leafUseDarkGrayAsDefaultIntent?: boolean;
   groupFontHeight?: LineHeightType;
   groupFontSize?: FontSizeType;
   groupFontWeight?: FontWeightType;
   groupLetterSpacing?: LetterSpacingType;
+  groupUseDarkGrayAsDefaultIntent?: boolean;
   sectionFontHeight?: LineHeightType;
   sectionFontSize?: FontSizeType;
   sectionFontWeight?: FontWeightType;
@@ -301,6 +307,10 @@ export type MenuStyleProps = {
   itemSizePerIndent?: number;
   groupExpandedIcon?: IconName;
   groupCollapsedIcon?: IconName;
+
+  // Tree State
+  itemExpandedIds?: Set<React.Key>;
+  setItemExpandedIds?: (expandedIds: Set<React.Key>) => void;
 };
 
 /******************************************************
@@ -327,7 +337,15 @@ export type OverflowType =
   | "overflow-auto"
   | "overflow-hidden"
   | "overflow-visible"
-  | "overflow-scroll";
+  | "overflow-scroll"
+  | "overflow-x-auto"
+  | "overflow-y-auto"
+  | "overflow-x-hidden"
+  | "overflow-y-hidden"
+  | "overflow-x-visible"
+  | "overflow-y-visible"
+  | "overflow-x-scroll"
+  | "overflow-y-scroll";
 
 /**
  * Controlling how the browser behaves when reaching the boundary of a scrolling area
@@ -816,6 +834,18 @@ export type LeftMarginType =
   | "ml-16"
   | "ml-20"
   | "ml-24"
+  | "ml-28"
+  | "ml-32"
+  | "ml-36"
+  | "ml-40"
+  | "ml-44"
+  | "ml-48"
+  | "ml-52"
+  | "ml-56"
+  | "ml-60"
+  | "ml-64"
+  | "ml-72"
+  | "ml-80"
   | "ml-auto";
 
 /**
@@ -844,6 +874,18 @@ export type RightMarginType =
   | "mr-16"
   | "mr-20"
   | "mr-24"
+  | "mr-28"
+  | "mr-32"
+  | "mr-36"
+  | "mr-40"
+  | "mr-44"
+  | "mr-48"
+  | "mr-52"
+  | "mr-56"
+  | "mr-60"
+  | "mr-64"
+  | "mr-72"
+  | "mr-80"
   | "mr-auto";
 
 /**
@@ -872,6 +914,18 @@ export type HorizontalMarginType =
   | "mx-16"
   | "mx-20"
   | "mx-24"
+  | "mx-28"
+  | "mx-32"
+  | "mx-36"
+  | "mx-40"
+  | "mx-44"
+  | "mx-48"
+  | "mx-52"
+  | "mx-56"
+  | "mx-60"
+  | "mx-64"
+  | "mx-72"
+  | "mx-80"
   | "mx-auto";
 
 /**
@@ -900,6 +954,18 @@ export type TopMarginType =
   | "mt-16"
   | "mt-20"
   | "mt-24"
+  | "mt-28"
+  | "mt-32"
+  | "mt-36"
+  | "mt-40"
+  | "mt-44"
+  | "mt-48"
+  | "mt-52"
+  | "mt-56"
+  | "mt-60"
+  | "mt-64"
+  | "mt-72"
+  | "mt-80"
   | "mt-auto";
 
 /**
@@ -928,6 +994,18 @@ export type BottomMarginType =
   | "mb-16"
   | "mb-20"
   | "mb-24"
+  | "mb-28"
+  | "mb-32"
+  | "mb-36"
+  | "mb-40"
+  | "mb-44"
+  | "mb-48"
+  | "mb-52"
+  | "mb-56"
+  | "mb-60"
+  | "mb-64"
+  | "mb-72"
+  | "mb-80"
   | "mb-auto";
 
 /**
@@ -956,6 +1034,18 @@ export type VerticalMarginType =
   | "my-16"
   | "my-20"
   | "my-24"
+  | "my-28"
+  | "my-32"
+  | "my-36"
+  | "my-40"
+  | "my-44"
+  | "my-48"
+  | "my-52"
+  | "my-56"
+  | "my-60"
+  | "my-64"
+  | "my-72"
+  | "my-80"
   | "my-auto";
 
 /*****************************************************************
@@ -1251,7 +1341,8 @@ export type MaxHeightType =
   | "max-h-72"
   | "max-h-80"
   | "max-h-96"
-  | "max-h-full";
+  | "max-h-full"
+  | "max-h-screen";
 
 /**
  * Setting the minimum height of an element
@@ -1798,6 +1889,8 @@ export type ResourceProperty = {
   icon?: IconName;
   iconStyle?: IconStyle;
   iconTransform?: IconTransform;
+  asLink?: boolean;
+  linkPath?: string;
 };
 
 /*******************************************************
@@ -1806,6 +1899,7 @@ export type ResourceProperty = {
 
 export type ListItem = {
   section?: string;
+  group?: string;
   label: string;
   path?: string;
   disabled?: boolean;

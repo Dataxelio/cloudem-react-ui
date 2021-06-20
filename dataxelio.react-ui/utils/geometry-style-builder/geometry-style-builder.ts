@@ -24,6 +24,7 @@ import {
 export type GeometryStyleBuilderInput = {
   fixed?: boolean;
   fill?: boolean;
+  cross?: boolean;
   minimal?: boolean;
   outlined?: boolean;
   ringed?: boolean;
@@ -63,7 +64,7 @@ export function geometryStyleBuilder(input: GeometryStyleBuilderInput): string {
   // Width & Height
   res.push(
     input.fixed ? "container" : input.fill ? "w-full" : input.width ?? "w-auto",
-    input.height ?? "h-auto"
+    input.cross ? "h-full" : input.height ?? "h-auto"
   );
 
   // Max Width

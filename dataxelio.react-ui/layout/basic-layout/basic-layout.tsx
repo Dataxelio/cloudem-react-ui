@@ -102,6 +102,7 @@ export interface BasicLayoutProps extends React.HTMLAttributes<HTMLElement> {
   // Geometry Style
   fixed?: boolean;
   fluid?: boolean;
+  cross?: boolean;
   width?: WidthType;
   maxWidth?: MaxWidthType;
   minWidth?: MinWidthType;
@@ -173,6 +174,7 @@ export const BasicLayout = React.forwardRef<HTMLElement, BasicLayoutProps>(
 
       fixed,
       fluid,
+      cross,
       width,
       maxWidth,
       minWidth,
@@ -254,6 +256,7 @@ export const BasicLayout = React.forwardRef<HTMLElement, BasicLayoutProps>(
     const geometryClassName = geometryStyleBuilder({
       fixed,
       fill: fluid,
+      cross,
       width,
       maxWidth,
       minWidth,

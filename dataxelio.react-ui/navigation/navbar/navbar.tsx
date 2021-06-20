@@ -157,6 +157,7 @@ export function Navbar({
     >
       <FlexLayout
         fluid
+        cross
         domElement="ul"
         minimal={minimal}
         outlined={outlined}
@@ -173,7 +174,6 @@ export function Navbar({
         overflow="overflow-hidden"
         debugMode={debugMode}
         debugIntent={debugIntent}
-        className="h-full"
       >
         <FlexLayout
           minimal

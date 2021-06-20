@@ -14,6 +14,8 @@ class MyDocument extends Document {
       <Html>
         <Head>
           <link rel="icon" href="/favicon.png" />
+          <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter" />
+          <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto" />
           <style>{dom.css()}</style>
         </Head>
         <body>

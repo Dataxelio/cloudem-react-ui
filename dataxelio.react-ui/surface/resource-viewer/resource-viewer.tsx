@@ -25,6 +25,7 @@ import { FlexLayout } from "@dataxelio/react-ui.layout.flex-layout";
 import { Header } from "@dataxelio/react-ui.element.header";
 import { Content } from "@dataxelio/react-ui.element.content";
 import { Card } from "@dataxelio/react-ui.surface.card";
+import { LinkButton } from "@dataxelio/react-ui.input.link-button";
 
 export interface ResourceViewerProps {
   title?: string;
@@ -140,7 +141,7 @@ export const ResourceViewer = React.forwardRef<HTMLElement, ResourceViewerProps>
                     <BasicLayout key={property.id} minimal fluid>
                       <Paragraph
                         intentColor={IntentColor.GRAY}
-                        fontWeight="font-semibold"
+                        fontWeight="font-medium"
                         fontSize="text-sm"
                       >
                         {property.name}
@@ -151,14 +152,22 @@ export const ResourceViewer = React.forwardRef<HTMLElement, ResourceViewerProps>
                         intent={property.intent}
                         strongIntent
                         fontSize="text-sm"
-                        fontWeight={property.intent === undefined ? "font-normal" : "font-semibold"}
-                        //textOverflow="truncate"
-                        //wordBreak="break-all"
+                        fontWeight={property.intent === undefined ? "font-normal" : "font-medium"}
+                        // textOverflow="truncate"
+                        // wordBreak="break-all"
                         leftIcon={property.icon}
                         leftIconStyle={property.iconStyle}
                         leftIconTransform={property.iconTransform}
                       >
-                        {property.value || "-"}
+                        {(!property.asLink || !property.linkPath) && (property.value || "-")}
+                        {property.asLink && !!property.linkPath && (
+                          <LinkButton
+                            path={property.linkPath}
+                            text={property.value || "-"}
+                            horizontalPadding="px-0"
+                            verticalPadding="py-0"
+                          />
+                        )}
                       </Label>
                     </BasicLayout>
                   ))}

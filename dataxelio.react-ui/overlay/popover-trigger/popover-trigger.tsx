@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useTransition, animated, config } from "@react-spring/web";
 
 import { useOverlayTriggerState } from "@react-stately/overlays";
@@ -156,7 +156,7 @@ export const PopoverTrigger = ({
   // menuItemDisabledIds,
   menuItemExpandedIds,
   onMenuItemAction,
-  onMenuItemExpandedChange,
+  setMenuItemExpandedIds,
   // onMenuItemSelectionChange,
   selectedMenuItem,
   setSelectedMenuItem,
@@ -171,6 +171,8 @@ export const PopoverTrigger = ({
   const popoverRef = useRef<HTMLElement>(null);
 
   // const [selectedMenuItem, setSelectedMenuItem] = useState<TreeItem | undefined>(undefined);
+
+  const [expandedIds, setExpandedIds] = useState<Set<React.Key> | undefined>(menuItemExpandedIds);
 
   const isSSR = useIsSSR();
 
@@ -217,12 +219,18 @@ export const PopoverTrigger = ({
     </Item>
   );
 
+  useEffect(() => {
+    if (!!expandedIds && !!setMenuItemExpandedIds) {
+      setMenuItemExpandedIds(expandedIds);
+    }
+  }, [expandedIds]);
+
   const transitions = useTransition(state.isOpen, {
     from: { transform: "scale(0.95)", opacity: 0 },
     enter: { transform: "scale(1.0)", opacity: 1 },
     leave: { transform: "scale(0.95)", opacity: 0 },
     reverse: state.isOpen,
-    delay: 1,
+    delay: 10,
     config: config.stiff,
   });
 
@@ -350,11 +358,11 @@ export const PopoverTrigger = ({
                           items={tree.items}
                           selectedKeys={tree.selectedKeys}
                           disabledKeys={disabledMenuItemIds}
-                          expandedKeys={menuItemExpandedIds}
+                          itemExpandedIds={expandedIds}
+                          setItemExpandedIds={lexpandedIds => setExpandedIds(lexpandedIds)}
                           selectionMode="single"
                           disallowEmptySelection
                           onAction={onMenuItemAction}
-                          onExpandedChange={onMenuItemExpandedChange}
                           onSelectionChange={keys => {
                             if (keys === "all" || keys.size <= 0) {
                               !!setSelectedMenuItem && setSelectedMenuItem(undefined);

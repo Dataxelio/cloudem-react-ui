@@ -1,5 +1,9 @@
 import React, { useState, useRef, useImperativeHandle } from "react";
-import { useTextField, useFocusRing, mergeProps } from "react-aria";
+
+import { useFocus } from "@react-aria/interactions";
+import { useFocusRing } from "@react-aria/focus";
+import { useTextField } from "@react-aria/textfield";
+import { mergeProps } from "@react-aria/utils";
 import { AriaTextFieldProps } from "@react-types/textfield";
 
 import {
@@ -141,7 +145,14 @@ export const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(
     const innerRef = useRef<HTMLInputElement>(null);
     useImperativeHandle(ref, () => innerRef.current as HTMLInputElement);
 
-    const { isFocused, isFocusVisible, focusProps } = useFocusRing({
+    const [isFocused, setIsFocused] = useState(false);
+
+    const { focusProps } = useFocus({
+      isDisabled,
+      onFocusChange: focused => setIsFocused(focused),
+    });
+
+    const { isFocusVisible, focusProps: focusRingProps } = useFocusRing({
       autoFocus,
       isTextInput: true,
     });
@@ -229,7 +240,7 @@ export const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(
             <input
               ref={innerRef}
               className={`${intentClassName} ${geometryClassName} ${typographyClassName}`}
-              {...mergeProps(inputProps, focusProps)}
+              {...mergeProps(inputProps, focusProps, focusRingProps)}
             />
             {inputType === "password" && (
               <Tooltip

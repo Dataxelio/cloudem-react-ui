@@ -20,6 +20,8 @@ export type CardProps = TitledOverlayDomProps & CardStyleProps;
 export const Card = React.forwardRef<HTMLElement, CardProps>(
   (
     {
+      headerOrientation = "portrait",
+      headerAlignment = "left",
       contentOrientation = "portrait",
       contentAlignment = "left",
       footerAlignment = "left",
@@ -34,6 +36,7 @@ export const Card = React.forwardRef<HTMLElement, CardProps>(
       backgroundOpacity,
       borderOpacity = "border-opacity-30",
 
+      headerGap = "gap-1",
       contentGap = "gap-5",
       leftMargin,
       rightMargin,
@@ -142,6 +145,9 @@ export const Card = React.forwardRef<HTMLElement, CardProps>(
       >
         {!!headerChildElement && (
           <HeaderImpl
+            orientation={headerOrientation}
+            alignment={headerAlignment}
+            gap={headerGap}
             intent={intent}
             horizontalPadding={horizontalPadding}
             verticalPadding={verticalPadding}

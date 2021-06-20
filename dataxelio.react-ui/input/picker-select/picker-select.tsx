@@ -42,7 +42,10 @@ import { PopoverTrigger } from "@dataxelio/react-ui.overlay.popover-trigger";
 export interface PickerSelectProps extends ButtonTriggerStyleProps {
   label: string;
   isDisabled?: boolean;
-  items: ListItem[];
+  menuItems: ListItem[];
+  menuSortSections?: boolean;
+  menuSortGroups?: boolean;
+  menuSortItems?: boolean;
   openedIcon?: IconName;
   closedIcon?: IconName;
 
@@ -90,6 +93,7 @@ export interface PickerSelectProps extends ButtonTriggerStyleProps {
   menuItemFontSize?: FontSizeType;
   menuItemFontWeight?: FontWeightType;
   menuItemLetterSpacing?: LetterSpacingType;
+  menuItemUseDarkGrayAsDefaultIntent?: boolean;
   menuSectionFontHeight?: LineHeightType;
   menuSectionFontSize?: FontSizeType;
   menuSectionFontWeight?: FontWeightType;
@@ -103,11 +107,14 @@ export interface PickerSelectProps extends ButtonTriggerStyleProps {
 export const PickerSelect = ({
   label,
   isDisabled,
-  items,
+  menuItems,
+  menuSortSections = true,
+  menuSortGroups = true,
+  menuSortItems = true,
   openedIcon = "caret-up",
   closedIcon = "caret-down",
 
-  width = "w-40",
+  // width = "w-40",
   horizontalPadding = "px-4",
   verticalPadding = "py-1.5",
   fontSize = "text-sm",
@@ -154,6 +161,7 @@ export const PickerSelect = ({
   menuItemFontSize,
   menuItemFontWeight,
   menuItemLetterSpacing,
+  menuItemUseDarkGrayAsDefaultIntent,
   menuSectionFontHeight,
   menuSectionFontSize,
   menuSectionFontWeight,
@@ -168,7 +176,12 @@ export const PickerSelect = ({
   const [popoverOpen, setPopoverOpen] = useState<boolean>(false);
   const [selectedMenuItem, setSelectedMenuItem] = useState<TreeItem | undefined>(undefined);
 
-  const { haveSection: menuHaveSection, treeItems: menuTreeItems } = useBuildTree(items);
+  const { haveSection: menuHaveSection, treeItems: menuTreeItems } = useBuildTree(
+    menuItems,
+    menuSortSections,
+    menuSortGroups,
+    menuSortItems
+  );
 
   return (
     <PopoverTrigger
@@ -207,6 +220,7 @@ export const PickerSelect = ({
       leafFontSize={menuItemFontSize}
       leafFontWeight={menuItemFontWeight}
       leafLetterSpacing={menuItemLetterSpacing}
+      leafUseDarkGrayAsDefaultIntent={menuItemUseDarkGrayAsDefaultIntent}
       sectionFontHeight={menuSectionFontHeight}
       sectionFontSize={menuSectionFontSize}
       sectionFontWeight={menuSectionFontWeight}
@@ -233,7 +247,7 @@ export const PickerSelect = ({
     >
       <Button
         isDisabled={isDisabled}
-        width={width}
+        // width={width}
         horizontalPadding={horizontalPadding}
         verticalPadding={verticalPadding}
         fontSize={fontSize}

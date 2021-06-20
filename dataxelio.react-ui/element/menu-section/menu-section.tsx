@@ -54,10 +54,12 @@ export interface MenuSectionProps {
   leafFontSize: FontSizeType;
   leafFontWeight: FontWeightType;
   leafLetterSpacing: LetterSpacingType;
+  leafUseDarkGrayAsDefaultIntent: boolean;
   groupFontHeight: LineHeightType;
   groupFontSize: FontSizeType;
   groupFontWeight: FontWeightType;
   groupLetterSpacing: LetterSpacingType;
+  groupUseDarkGrayAsDefaultIntent: boolean;
   sectionFontHeight: LineHeightType;
   sectionFontSize: FontSizeType;
   sectionFontWeight: FontWeightType;
@@ -102,10 +104,12 @@ export const MenuSection = ({
   leafFontSize,
   leafFontWeight,
   leafLetterSpacing,
+  leafUseDarkGrayAsDefaultIntent,
   groupFontHeight,
   groupFontSize,
   groupFontWeight,
   groupLetterSpacing,
+  groupUseDarkGrayAsDefaultIntent,
   sectionFontHeight,
   sectionFontSize,
   sectionFontWeight,
@@ -156,6 +160,7 @@ export const MenuSection = ({
         {!!section.rendered && typeof section.rendered === "string" && (
           <div className={geometryClassName} style={{ paddingLeft: initialLeftPadding }}>
             <Text
+              intentColor={IntentColor.GRAY}
               tText={section.rendered}
               minimal={true}
               opacity={sectionOpacity}
@@ -192,10 +197,12 @@ export const MenuSection = ({
               leafFontSize={leafFontSize}
               leafFontWeight={leafFontWeight}
               leafLetterSpacing={leafLetterSpacing}
+              leafUseDarkGrayAsDefaultIntent={leafUseDarkGrayAsDefaultIntent}
               groupFontHeight={groupFontHeight}
               groupFontSize={groupFontSize}
               groupFontWeight={groupFontWeight}
               groupLetterSpacing={groupLetterSpacing}
+              groupUseDarkGrayAsDefaultIntent={groupUseDarkGrayAsDefaultIntent}
               textOverflow={textOverflow}
               wordBreak={wordBreak}
               item={node}

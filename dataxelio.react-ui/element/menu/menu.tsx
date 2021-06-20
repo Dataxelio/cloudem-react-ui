@@ -1,4 +1,4 @@
-import React, { useRef, useImperativeHandle } from "react";
+import React, { useState, useEffect, useRef, useImperativeHandle } from "react";
 
 import { useMenu, AriaMenuOptions } from "@react-aria/menu";
 import { useTreeState, TreeProps } from "@react-stately/tree";
@@ -43,10 +43,12 @@ export const Menu = React.forwardRef<HTMLUListElement, MenuProps>(
       leafFontSize = "text-sm",
       leafFontWeight = "font-normal",
       leafLetterSpacing = "tracking-normal",
+      leafUseDarkGrayAsDefaultIntent = true,
       groupFontHeight = "leading-normal",
       groupFontSize = "text-base",
       groupFontWeight = "font-bold",
       groupLetterSpacing = "tracking-normal",
+      groupUseDarkGrayAsDefaultIntent = false,
       sectionFontHeight = "leading-normal",
       sectionFontSize = "text-sm",
       sectionFontWeight = "font-semibold",
@@ -60,6 +62,11 @@ export const Menu = React.forwardRef<HTMLUListElement, MenuProps>(
       groupExpandedIcon: expandedIcon = "caret-down",
       groupCollapsedIcon: collapsedIcon = "caret-right",
 
+      itemExpandedIds,
+      setItemExpandedIds,
+
+      expandedKeys,
+      onExpandedChange,
       onAction,
 
       ...rest
@@ -69,7 +76,13 @@ export const Menu = React.forwardRef<HTMLUListElement, MenuProps>(
     const innerRef = useRef<HTMLUListElement>(null);
     useImperativeHandle(ref, () => innerRef.current as HTMLUListElement);
 
-    const state = useTreeState({ ...rest });
+    const [expandedIds, setExpandedIds] = useState<Set<React.Key>>(itemExpandedIds ?? new Set([]));
+
+    const state = useTreeState({
+      expandedKeys: expandedIds,
+      onExpandedChange: lexpandedIds => setExpandedIds(lexpandedIds),
+      ...rest,
+    });
 
     const { menuProps } = useMenu({ onAction, ...rest }, state, innerRef);
 
@@ -85,6 +98,14 @@ export const Menu = React.forwardRef<HTMLUListElement, MenuProps>(
     const geometryClassName = geometryStyleBuilder({ fill });
 
     const typographyClassName = typographyListStyleRemoval();
+
+    useEffect(() => {
+      if (!!expandedIds && !!setItemExpandedIds) {
+        // console.log("Menu expanded ids :");
+        // console.log(expandedIds);
+        setItemExpandedIds(expandedIds);
+      }
+    }, [expandedIds]);
 
     return (
       <ul
@@ -114,10 +135,12 @@ export const Menu = React.forwardRef<HTMLUListElement, MenuProps>(
                 leafFontSize={leafFontSize}
                 leafFontWeight={leafFontWeight}
                 leafLetterSpacing={leafLetterSpacing}
+                leafUseDarkGrayAsDefaultIntent={leafUseDarkGrayAsDefaultIntent}
                 groupFontHeight={groupFontHeight}
                 groupFontSize={groupFontSize}
                 groupFontWeight={groupFontWeight}
                 groupLetterSpacing={groupLetterSpacing}
+                groupUseDarkGrayAsDefaultIntent={groupUseDarkGrayAsDefaultIntent}
                 sectionFontHeight={sectionFontHeight}
                 sectionFontSize={sectionFontSize}
                 sectionFontWeight={sectionFontWeight}
@@ -151,10 +174,12 @@ export const Menu = React.forwardRef<HTMLUListElement, MenuProps>(
                 leafFontSize={leafFontSize}
                 leafFontWeight={leafFontWeight}
                 leafLetterSpacing={leafLetterSpacing}
+                leafUseDarkGrayAsDefaultIntent={leafUseDarkGrayAsDefaultIntent}
                 groupFontHeight={groupFontHeight}
                 groupFontSize={groupFontSize}
                 groupFontWeight={groupFontWeight}
                 groupLetterSpacing={groupLetterSpacing}
+                groupUseDarkGrayAsDefaultIntent={groupUseDarkGrayAsDefaultIntent}
                 textOverflow={textOverflow}
                 wordBreak={wordBreak}
                 item={item}
