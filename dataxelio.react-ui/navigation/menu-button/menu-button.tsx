@@ -63,6 +63,7 @@ export interface MenuButtonProps extends ButtonTriggerStyleProps {
   isMenuVirtualized?: boolean;
   menuAutoFocus?: boolean | "first" | "last";
   shouldMenuFocusWrap?: boolean;
+  setSelectedMenuItem?: (selectedItem?: TreeItem) => void;
 
   // Popover
   popoverBackgroundOpacity?: BackgroundOpacityType;
@@ -105,6 +106,7 @@ export interface MenuButtonProps extends ButtonTriggerStyleProps {
   menuSectionLetterSpacing?: LetterSpacingType;
   menuItemTextOverflow?: TextOverflowType;
   menuItemWordBreak?: WordBreakType;
+  menuRenderSectionLabel?: boolean;
   menuItemInitialIndent?: number;
   menuItemSizePerIndent?: number;
 }
@@ -138,6 +140,7 @@ export const MenuButton = ({
   isMenuVirtualized,
   menuAutoFocus,
   shouldMenuFocusWrap,
+  setSelectedMenuItem,
 
   popoverBackgroundOpacity,
   popoverBorderOpacity,
@@ -178,13 +181,14 @@ export const MenuButton = ({
   menuSectionLetterSpacing,
   menuItemTextOverflow,
   menuItemWordBreak,
+  menuRenderSectionLabel,
   menuItemInitialIndent,
   menuItemSizePerIndent,
 
   ...rest
 }: MenuButtonProps) => {
   const [popoverOpen, setPopoverOpen] = useState<boolean>(false);
-  const [selectedMenuItem, setSelectedMenuItem] = useState<TreeItem | undefined>(undefined);
+  const [selectedItem, setSelectedItem] = useState<TreeItem | undefined>(undefined);
 
   const { haveSection: menuHaveSection, treeItems: menuTreeItems } = useBuildTree(
     menuItems,
@@ -196,11 +200,14 @@ export const MenuButton = ({
   const router = useRouter();
 
   useEffect(() => {
-    if (!!selectedMenuItem && selectedMenuItem.name.length > 0) {
-      // console.log("router push");
-      router.push(selectedMenuItem.name);
+    if (!!selectedItem && !selectedItem.children && selectedItem.name.length > 0) {
+      router.push(selectedItem.name);
     }
-  }, [selectedMenuItem?.name]);
+
+    if (!!selectedItem && !!setSelectedMenuItem) {
+      setSelectedMenuItem(selectedItem);
+    }
+  }, [menuItems, selectedItem?.id]);
 
   return (
     <PopoverTrigger
@@ -246,6 +253,7 @@ export const MenuButton = ({
       sectionLetterSpacing={menuSectionLetterSpacing}
       itemTextOverflow={menuItemTextOverflow}
       itemWordBreak={menuItemWordBreak}
+      renderSectionLabel={menuRenderSectionLabel}
       itemInitialIndent={menuItemInitialIndent}
       itemSizePerIndent={menuItemSizePerIndent}
       syncTriggerLabelWithSelectedItem={syncButtonWithSelectedItem}
@@ -261,12 +269,12 @@ export const MenuButton = ({
       shouldMenuFocusWrap={shouldMenuFocusWrap}
       menuInitialItems={menuTreeItems}
       onMenuItemAction={() => setPopoverOpen(false)}
-      selectedMenuItem={selectedMenuItem}
-      setSelectedMenuItem={selectedItem => setSelectedMenuItem(selectedItem)}
+      selectedMenuItem={selectedItem}
+      setSelectedMenuItem={selectedItem => setSelectedItem(selectedItem)}
     >
       <Button
         isDisabled={isDisabled}
-        intentAtDefaultState={!!selectedMenuItem ? true : intentAtDefaultState}
+        intentAtDefaultState={!!selectedItem ? true : intentAtDefaultState}
         // width={width}
         horizontalPadding={horizontalPadding}
         verticalPadding={verticalPadding}

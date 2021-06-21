@@ -1,6 +1,7 @@
 import React from "react";
 
 import {
+  OrientationType,
   AlignmentType,
   IntentColor,
   FlexGridGapType,
@@ -14,6 +15,7 @@ import { FlexLayout } from "@dataxelio/react-ui.layout.flex-layout";
 
 export interface FooterImplProps {
   // Orientation
+  orientation?: OrientationType;
   alignment?: AlignmentType;
 
   // Intent Style
@@ -36,10 +38,12 @@ export interface FooterImplProps {
 export const FooterImpl = React.forwardRef<HTMLElement, FooterImplProps>(
   (
     {
-      alignment = "left",
+      orientation,
+      alignment,
+
       intent,
 
-      gap = "gap-5",
+      gap,
       horizontalMargin,
       verticalMargin,
       debugMode,
@@ -55,17 +59,27 @@ export const FooterImpl = React.forwardRef<HTMLElement, FooterImplProps>(
     return (
       <FlexLayout
         ref={ref}
-        flexDirection="flex-row"
+        flexDirection={orientation === "portrait" ? "flex-col" : "flex-row"}
         flexWrap="flex-nowrap"
         flexGap={gap}
         flexMainAxisAlignment={
-          alignment === "left"
+          orientation === "portrait"
+            ? "justify-center"
+            : alignment === "left"
             ? "justify-start"
             : alignment === "center"
             ? "justify-center"
             : "justify-end"
         }
-        flexCrossAxisAlignment="items-center"
+        flexCrossAxisAlignment={
+          orientation === "landscape"
+            ? "items-center"
+            : alignment === "left"
+            ? "items-start"
+            : alignment === "center"
+            ? "items-center"
+            : "items-end"
+        }
         intent={intent}
         minimal={intent === undefined}
         fluid

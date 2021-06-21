@@ -56,6 +56,8 @@ export const Menu = React.forwardRef<HTMLUListElement, MenuProps>(
       itemTextOverflow: textOverflow = "truncate",
       itemWordBreak: wordBreak = "break-normal",
 
+      renderSectionLabel = true,
+
       itemInitialIndent: initialIndent = 0,
       groupSelfIndent: selfIndent = 4,
       itemSizePerIndent: sizePerIndent = 0.25,
@@ -117,6 +119,7 @@ export const Menu = React.forwardRef<HTMLUListElement, MenuProps>(
           <React.Fragment key={item.key}>
             {item.type === "section" && (
               <MenuSection
+                renderLabel={renderSectionLabel}
                 darkMode={darkMode}
                 minimal={minimal}
                 intent={intent}

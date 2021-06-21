@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import { IconName } from "@fortawesome/fontawesome-svg-core";
 
@@ -58,6 +58,7 @@ export interface PickerSelectProps extends ButtonTriggerStyleProps {
   isMenuVirtualized?: boolean;
   menuAutoFocus?: boolean | "first" | "last";
   shouldMenuFocusWrap?: boolean;
+  setSelectedMenuItem?: (selectedItem?: TreeItem) => void;
 
   // Popover
   popoverBackgroundOpacity?: BackgroundOpacityType;
@@ -100,6 +101,7 @@ export interface PickerSelectProps extends ButtonTriggerStyleProps {
   menuSectionLetterSpacing?: LetterSpacingType;
   menuItemTextOverflow?: TextOverflowType;
   menuItemWordBreak?: WordBreakType;
+  menuRenderSectionLabel?: boolean;
   menuItemInitialIndent?: number;
   menuItemSizePerIndent?: number;
 }
@@ -128,6 +130,7 @@ export const PickerSelect = ({
   isMenuVirtualized,
   menuAutoFocus,
   shouldMenuFocusWrap,
+  setSelectedMenuItem,
 
   popoverBackgroundOpacity,
   popoverBorderOpacity,
@@ -168,13 +171,14 @@ export const PickerSelect = ({
   menuSectionLetterSpacing,
   menuItemTextOverflow,
   menuItemWordBreak,
+  menuRenderSectionLabel,
   menuItemInitialIndent,
   menuItemSizePerIndent,
 
   ...rest
 }: PickerSelectProps) => {
   const [popoverOpen, setPopoverOpen] = useState<boolean>(false);
-  const [selectedMenuItem, setSelectedMenuItem] = useState<TreeItem | undefined>(undefined);
+  const [selectedItem, setSelectedItem] = useState<TreeItem | undefined>(undefined);
 
   const { haveSection: menuHaveSection, treeItems: menuTreeItems } = useBuildTree(
     menuItems,
@@ -182,6 +186,12 @@ export const PickerSelect = ({
     menuSortGroups,
     menuSortItems
   );
+
+  useEffect(() => {
+    if (!!selectedItem && !!setSelectedMenuItem) {
+      setSelectedMenuItem(selectedItem);
+    }
+  }, [menuItems, selectedItem?.id]);
 
   return (
     <PopoverTrigger
@@ -227,6 +237,7 @@ export const PickerSelect = ({
       sectionLetterSpacing={menuSectionLetterSpacing}
       itemTextOverflow={menuItemTextOverflow}
       itemWordBreak={menuItemWordBreak}
+      renderSectionLabel={menuRenderSectionLabel}
       itemInitialIndent={menuItemInitialIndent}
       itemSizePerIndent={menuItemSizePerIndent}
       syncTriggerLabelWithSelectedItem={true}
@@ -242,8 +253,8 @@ export const PickerSelect = ({
       shouldMenuFocusWrap={shouldMenuFocusWrap}
       menuInitialItems={menuTreeItems}
       onMenuItemAction={() => setPopoverOpen(false)}
-      selectedMenuItem={selectedMenuItem}
-      setSelectedMenuItem={selectedItem => setSelectedMenuItem(selectedItem)}
+      selectedMenuItem={selectedItem}
+      setSelectedMenuItem={selectedItem => setSelectedItem(selectedItem)}
     >
       <Button
         isDisabled={isDisabled}

@@ -81,6 +81,10 @@ export type SidebarProps = {
    */
   setMenuItemExpandedIds?: (expandedIds: Set<React.Key>) => void;
   /**
+   * Callback to call when new item is selected
+   */
+  setSelectedMenuItem?: (selectedItem?: TreeItem) => void;
+  /**
    * List of this sidebar menu items.
    */
   menuItems: ListItem[];
@@ -217,6 +221,10 @@ export type SidebarProps = {
    */
   menuItemWordBreak?: WordBreakType;
   /**
+   * Tells if label of menu section is rendered
+   */
+  menuRenderSectionLabel?: boolean;
+  /**
    * Menu initial indent
    */
   menuItemInitialIndent?: number;
@@ -255,6 +263,7 @@ export function Sidebar({
   shouldMenuFocusWrap,
   menuItemExpandedIds,
   setMenuItemExpandedIds,
+  setSelectedMenuItem,
   menuItems,
   menuSortSections = false,
   menuSortGroups = false,
@@ -289,6 +298,7 @@ export function Sidebar({
   menuSectionLetterSpacing,
   menuItemTextOverflow = "overflow-clip",
   menuItemWordBreak,
+  menuRenderSectionLabel,
   menuItemInitialIndent,
   menuGroupSelfIndent,
   menuItemSizePerIndent,
@@ -296,7 +306,7 @@ export function Sidebar({
   menuGroupCollapsedIcon,
   children,
 }: SidebarProps) {
-  const [selectedMenuItem, setSelectedMenuItem] = useState<TreeItem | undefined>(undefined);
+  const [selectedItem, setSelectedItem] = useState<TreeItem | undefined>(undefined);
 
   const [expandedIds, setExpandedIds] = useState<Set<React.Key> | undefined>(menuItemExpandedIds);
 
@@ -333,11 +343,14 @@ export function Sidebar({
   const router = useRouter();
 
   useEffect(() => {
-    if (!!selectedMenuItem && !selectedMenuItem.children && selectedMenuItem.name.length > 0) {
-      // console.log("router push");
-      router.push(selectedMenuItem.name);
+    if (!!selectedItem && !selectedItem.children && selectedItem.name.length > 0) {
+      router.push(selectedItem.name);
     }
-  }, [selectedMenuItem?.name]);
+
+    if (!!selectedItem && !!setSelectedMenuItem) {
+      setSelectedMenuItem(selectedItem);
+    }
+  }, [menuItems, selectedItem?.id]);
 
   useEffect(() => {
     if (!!expandedIds && !!setMenuItemExpandedIds) {
@@ -392,6 +405,7 @@ export function Sidebar({
         sectionLetterSpacing={menuSectionLetterSpacing}
         itemTextOverflow={menuItemTextOverflow}
         itemWordBreak={menuItemWordBreak}
+        renderSectionLabel={menuRenderSectionLabel}
         itemInitialIndent={menuItemInitialIndent}
         groupSelfIndent={menuGroupSelfIndent}
         itemSizePerIndent={menuItemSizePerIndent}
@@ -409,11 +423,10 @@ export function Sidebar({
         // onAction={onMenuItemAction}
         onSelectionChange={keys => {
           if (keys === "all" || keys.size <= 0) {
-            !!setSelectedMenuItem && setSelectedMenuItem(undefined);
+            !!setSelectedItem && setSelectedItem(undefined);
           } else {
             tree.setSelectedKeys(keys);
-            !!setSelectedMenuItem &&
-              setSelectedMenuItem(tree.getItem(keys.values().next().value).value);
+            !!setSelectedItem && setSelectedItem(tree.getItem(keys.values().next().value).value);
           }
         }}
       >

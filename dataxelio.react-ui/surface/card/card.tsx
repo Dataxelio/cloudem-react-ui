@@ -22,8 +22,11 @@ export const Card = React.forwardRef<HTMLElement, CardProps>(
     {
       headerOrientation = "portrait",
       headerAlignment = "left",
+      contentTextOrientation = "portrait",
+      contentTextAlignment = "left",
       contentOrientation = "portrait",
       contentAlignment = "left",
+      footerOrientation = "landscape",
       footerAlignment = "left",
 
       dividerAfterHeader = true,
@@ -38,6 +41,8 @@ export const Card = React.forwardRef<HTMLElement, CardProps>(
 
       headerGap = "gap-1",
       contentGap = "gap-5",
+      contentTextGap = "gap-1",
+      footerGap = "gap-2",
       leftMargin,
       rightMargin,
       horizontalMargin,
@@ -163,6 +168,9 @@ export const Card = React.forwardRef<HTMLElement, CardProps>(
         )}
         {!!contentTextChildElement && (
           <ContentTextImpl
+            orientation={contentTextOrientation}
+            alignment={contentTextAlignment}
+            gap={contentTextGap}
             verticalMargin={internalVerticalMargin}
             horizontalPadding={horizontalPadding}
             debugMode={debugMode}
@@ -192,7 +200,9 @@ export const Card = React.forwardRef<HTMLElement, CardProps>(
         )}
         {!!footerChildElement && (
           <FooterImpl
+            orientation={footerOrientation}
             alignment={footerAlignment}
+            gap={footerGap}
             verticalMargin={internalVerticalMargin}
             horizontalPadding={horizontalPadding}
             debugMode={debugMode}

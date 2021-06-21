@@ -38,12 +38,12 @@ export interface ContentImplProps {
 export const ContentImpl = React.forwardRef<HTMLElement, ContentImplProps>(
   (
     {
-      orientation = "portrait",
-      alignment = "left",
+      orientation,
+      alignment,
 
       intent,
 
-      gap = "gap-5",
+      gap,
       horizontalMargin,
       verticalMargin,
       debugMode,

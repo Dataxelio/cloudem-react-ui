@@ -59,6 +59,8 @@ const Index = () => {
 
   const [propertyValue, setPropertyValue] = React.useState<string>("Default");
 
+  const [selectedAppItem, setSelectedAppItem] = React.useState<TreeItem | undefined>(undefined);
+
   const [expandedIds, setExpandedIds] = React.useState<Set<React.Key> | undefined>(
     new Set(["00", "01", "02", "03", "04"])
   );
@@ -212,6 +214,12 @@ const Index = () => {
 
   const isSSR = useIsSSR();
 
+  React.useEffect(() => {
+    if (!!selectedAppItem) {
+      console.log(`Selected App = ${selectedAppItem.label}`);
+    }
+  }, [selectedAppItem?.id]);
+
   return (
     <div>
       <Head>
@@ -247,33 +255,36 @@ const Index = () => {
                 popoverInternalVerticalMargin="my-3"
                 menuForceItemLowGrayBackgroundAtHoverState
                 menuGapBetweenItems="gap-3"
+                menuSortItems={false}
                 menuItems={[
-                  { label: "Home", path: "/" },
                   { label: "Designer", path: "/designer" },
                   { label: "Administrator", path: "/administrator" },
                 ]}
+                setSelectedMenuItem={selectectedItem => setSelectedAppItem(selectectedItem)}
               />
-              <MenuButton
-                label="Select a project"
-                menuDarkMode
-                syncButtonWithSelectedItem
-                minimal
-                intent={IntentColor.BRAND}
-                intentAtDefaultState={false}
-                useDarkGrayAsDefaultIntent
-                // width="w-40"
-                height="h-10"
-                fontWeight="font-normal"
-                gapBetweenElements="gap-2"
-                popoverInternalVerticalMargin="my-3"
-                menuForceItemLowGrayBackgroundAtHoverState
-                // menuGapBetweenItems="gap-2"
-                menuItems={[
-                  { label: "Project1 - AWS (Paris)", path: "/" },
-                  { label: "Project2 - AWS (Ireland)", path: "/designer" },
-                  { label: "Project3 - GCP (Frankfurt)", path: "/administrator" },
-                ]}
-              />
+              {!!selectedAppItem && selectedAppItem.label === "Designer" && (
+                <MenuButton
+                  label="Select a project"
+                  menuDarkMode
+                  syncButtonWithSelectedItem
+                  minimal
+                  intent={IntentColor.BRAND}
+                  intentAtDefaultState={false}
+                  useDarkGrayAsDefaultIntent
+                  // width="w-40"
+                  height="h-10"
+                  fontWeight="font-normal"
+                  gapBetweenElements="gap-2"
+                  popoverInternalVerticalMargin="my-3"
+                  menuForceItemLowGrayBackgroundAtHoverState
+                  // menuGapBetweenItems="gap-2"
+                  menuItems={[
+                    { label: "Project1 - AWS (Paris)", path: "/" },
+                    { label: "Project2 - AWS (Ireland)", path: "/designer" },
+                    { label: "Project3 - GCP (Frankfurt)", path: "/administrator" },
+                  ]}
+                />
+              )}
             </NavbarGroup>
             <NavbarGroup alignment="center">
               <SearchBar
@@ -542,6 +553,7 @@ const Index = () => {
               flexGap="gap-2"
             >
               <PickerSelect
+                menuRenderSectionLabel={false}
                 label="Pick an option"
                 outlined
                 menuItems={[
@@ -553,6 +565,7 @@ const Index = () => {
                 ]}
               />
               <PickerSelect
+                menuRenderSectionLabel={false}
                 label="Pick an option with section"
                 width="w-48"
                 outlined
@@ -589,6 +602,7 @@ const Index = () => {
               />
 
               <MenuButton
+                // menuRenderSectionLabel={false}
                 label="Action List"
                 syncButtonWithSelectedItem
                 outlined
@@ -931,8 +945,7 @@ const Index = () => {
                 <Image src={logoPic1} />
               </Header>
               <ContentText>
-                Welcome to this simple card presentation. We will show you what you can build with
-                that
+                <Paragraph fontSize="text-xs">Card Content Text</Paragraph>
               </ContentText>
               <Content>
                 <Paragraph>Simple Card Content 1</Paragraph>
@@ -953,6 +966,7 @@ const Index = () => {
               boxShadow="shadow-md"
               borderRadius="rounded-sm"
               maxWidth="max-w-xl"
+              contentTextAlignment="center"
               footerAlignment="right"
               dividerAfterHeader
               onSubmit={e => {
@@ -963,6 +977,11 @@ const Index = () => {
               <Header>
                 <Title>Simple Form Card</Title>
               </Header>
+              <ContentText>
+                <Paragraph fontSize="text-xs" intentColor={IntentColor.DANGER}>
+                  Sign in your account
+                </Paragraph>
+              </ContentText>
               <Content>
                 <FlexLayout
                   flexDirection="flex-col"
@@ -1039,6 +1058,7 @@ const Index = () => {
               borderRadius="rounded-sm"
               maxWidth="max-w-3xl"
               contentOrientation="landscape"
+              footerGap="gap-3"
               footerAlignment="right"
               dividerAfterHeader
               onSubmit={e => {

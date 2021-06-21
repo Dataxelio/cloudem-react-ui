@@ -160,8 +160,11 @@ export type CardStyleProps = {
   // Orientation
   headerOrientation?: OrientationType;
   headerAlignment?: AlignmentType;
+  contentTextOrientation?: OrientationType;
+  contentTextAlignment?: AlignmentType;
   contentOrientation?: OrientationType;
   contentAlignment?: AlignmentType;
+  footerOrientation?: OrientationType;
   footerAlignment?: AlignmentType;
 
   // Divider
@@ -178,7 +181,9 @@ export type CardStyleProps = {
 
   // Layout Style
   headerGap?: FlexGridGapType;
+  contentTextGap?: FlexGridGapType;
   contentGap?: FlexGridGapType;
+  footerGap?: FlexGridGapType;
   leftMargin?: LeftMarginType;
   rightMargin?: RightMarginType;
   horizontalMargin?: HorizontalMarginType;
@@ -300,6 +305,9 @@ export type MenuStyleProps = {
   sectionLetterSpacing?: LetterSpacingType;
   itemTextOverflow?: TextOverflowType;
   itemWordBreak?: WordBreakType;
+
+  // Section
+  renderSectionLabel?: boolean;
 
   // Tree
   itemInitialIndent?: number;

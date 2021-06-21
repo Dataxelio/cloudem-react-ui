@@ -54,8 +54,13 @@ export const PopoverTrigger = ({
   isModal = false,
   preventScroll = false,
 
+  headerOrientation,
+  headerAlignment,
+  contentTextOrientation,
+  contentTextAlignment,
   contentOrientation,
   contentAlignment,
+  footerOrientation,
   footerAlignment,
 
   dividerAfterHeader,
@@ -77,7 +82,10 @@ export const PopoverTrigger = ({
   forceItemLowBrandBackgroundAtHoverState,
   itemCursor,
 
+  headerGap,
+  contentTextGap,
   contentGap,
+  footerGap,
   leftMargin,
   rightMargin,
   horizontalMargin,
@@ -130,6 +138,8 @@ export const PopoverTrigger = ({
   sectionLetterSpacing,
   itemTextOverflow,
   itemWordBreak,
+
+  renderSectionLabel,
 
   itemInitialIndent = forceItemLowGrayBackgroundAtHoverState ||
   forceItemLowBrandBackgroundAtHoverState
@@ -268,8 +278,13 @@ export const PopoverTrigger = ({
                     autoFocus={autoFocus}
                     isModal={isModal}
                     preventScroll={preventScroll}
+                    headerOrientation={headerOrientation}
+                    headerAlignment={headerAlignment}
+                    contentTextOrientation={contentTextOrientation}
+                    contentTextAlignment={contentTextAlignment}
                     contentOrientation={contentOrientation}
                     contentAlignment={contentAlignment}
+                    footerOrientation={footerOrientation}
                     footerAlignment={footerAlignment}
                     dividerAfterHeader={dividerAfterHeader}
                     dividerAfterContentText={dividerAfterContentText}
@@ -279,7 +294,10 @@ export const PopoverTrigger = ({
                     intent={intent}
                     backgroundOpacity={backgroundOpacity}
                     borderOpacity={borderOpacity}
+                    headerGap={headerGap}
+                    contentTextGap={contentTextGap}
                     contentGap={contentGap}
+                    footerGap={footerGap}
                     leftMargin={leftMargin}
                     rightMargin={rightMargin}
                     horizontalMargin={horizontalMargin}
@@ -347,6 +365,7 @@ export const PopoverTrigger = ({
                           sectionLetterSpacing={sectionLetterSpacing}
                           itemTextOverflow={itemTextOverflow}
                           itemWordBreak={itemWordBreak}
+                          renderSectionLabel={renderSectionLabel}
                           itemInitialIndent={itemInitialIndent}
                           groupSelfIndent={groupSelfIndent}
                           itemSizePerIndent={itemSizePerIndent}

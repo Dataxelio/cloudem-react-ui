@@ -1,20 +1,28 @@
 import React from "react";
 
 import {
+  OrientationType,
+  AlignmentType,
   IntentColor,
+  FlexGridGapType,
   HorizontalMarginType,
   VerticalMarginType,
   HorizontalPaddingType,
   VerticalPaddingType,
 } from "@dataxelio/react-ui.utils.prop-types";
 
-import { BasicLayout } from "@dataxelio/react-ui.layout.basic-layout";
+import { FlexLayout } from "@dataxelio/react-ui.layout.flex-layout";
 
 export interface ContentTextImplProps {
+  // Orientation
+  orientation?: OrientationType;
+  alignment?: AlignmentType;
+
   // Intent Style
   intent?: IntentColor;
 
   // Layout Style
+  gap?: FlexGridGapType;
   horizontalMargin?: HorizontalMarginType;
   verticalMargin?: VerticalMarginType;
   debugMode?: boolean;
@@ -30,8 +38,12 @@ export interface ContentTextImplProps {
 export const ContentTextImpl = React.forwardRef<HTMLElement, ContentTextImplProps>(
   (
     {
+      orientation,
+      alignment,
+
       intent,
 
+      gap,
       horizontalMargin,
       verticalMargin,
       debugMode,
@@ -45,8 +57,29 @@ export const ContentTextImpl = React.forwardRef<HTMLElement, ContentTextImplProp
     ref
   ) => {
     return (
-      <BasicLayout
+      <FlexLayout
         ref={ref}
+        flexDirection={orientation === "portrait" ? "flex-col" : "flex-row"}
+        flexWrap="flex-nowrap"
+        flexGap={gap}
+        flexMainAxisAlignment={
+          orientation === "portrait"
+            ? "justify-center"
+            : alignment === "left"
+            ? "justify-start"
+            : alignment === "center"
+            ? "justify-center"
+            : "justify-end"
+        }
+        flexCrossAxisAlignment={
+          orientation === "landscape"
+            ? "items-center"
+            : alignment === "left"
+            ? "items-start"
+            : alignment === "center"
+            ? "items-center"
+            : "items-end"
+        }
         intent={intent}
         minimal={intent === undefined}
         fluid
@@ -58,7 +91,7 @@ export const ContentTextImpl = React.forwardRef<HTMLElement, ContentTextImplProp
         debugIntent={debugIntent}
       >
         {children}
-      </BasicLayout>
+      </FlexLayout>
     );
   }
 );

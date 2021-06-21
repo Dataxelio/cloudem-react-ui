@@ -29,6 +29,8 @@ import { Text } from "@dataxelio/react-ui.element.text";
 import { MenuItem } from "@dataxelio/react-ui.element.menu-item";
 
 export interface MenuSectionProps {
+  renderLabel: boolean;
+
   // Intent Style
   darkMode: boolean;
   minimal: boolean;
@@ -83,6 +85,8 @@ export interface MenuSectionProps {
 }
 
 export const MenuSection = ({
+  renderLabel,
+
   darkMode,
   minimal,
   intent,
@@ -142,7 +146,7 @@ export const MenuSection = ({
     flexGridGap: gapBetweenItems,
     flexGridMainAxisAlignment: "justify-center",
     flexGridCrossAxisAlignment: "items-start",
-    topMargin: marginBetweenItemsAndSection,
+    topMargin: renderLabel ? marginBetweenItemsAndSection : "mt-0",
   });
 
   const geometryClassName = geometryStyleBuilder({
@@ -157,7 +161,7 @@ export const MenuSection = ({
         <Divider domElement="li" orientation="horizontal" darkMode={darkMode} opacity={0.3} />
       )}
       <li className={geometryClassName} {...itemProps}>
-        {!!section.rendered && typeof section.rendered === "string" && (
+        {renderLabel && !!section.rendered && typeof section.rendered === "string" && (
           <div className={geometryClassName} style={{ paddingLeft: initialLeftPadding }}>
             <Text
               intentColor={IntentColor.GRAY}
@@ -174,7 +178,10 @@ export const MenuSection = ({
             />
           </div>
         )}
-        {!!section.rendered && typeof section.rendered !== "string" && section.rendered}
+        {renderLabel &&
+          !!section.rendered &&
+          typeof section.rendered !== "string" &&
+          section.rendered}
         <ul
           className={`${layoutClassName} ${geometryClassName} ${typographyClassName}`}
           {...groupProps}
