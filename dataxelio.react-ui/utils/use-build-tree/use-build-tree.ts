@@ -2,6 +2,13 @@ import { useMemo } from "react";
 
 import { ListItem, TreeItem } from "@dataxelio/react-ui.utils.prop-types";
 
+export type buildInput = {
+  items: ListItem[];
+  sortSections: boolean;
+  sortGroups: boolean;
+  sortItems: boolean;
+};
+
 type GroupEntry = {
   id: string;
   items: TreeItem[];
@@ -17,16 +24,11 @@ export type NodeReturn = {
   treeItems: TreeItem[];
 };
 
-export function buildTree(
-  items: ListItem[],
-  sortSections: boolean,
-  sortGroups: boolean,
-  sortItems: boolean
-): NodeReturn {
+export function buildTree(input: buildInput): NodeReturn {
   let incr: number = 0;
   const sectionNodeMap = new Map<string, SectionEntry>();
 
-  items.forEach(item => {
+  input.items.forEach(item => {
     const sectionName = item.section ?? "";
     const sectionNodeEntryRaw = sectionNodeMap.get(sectionName);
     const sectionNodeEntry: SectionEntry = sectionNodeEntryRaw ?? {
@@ -59,7 +61,7 @@ export function buildTree(
 
     itemNodes.push({
       id: `${groupNodeId}${itemNodeOffset}`,
-      name: item.path ?? "",
+      path: item.path ?? "",
       label: item.label,
       disabled: item.disabled,
       leftIcon: item.leftIcon,
@@ -68,13 +70,15 @@ export function buildTree(
       rightIcon: item.rightIcon,
       rightIconTransform: item.rightIconTransform,
       rightIconStyle: item.rightIconStyle,
+      customId: item.customId,
+      customName: item.customName,
     });
   });
 
   const haveSection = sectionNodeMap.size > 1;
   const treeItems: TreeItem[] = [];
 
-  const sortedSectionNodeMap = sortSections
+  const sortedSectionNodeMap = input.sortSections
     ? new Map([...sectionNodeMap].sort((a, b) => a[0].localeCompare(b[0])))
     : sectionNodeMap;
 
@@ -84,7 +88,7 @@ export function buildTree(
     if (haveSection) {
       const newLength = treeItems.push({
         id: String(sValue.id),
-        name: sKey,
+        path: "",
         label: sKey,
         children: [],
       });
@@ -95,7 +99,7 @@ export function buildTree(
     const groupNodeMap = sValue.groupNodeMap;
     const haveGroup = groupNodeMap.size > 1;
 
-    const sortedGroupNodeMap = sortGroups
+    const sortedGroupNodeMap = input.sortGroups
       ? new Map([...groupNodeMap].sort((a, b) => a[0].localeCompare(b[0])))
       : groupNodeMap;
 
@@ -106,7 +110,7 @@ export function buildTree(
         if (!!currentSection && !!currentSection.children) {
           const newLength = currentSection.children.push({
             id: gValue.id,
-            name: gKey,
+            path: "",
             label: gKey,
             children: [],
           });
@@ -115,7 +119,7 @@ export function buildTree(
         } else {
           const newLength = treeItems.push({
             id: gValue.id,
-            name: gKey,
+            path: "",
             label: gKey,
             children: [],
           });
@@ -124,7 +128,7 @@ export function buildTree(
         }
       }
 
-      const leafItems = sortItems
+      const leafItems = input.sortItems
         ? [...gValue.items].sort((a, b) => a.label.localeCompare(b.label))
         : [...gValue.items];
 
@@ -141,15 +145,10 @@ export function buildTree(
   return { haveSection, treeItems };
 }
 
-export function useBuildTree(
-  items: ListItem[],
-  sortSections: boolean,
-  sortGroups: boolean,
-  sortItems: boolean
-): NodeReturn {
+export function useBuildTree(input: buildInput): NodeReturn {
   const res = useMemo(
-    () => buildTree(items, sortSections, sortGroups, sortItems),
-    [items, sortSections, sortGroups, sortItems]
+    () => buildTree(input),
+    [input.items, input.sortSections, input.sortGroups, input.sortItems]
   );
 
   return res;

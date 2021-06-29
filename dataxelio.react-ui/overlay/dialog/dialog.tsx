@@ -131,7 +131,7 @@ export const Dialog = ({
   debugIntent,
 
   width,
-  maxWidth,
+  maxWidth = "max-w-md",
   minWidth,
   height,
   maxHeight,

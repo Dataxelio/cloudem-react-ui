@@ -36,6 +36,7 @@ import {
 } from "@dataxelio/react-ui.utils.prop-types";
 
 import { useBuildTree } from "@dataxelio/react-ui.utils.use-build-tree";
+import { useSelectedMenuItem } from "@dataxelio/react-ui.utils.use-selected-menu-item";
 import { Button } from "@dataxelio/react-ui.input.button";
 import { PopoverTrigger } from "@dataxelio/react-ui.overlay.popover-trigger";
 
@@ -58,6 +59,8 @@ export interface PickerSelectProps extends ButtonTriggerStyleProps {
   isMenuVirtualized?: boolean;
   menuAutoFocus?: boolean | "first" | "last";
   shouldMenuFocusWrap?: boolean;
+  defaultSelectedMenuItemLabel?: string;
+  selectedMenuItem?: TreeItem;
   setSelectedMenuItem?: (selectedItem?: TreeItem) => void;
 
   // Popover
@@ -130,12 +133,14 @@ export const PickerSelect = ({
   isMenuVirtualized,
   menuAutoFocus,
   shouldMenuFocusWrap,
+  defaultSelectedMenuItemLabel,
+  selectedMenuItem,
   setSelectedMenuItem,
 
   popoverBackgroundOpacity,
   popoverBorderOpacity,
   popoverWidth,
-  popoverMaxWidth,
+  popoverMaxWidth = "max-w-xs",
   popoverMinWidth,
   popoverHeight,
   popoverMaxHeight,
@@ -177,14 +182,22 @@ export const PickerSelect = ({
 
   ...rest
 }: PickerSelectProps) => {
-  const [popoverOpen, setPopoverOpen] = useState<boolean>(false);
-  const [selectedItem, setSelectedItem] = useState<TreeItem | undefined>(undefined);
+  const { haveSection: menuHaveSection, treeItems: menuTreeItems } = useBuildTree({
+    items: menuItems,
+    sortSections: menuSortSections,
+    sortGroups: menuSortGroups,
+    sortItems: menuSortItems,
+  });
 
-  const { haveSection: menuHaveSection, treeItems: menuTreeItems } = useBuildTree(
-    menuItems,
-    menuSortSections,
-    menuSortGroups,
-    menuSortItems
+  const defaultSelectedMenuItem = useSelectedMenuItem({
+    active: true,
+    items: menuTreeItems,
+    label: defaultSelectedMenuItemLabel,
+  });
+
+  const [popoverOpen, setPopoverOpen] = useState<boolean>(false);
+  const [selectedItem, setSelectedItem] = useState<TreeItem | undefined>(
+    selectedMenuItem ?? defaultSelectedMenuItem
   );
 
   useEffect(() => {
@@ -252,6 +265,7 @@ export const PickerSelect = ({
       menuAutoFocus={menuAutoFocus}
       shouldMenuFocusWrap={shouldMenuFocusWrap}
       menuInitialItems={menuTreeItems}
+      menuInitialSelectedItemId={!!defaultSelectedMenuItem ? defaultSelectedMenuItem.id : undefined}
       onMenuItemAction={() => setPopoverOpen(false)}
       selectedMenuItem={selectedItem}
       setSelectedMenuItem={selectedItem => setSelectedItem(selectedItem)}

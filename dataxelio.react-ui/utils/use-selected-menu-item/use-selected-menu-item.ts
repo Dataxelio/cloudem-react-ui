@@ -2,20 +2,26 @@ import { useMemo } from "react";
 
 import { TreeItem } from "@dataxelio/react-ui.utils.prop-types";
 
-export function getMenuItemById(
-  active: boolean,
-  items: TreeItem[],
-  key: string
-): TreeItem | undefined {
+export type searchInput = {
+  active: boolean;
+  items: TreeItem[];
+  label?: string;
+};
+
+export function searchItemByLabel(input: searchInput): TreeItem | undefined {
   let res: TreeItem | undefined = undefined;
 
-  if (active) {
-    res = items.find(item => item.id === key);
+  if (input.active && !!input.label) {
+    res = input.items.find(item => item.label === input.label);
 
     if (!res) {
-      items.every(item => {
+      input.items.every(item => {
         if (!!item.children) {
-          res = getMenuItemById(active, item.children, key);
+          res = searchItemByLabel({
+            active: input.active,
+            items: item.children,
+            label: input.label,
+          });
         }
 
         if (!!res) {
@@ -30,12 +36,8 @@ export function getMenuItemById(
   return res;
 }
 
-export function useSelectedMenuItem(
-  active: boolean,
-  items: TreeItem[],
-  key: string
-): TreeItem | undefined {
-  const res = useMemo(() => getMenuItemById(active, items, key), [active, items, key]);
+export function useSelectedMenuItem(input: searchInput): TreeItem | undefined {
+  const res = useMemo(() => searchItemByLabel(input), [input.active, input.items, input.label]);
 
   return res;
 }

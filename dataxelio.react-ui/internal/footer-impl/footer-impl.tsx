@@ -9,6 +9,8 @@ import {
   VerticalMarginType,
   HorizontalPaddingType,
   VerticalPaddingType,
+  TopMarginType,
+  BottomMarginType,
 } from "@dataxelio/react-ui.utils.prop-types";
 
 import { FlexLayout } from "@dataxelio/react-ui.layout.flex-layout";
@@ -24,6 +26,8 @@ export interface FooterImplProps {
   // Layout Style
   gap?: FlexGridGapType;
   horizontalMargin?: HorizontalMarginType;
+  topMargin?: TopMarginType;
+  bottomMargin?: BottomMarginType;
   verticalMargin?: VerticalMarginType;
   debugMode?: boolean;
   debugIntent?: IntentColor;
@@ -45,6 +49,8 @@ export const FooterImpl = React.forwardRef<HTMLElement, FooterImplProps>(
 
       gap,
       horizontalMargin,
+      topMargin,
+      bottomMargin,
       verticalMargin,
       debugMode,
       debugIntent,
@@ -84,7 +90,9 @@ export const FooterImpl = React.forwardRef<HTMLElement, FooterImplProps>(
         minimal={intent === undefined}
         fluid
         horizontalMargin={horizontalMargin}
-        verticalMargin={verticalMargin}
+        topMargin={topMargin}
+        bottomMargin={bottomMargin}
+        verticalMargin={!!bottomMargin || !!topMargin ? undefined : verticalMargin}
         horizontalPadding={horizontalPadding}
         verticalPadding={verticalPadding}
         debugMode={debugMode}

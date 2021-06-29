@@ -101,7 +101,7 @@ export const PopoverTrigger = ({
   fixed,
   fluid,
   width,
-  maxWidth = "max-w-xs",
+  maxWidth,
   minWidth,
   height,
   maxHeight,
@@ -162,8 +162,7 @@ export const PopoverTrigger = ({
   menuAutoFocus,
   shouldMenuFocusWrap,
   menuInitialItems,
-  // menuItemSelectedIds,
-  // menuItemDisabledIds,
+  menuInitialSelectedItemId,
   menuItemExpandedIds,
   onMenuItemAction,
   setMenuItemExpandedIds,
@@ -208,7 +207,7 @@ export const PopoverTrigger = ({
 
   const tree = useTreeData<TreeItem>({
     initialItems: menuInitialItems,
-    initialSelectedKeys: [],
+    initialSelectedKeys: !!menuInitialSelectedItemId ? [menuInitialSelectedItemId] : [],
     getKey: item => item.id,
     getChildren: item => item.children ?? [],
   });

@@ -44,6 +44,7 @@ export interface ResourceViewerProps {
   debugIntent?: IntentColor;
 
   // Geometry Style
+  fluid?: boolean;
   width?: WidthType;
   maxWidth?: MaxWidthType;
   minWidth?: MinWidthType;
@@ -67,8 +68,9 @@ export const ResourceViewer = React.forwardRef<HTMLElement, ResourceViewerProps>
       verticalMargin,
       debugMode,
       debugIntent,
+      fluid = false,
       width,
-      maxWidth = "max-w-4xl",
+      maxWidth,
       minWidth,
       height,
       maxHeight,
@@ -108,6 +110,7 @@ export const ResourceViewer = React.forwardRef<HTMLElement, ResourceViewerProps>
         verticalMargin={verticalMargin}
         debugMode={debugMode}
         debugIntent={debugIntent}
+        fluid={fluid}
         width={width}
         maxWidth={maxWidth}
         minWidth={minWidth}

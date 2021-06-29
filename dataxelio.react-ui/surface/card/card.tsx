@@ -43,6 +43,7 @@ export const Card = React.forwardRef<HTMLElement, CardProps>(
       contentGap = "gap-5",
       contentTextGap = "gap-1",
       footerGap = "gap-2",
+      overflow,
       leftMargin,
       rightMargin,
       horizontalMargin,
@@ -51,13 +52,15 @@ export const Card = React.forwardRef<HTMLElement, CardProps>(
       bottomMargin,
       verticalMargin,
       internalVerticalMargin = "my-5",
+      footerInternalTopMargin,
+      footerInternalBottomMargin,
       debugMode,
       debugIntent,
 
       fixed,
       fluid = true,
       width,
-      maxWidth = "max-w-md",
+      maxWidth,
       minWidth,
       height,
       maxHeight,
@@ -120,6 +123,7 @@ export const Card = React.forwardRef<HTMLElement, CardProps>(
         outlined={outlined}
         backgroundOpacity={backgroundOpacity}
         borderOpacity={borderOpacity}
+        overflow={overflow}
         leftMargin={leftMargin}
         rightMargin={rightMargin}
         horizontalMargin={horizontalMargin}
@@ -203,6 +207,8 @@ export const Card = React.forwardRef<HTMLElement, CardProps>(
             orientation={footerOrientation}
             alignment={footerAlignment}
             gap={footerGap}
+            topMargin={footerInternalTopMargin}
+            bottomMargin={footerInternalBottomMargin}
             verticalMargin={internalVerticalMargin}
             horizontalPadding={horizontalPadding}
             debugMode={debugMode}

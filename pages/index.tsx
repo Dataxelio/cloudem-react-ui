@@ -2,8 +2,13 @@ import React from "react";
 import Link from "next/link";
 import Head from "next/head";
 import Image from "next/image";
+import { useRouter } from "next/router";
 import logoPic from "../public/Cloudem_Logo_Complet_75x15.png";
 import logoPic1 from "../public/Cloudem_Logo_Unitary_50x54.png";
+
+import { useForm } from "react-hook-form";
+
+import Joi from "joi";
 
 import { Item, Section } from "@react-stately/collections";
 import { useTreeData, TreeNode } from "@react-stately/data";
@@ -50,6 +55,12 @@ import { Navbar } from "@dataxelio/react-ui.navigation.navbar";
 import { Sidebar } from "@dataxelio/react-ui.navigation.sidebar";
 import { useIsSSR } from "@react-aria/ssr";
 
+type FormSchema = {
+  account: string;
+  email: string;
+  password: string;
+};
+
 const Index = () => {
   const [openDialog, setOpenDialog] = React.useState(false);
   const [openDialog2, setOpenDialog2] = React.useState(false);
@@ -61,50 +72,57 @@ const Index = () => {
 
   const [selectedAppItem, setSelectedAppItem] = React.useState<TreeItem | undefined>(undefined);
 
+  const [selectedResourceItem, setSelectedResourceItem] = React.useState<TreeItem | undefined>(
+    undefined
+  );
+
   const [expandedIds, setExpandedIds] = React.useState<Set<React.Key> | undefined>(
     new Set(["00", "01", "02", "03", "04"])
   );
 
+  const [inputValues, setInputValues] = React.useState<string[]>(["", "", ""]);
+  const [inputErrors, setInputErrors] = React.useState<string[]>(["", "", ""]);
+
   const menuItems1: TreeItem[] = [
     {
       id: "1",
-      name: "Animals",
+      path: "Animals",
       label: "Animals",
       children: [
-        { id: "11", name: "Aardvark", label: "Aardvark" },
-        { id: "12", name: "Kangaroo", label: "Kangaroo" },
-        { id: "13", name: "Snake", label: "Snake" },
+        { id: "11", path: "Aardvark", label: "Aardvark" },
+        { id: "12", path: "Kangaroo", label: "Kangaroo" },
+        { id: "13", path: "Snake", label: "Snake" },
       ],
     },
     {
       id: "2",
-      name: "People",
+      path: "People",
       label: "People",
       children: [
-        { id: "21", name: "Danni", label: "Danni" },
-        { id: "22", name: "Devon", label: "Devon" },
+        { id: "21", path: "Danni", label: "Danni" },
+        { id: "22", path: "Devon", label: "Devon" },
         {
           id: "23",
-          name: "Ross",
+          path: "Ross",
           label: "Ross",
-          children: [{ id: "231", name: "Tests", label: "Tests" }],
+          children: [{ id: "231", path: "Tests", label: "Tests" }],
         },
       ],
     },
     {
       id: "3",
-      name: "Children",
+      path: "Children",
       label: "Children",
       children: [
-        { id: "31", name: "Edem", label: "Edem" },
-        { id: "32", name: "Femi", label: "Femi" },
+        { id: "31", path: "Edem", label: "Edem" },
+        { id: "32", path: "Femi", label: "Femi" },
         {
           id: "33",
-          name: "Widad",
+          path: "Widad",
           label: "Widad",
           children: [
-            { id: "331", name: "Irfane", label: "Irfane" },
-            { id: "332", name: "Ibath", label: "Ibath" },
+            { id: "331", path: "Irfane", label: "Irfane" },
+            { id: "332", path: "Ibath", label: "Ibath" },
           ],
         },
       ],
@@ -121,43 +139,43 @@ const Index = () => {
   const menuItems2: TreeItem[] = [
     {
       id: "1",
-      name: "Animaux",
+      path: "Animaux",
       label: "Animaux",
       children: [
-        { id: "11", name: "Aardvark", label: "Aardvark" },
-        { id: "12", name: "Kangaroo", label: "Kangaroo" },
-        { id: "13", name: "Snake", label: "Snake" },
+        { id: "11", path: "Aardvark", label: "Aardvark" },
+        { id: "12", path: "Kangaroo", label: "Kangaroo" },
+        { id: "13", path: "Snake", label: "Snake" },
       ],
     },
     {
       id: "2",
-      name: "Personnes",
+      path: "Personnes",
       label: "Personnes",
       children: [
-        { id: "21", name: "Danni", label: "Danni", leftIcon: "folder", rightIcon: "eye" },
-        { id: "22", name: "Devon", label: "Devon" },
+        { id: "21", path: "Danni", label: "Danni", leftIcon: "folder", rightIcon: "eye" },
+        { id: "22", path: "Devon", label: "Devon" },
         {
           id: "23",
-          name: "Ross",
+          path: "Ross",
           label: "Ross",
-          children: [{ id: "231", name: "Tests", label: "Tests" }],
+          children: [{ id: "231", path: "Tests", label: "Tests" }],
         },
       ],
     },
     {
       id: "3",
-      name: "Enfants",
+      path: "Enfants",
       label: "Enfants",
       children: [
-        { id: "31", name: "Edem", label: "Edem" },
-        { id: "32", name: "Femi", label: "Femi" },
+        { id: "31", path: "Edem", label: "Edem" },
+        { id: "32", path: "Femi", label: "Femi" },
         {
           id: "33",
-          name: "Widad",
+          path: "Widad",
           label: "Widad",
           children: [
-            { id: "331", name: "Irfane", label: "Irfane" },
-            { id: "332", name: "Ibath", label: "Ibath" },
+            { id: "331", path: "Irfane", label: "Irfane" },
+            { id: "332", path: "Ibath", label: "Ibath" },
           ],
         },
       ],
@@ -174,38 +192,38 @@ const Index = () => {
   const menuItems3: TreeItem[] = [
     {
       id: "1",
-      name: "Animals",
+      path: "Animals",
       label: "Animals",
       children: [
-        { id: "11", name: "Aardvark", label: "Aardvarkka" },
-        { id: "12", name: "Kangaroo", label: "Kangaroo", disabled: true },
-        { id: "13", name: "Snake", label: "Snake" },
+        { id: "11", path: "Aardvark", label: "Aardvarkka" },
+        { id: "12", path: "Kangaroo", label: "Kangaroo", disabled: true },
+        { id: "13", path: "Snake", label: "Snake" },
       ],
     },
     {
       id: "2",
-      name: "People",
+      path: "People",
       label: "People",
       children: [
-        { id: "21", name: "Danni", label: "Danni" },
-        { id: "22", name: "Devon", label: "Devon" },
+        { id: "21", path: "Danni", label: "Danni" },
+        { id: "22", path: "Devon", label: "Devon" },
         {
           id: "23",
-          name: "Ross",
+          path: "Ross",
           label: "Ross",
         },
       ],
     },
     {
       id: "3",
-      name: "Children",
+      path: "Children",
       label: "Children",
       children: [
-        { id: "31", name: "Edem", label: "Edem" },
-        { id: "32", name: "Femi", label: "Femi" },
+        { id: "31", path: "Edem", label: "Edem" },
+        { id: "32", path: "Femi", label: "Femi" },
         {
           id: "33",
-          name: "Widad",
+          path: "Widad",
           label: "Widad",
         },
       ],
@@ -214,11 +232,51 @@ const Index = () => {
 
   const isSSR = useIsSSR();
 
+  const router = useRouter();
+
   React.useEffect(() => {
     if (!!selectedAppItem) {
       console.log(`Selected App = ${selectedAppItem.label}`);
     }
   }, [selectedAppItem?.id]);
+
+  React.useEffect(() => {
+    if (!!selectedResourceItem) {
+      console.log(`Selected Resource = ${selectedResourceItem.label}`);
+
+      if (!selectedResourceItem.children && selectedResourceItem.path.length > 0) {
+        router.push(selectedResourceItem.path);
+      }
+    }
+  }, [selectedResourceItem]);
+
+  React.useEffect(() => {
+    console.log(inputValues);
+  }, [inputValues]);
+
+  const inputNames = ["account", "email", "password"];
+
+  const schemaMap = new Map<string, Joi.StringSchema>([
+    [inputNames[0], Joi.string().required()],
+    [
+      inputNames[1],
+      Joi.string()
+        .email({ tlds: { allow: false } })
+        .required(),
+    ],
+    [inputNames[2], Joi.string().required()],
+  ]);
+
+  const schema = Joi.object().keys(Object.fromEntries(schemaMap));
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    setFocus,
+    formState: { errors },
+    watch,
+  } = useForm<FormSchema>();
 
   return (
     <div>
@@ -351,6 +409,7 @@ const Index = () => {
 
           <Sidebar
             // menuItemUseDarkGrayAsDefaultIntent={false}
+            defaultSelectedMenuItemLabel="Elastic IPs"
             menuItems={[
               { label: "Dashboard", path: "/dashboard" },
               {
@@ -386,6 +445,8 @@ const Index = () => {
               // console.log(lexpandedIds);
               setExpandedIds(lexpandedIds);
             }}
+            selectedMenuItem={selectedResourceItem}
+            setSelectedMenuItem={selectedItem => setSelectedResourceItem(selectedItem)}
           >
             <SearchBar
               fill
@@ -556,6 +617,7 @@ const Index = () => {
                 menuRenderSectionLabel={false}
                 label="Pick an option"
                 outlined
+                defaultSelectedMenuItemLabel="Gogle"
                 menuItems={[
                   { label: "Microsoft" },
                   { label: "Apple" },
@@ -607,6 +669,7 @@ const Index = () => {
                 syncButtonWithSelectedItem
                 outlined
                 intent={IntentColor.PRIMARY}
+                defaultSelectedMenuItemLabel="Devon"
                 menuItems={[
                   { section: "People", label: "Danni", path: "/account" },
                   { section: "People", label: "Devon", path: "/dashboard" },
@@ -656,6 +719,7 @@ const Index = () => {
                 onClose={() => setOpenDialog(false)}
                 footerAlignment="right"
                 dividerAfterContent
+                shouldCloseOnInteractOutside={() => false}
               >
                 <Header>
                   <Title>Simple Dialog</Title>
@@ -901,12 +965,16 @@ const Index = () => {
               rightMargin="mr-5"
               boxShadow="shadow-md"
               borderRadius="rounded-lg"
-              maxWidth="max-w-xl"
+              // maxWidth="max-w-xl"
               headerOrientation="portrait"
               headerAlignment="left"
               headerGap="gap-1"
               footerAlignment="center"
               dividerAfterContent
+              internalVerticalMargin="my-5"
+              footerInternalTopMargin="mt-12"
+              footerInternalBottomMargin="mb-12"
+              fluid={false}
             >
               <Header>
                 <Title>Simple Card</Title>
@@ -992,9 +1060,40 @@ const Index = () => {
                   fluid
                 >
                   <TextField
+                    inputType="text"
+                    id="uaccount"
+                    label="Account"
+                    labelInfo="(required)"
+                    //helperText="Enter password to connect"
+                    intent={IntentColor.BRAND}
+                    placeholder="Account"
+                    intentAtDefaultState={false}
+                    fill
+                    value={inputValues[0]}
+                    onChange={value => {
+                      const currentInputValues = inputValues.slice();
+                      currentInputValues[0] = value;
+                      setInputValues(currentInputValues);
+                    }}
+                    onBlur={() => {
+                      const valueMap = new Map<string, string>([
+                        [inputNames[0], inputValues[0]],
+                        [inputNames[1], inputValues[1]],
+                        [inputNames[2], inputValues[2]],
+                      ]);
+                      const { value, error } = schema.validate(Object.fromEntries(valueMap), {
+                        abortEarly: false,
+                      });
+                      console.log("Account Input Value = ");
+                      console.log(value);
+                      console.log("Account Input Error = ");
+                      console.log(error);
+                    }}
+                    // {...register("uAccount", { required: true })}
+                  />
+                  <TextField
                     inputType="email"
-                    id="email2"
-                    name="email"
+                    id="uemail"
                     label="Email"
                     labelInfo="(required)"
                     //helperText="Enter password to connect"
@@ -1002,11 +1101,31 @@ const Index = () => {
                     placeholder="Email"
                     intentAtDefaultState={false}
                     fill
+                    value={inputValues[1]}
+                    onChange={value => {
+                      const currentInputValues = inputValues.slice();
+                      currentInputValues[1] = value;
+                      setInputValues(currentInputValues);
+                    }}
+                    onBlur={() => {
+                      const valueMap = new Map<string, string>([
+                        [inputNames[0], inputValues[0]],
+                        [inputNames[1], inputValues[1]],
+                        [inputNames[2], inputValues[2]],
+                      ]);
+                      const { value, error } = schema.validate(Object.fromEntries(valueMap), {
+                        abortEarly: false,
+                      });
+                      console.log("Email Input Value = ");
+                      console.log(value);
+                      console.log("Email Input Error = ");
+                      console.log(error);
+                    }}
+                    // {...register("uEmail", { required: true })}
                   />
                   <TextField
                     inputType="password"
-                    id="password2"
-                    name="password"
+                    id="upassword"
                     label="Password"
                     labelInfo="(required)"
                     helperText="Enter password to connect"
@@ -1014,6 +1133,27 @@ const Index = () => {
                     placeholder="Password"
                     intentAtDefaultState={false}
                     fill
+                    value={inputValues[2]}
+                    onChange={value => {
+                      const currentInputValues = inputValues.slice();
+                      currentInputValues[2] = value;
+                      setInputValues(currentInputValues);
+                    }}
+                    onBlur={() => {
+                      const valueMap = new Map<string, string>([
+                        [inputNames[0], inputValues[0]],
+                        [inputNames[1], inputValues[1]],
+                        [inputNames[2], inputValues[2]],
+                      ]);
+                      const { value, error } = schema.validate(Object.fromEntries(valueMap), {
+                        abortEarly: false,
+                      });
+                      console.log("Password Input Value = ");
+                      console.log(value);
+                      console.log("Password Input Error = ");
+                      console.log(error);
+                    }}
+                    // {...register("uPassword", { required: true })}
                   />
                   <CheckBox aria-label="terms" intent={IntentColor.PRIMARY}>
                     Accept Terms
@@ -1195,6 +1335,7 @@ const Index = () => {
               leftMargin="ml-5"
               rightMargin="mr-5"
               topMargin="mt-5"
+              // maxWidth="max-w-5xl"
               properties={[
                 {
                   id: "0",

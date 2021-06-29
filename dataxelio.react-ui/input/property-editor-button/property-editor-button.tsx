@@ -79,7 +79,7 @@ export const PropertyEditorButton = ({
   popoverBackgroundOpacity,
   popoverBorderOpacity,
   popoverWidth,
-  popoverMaxWidth,
+  popoverMaxWidth = "max-w-xs",
   popoverMinWidth,
   popoverHeight,
   popoverMaxHeight,

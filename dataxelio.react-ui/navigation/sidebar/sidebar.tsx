@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-import { useRouter } from "next/router";
+// import { useRouter } from "next/router";
 
 import { IconName } from "@fortawesome/fontawesome-svg-core";
 
@@ -28,6 +28,7 @@ import {
   WordBreakType,
 } from "@dataxelio/react-ui.utils.prop-types";
 import { useBuildTree } from "@dataxelio/react-ui.utils.use-build-tree";
+import { useSelectedMenuItem } from "@dataxelio/react-ui.utils.use-selected-menu-item";
 import { BasicLayout } from "@dataxelio/react-ui.layout.basic-layout";
 import { Menu } from "@dataxelio/react-ui.element.menu";
 
@@ -80,6 +81,14 @@ export type SidebarProps = {
    * Callback to call when items are expanded or collapsed
    */
   setMenuItemExpandedIds?: (expandedIds: Set<React.Key>) => void;
+  /**
+   * The default selected menu item label
+   */
+  defaultSelectedMenuItemLabel?: string;
+  /**
+   * The currently selected menu item
+   */
+  selectedMenuItem?: TreeItem;
   /**
    * Callback to call when new item is selected
    */
@@ -263,6 +272,8 @@ export function Sidebar({
   shouldMenuFocusWrap,
   menuItemExpandedIds,
   setMenuItemExpandedIds,
+  defaultSelectedMenuItemLabel,
+  selectedMenuItem,
   setSelectedMenuItem,
   menuItems,
   menuSortSections = false,
@@ -306,20 +317,28 @@ export function Sidebar({
   menuGroupCollapsedIcon,
   children,
 }: SidebarProps) {
-  const [selectedItem, setSelectedItem] = useState<TreeItem | undefined>(undefined);
+  const { haveSection: menuHaveSection, treeItems: menuTreeItems } = useBuildTree({
+    items: menuItems,
+    sortSections: menuSortSections,
+    sortGroups: menuSortGroups,
+    sortItems: menuSortItems,
+  });
+
+  const defaultSelectedMenuItem = useSelectedMenuItem({
+    active: true,
+    items: menuTreeItems,
+    label: defaultSelectedMenuItemLabel,
+  });
+
+  const [selectedItem, setSelectedItem] = useState<TreeItem | undefined>(
+    selectedMenuItem ?? defaultSelectedMenuItem
+  );
 
   const [expandedIds, setExpandedIds] = useState<Set<React.Key> | undefined>(menuItemExpandedIds);
 
-  const { haveSection: menuHaveSection, treeItems: menuTreeItems } = useBuildTree(
-    menuItems,
-    menuSortSections,
-    menuSortGroups,
-    menuSortItems
-  );
-
   const tree = useTreeData<TreeItem>({
     initialItems: menuTreeItems,
-    initialSelectedKeys: [],
+    initialSelectedKeys: !!defaultSelectedMenuItem ? [defaultSelectedMenuItem.id] : [],
     getKey: item => item.id,
     getChildren: item => item.children ?? [],
   });
@@ -340,12 +359,12 @@ export function Sidebar({
     </Item>
   );
 
-  const router = useRouter();
+  // const router = useRouter();
 
   useEffect(() => {
-    if (!!selectedItem && !selectedItem.children && selectedItem.name.length > 0) {
-      router.push(selectedItem.name);
-    }
+    // if (!!selectedItem && !selectedItem.children && selectedItem.name.length > 0) {
+    //   router.push(selectedItem.name);
+    // }
 
     if (!!selectedItem && !!setSelectedMenuItem) {
       setSelectedMenuItem(selectedItem);
