@@ -82,13 +82,13 @@ export type SidebarProps = {
    */
   setMenuItemExpandedIds?: (expandedIds: Set<React.Key>) => void;
   /**
-   * The default selected menu item label
+   * The selected menu item custom id
    */
-  defaultSelectedMenuItemLabel?: string;
+  selectedMenuItemCustomId?: string;
   /**
-   * The currently selected menu item
+   * The selected menu item label (Priority on custom id)
    */
-  selectedMenuItem?: TreeItem;
+  selectedMenuItemLabel?: string;
   /**
    * Callback to call when new item is selected
    */
@@ -97,6 +97,10 @@ export type SidebarProps = {
    * List of this sidebar menu items.
    */
   menuItems: ListItem[];
+  /**
+   * sidebar menu items version.
+   */
+  menuItemsVersion?: number;
   /**
    * Specify if sections are sorted or not
    */
@@ -272,10 +276,11 @@ export function Sidebar({
   shouldMenuFocusWrap,
   menuItemExpandedIds,
   setMenuItemExpandedIds,
-  defaultSelectedMenuItemLabel,
-  selectedMenuItem,
+  selectedMenuItemCustomId,
+  selectedMenuItemLabel,
   setSelectedMenuItem,
   menuItems,
+  menuItemsVersion = 1,
   menuSortSections = false,
   menuSortGroups = false,
   menuSortItems = false,
@@ -319,26 +324,24 @@ export function Sidebar({
 }: SidebarProps) {
   const { haveSection: menuHaveSection, treeItems: menuTreeItems } = useBuildTree({
     items: menuItems,
+    itemsVersion: menuItemsVersion,
     sortSections: menuSortSections,
     sortGroups: menuSortGroups,
     sortItems: menuSortItems,
   });
 
-  const defaultSelectedMenuItem = useSelectedMenuItem({
+  const selectedMenuItem = useSelectedMenuItem({
     active: true,
     items: menuTreeItems,
-    label: defaultSelectedMenuItemLabel,
+    itemsVersion: menuItemsVersion,
+    customId: selectedMenuItemCustomId,
+    label: selectedMenuItemLabel,
   });
-
-  const [selectedItem, setSelectedItem] = useState<TreeItem | undefined>(
-    selectedMenuItem ?? defaultSelectedMenuItem
-  );
 
   const [expandedIds, setExpandedIds] = useState<Set<React.Key> | undefined>(menuItemExpandedIds);
 
   const tree = useTreeData<TreeItem>({
     initialItems: menuTreeItems,
-    initialSelectedKeys: !!defaultSelectedMenuItem ? [defaultSelectedMenuItem.id] : [],
     getKey: item => item.id,
     getChildren: item => item.children ?? [],
   });
@@ -359,17 +362,22 @@ export function Sidebar({
     </Item>
   );
 
-  // const router = useRouter();
-
+  // Set selectedKeys when selectedMenuItem changed on parent side
   useEffect(() => {
-    // if (!!selectedItem && !selectedItem.children && selectedItem.name.length > 0) {
-    //   router.push(selectedItem.name);
-    // }
-
-    if (!!selectedItem && !!setSelectedMenuItem) {
-      setSelectedMenuItem(selectedItem);
+    if (!!selectedMenuItem && !tree.selectedKeys.has(selectedMenuItem.id)) {
+      tree.setSelectedKeys(new Set([selectedMenuItem.id]));
     }
-  }, [menuItems, selectedItem?.id]);
+  }, [menuItemsVersion, selectedMenuItem?.id]);
+
+  // Set selectedMenuItem when selectedKeys changed on child tree or on parent side
+  useEffect(() => {
+    if (!!setSelectedMenuItem && tree.selectedKeys.size > 0) {
+      const curItemKey = tree.selectedKeys.values().next().value as string;
+      let curItem: TreeItem | undefined = tree.getItem(curItemKey).value;
+
+      setSelectedMenuItem(curItem);
+    }
+  }, [menuItemsVersion, JSON.stringify([...tree.selectedKeys])]);
 
   useEffect(() => {
     if (!!expandedIds && !!setMenuItemExpandedIds) {
@@ -377,7 +385,7 @@ export function Sidebar({
       // console.log(expandedIds);
       setMenuItemExpandedIds(expandedIds);
     }
-  }, [expandedIds]);
+  }, [menuItemsVersion, expandedIds]);
 
   return (
     <BasicLayout
@@ -441,11 +449,8 @@ export function Sidebar({
         disallowEmptySelection
         // onAction={onMenuItemAction}
         onSelectionChange={keys => {
-          if (keys === "all" || keys.size <= 0) {
-            !!setSelectedItem && setSelectedItem(undefined);
-          } else {
+          if (keys !== "all") {
             tree.setSelectedKeys(keys);
-            !!setSelectedItem && setSelectedItem(tree.getItem(keys.values().next().value).value);
           }
         }}
       >

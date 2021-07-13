@@ -1,21 +1,18 @@
-import React, { useState, useEffect, useRef, useImperativeHandle } from "react";
+import React, { useRef, useImperativeHandle } from "react";
 
-import { useMenu, AriaMenuOptions } from "@react-aria/menu";
-import { useTreeState, TreeProps } from "@react-stately/tree";
-import { TreeNode } from "@react-stately/data";
+import { useListBox, AriaListBoxOptions } from "@react-aria/listbox";
+import { useListState, ListProps } from "@react-stately/list";
 
-import { TreeItem, IntentColor, MenuStyleProps } from "@dataxelio/react-ui.utils.prop-types";
+import { TreeItem, IntentColor, ListBoxStyleProps } from "@dataxelio/react-ui.utils.prop-types";
 import { layoutStyleBuilder } from "@dataxelio/react-ui.utils.layout-style-builder";
 import { geometryStyleBuilder } from "@dataxelio/react-ui.utils.geometry-style-builder";
 import { typographyListStyleRemoval } from "@dataxelio/react-ui.utils.typography-style-builder";
-import { MenuSection } from "@dataxelio/react-ui.element.menu-section";
-import { MenuItem } from "@dataxelio/react-ui.element.menu-item";
+import { ListBoxSection } from "@dataxelio/react-ui.element.list-box-section";
+import { ListBoxItem } from "@dataxelio/react-ui.element.list-box-item";
 
-export type MenuProps = AriaMenuOptions<TreeNode<TreeItem>> &
-  TreeProps<TreeNode<TreeItem>> &
-  MenuStyleProps;
+export type ListBoxProps = AriaListBoxOptions<TreeItem> & ListProps<TreeItem> & ListBoxStyleProps;
 
-export const Menu = React.forwardRef<HTMLUListElement, MenuProps>(
+export const ListBox = React.forwardRef<HTMLUListElement, ListBoxProps>(
   (
     {
       interactive = true,
@@ -23,16 +20,13 @@ export const Menu = React.forwardRef<HTMLUListElement, MenuProps>(
       minimal = true,
       intent = IntentColor.BRAND,
       itemIntentAtDefaultState: intentAtDefaultState = false,
-      itemApplyIntentOnGroup: applyIntentOnGroup = true,
       sectionOpacity = "text-opacity-100",
-      groupOpacity = "text-opacity-100",
       forceItemLowGrayBackgroundAtHoverState: forceLowGrayBackgroundAtHoverState = false,
       forceItemLowBrandBackgroundAtHoverState: forceLowBrandBackgroundAtHoverState = false,
       itemCursor: cursor = interactive ? "cursor-pointer" : "cursor-default",
 
       gapBetweenItems = "gap-3",
       marginBetweenItemsAndSection = "mt-4",
-      marginBetweenLeavesAndGroup = "mt-3",
 
       fill = true,
       itemBackgroundverticalPadding = forceLowGrayBackgroundAtHoverState ||
@@ -45,11 +39,6 @@ export const Menu = React.forwardRef<HTMLUListElement, MenuProps>(
       leafFontWeight = "font-normal",
       leafLetterSpacing = "tracking-normal",
       leafUseDarkGrayAsDefaultIntent = true,
-      groupFontHeight = "leading-normal",
-      groupFontSize = "text-base",
-      groupFontWeight = "font-bold",
-      groupLetterSpacing = "tracking-normal",
-      groupUseDarkGrayAsDefaultIntent = false,
       sectionFontHeight = "leading-normal",
       sectionFontSize = "text-sm",
       sectionFontWeight = "font-semibold",
@@ -60,34 +49,18 @@ export const Menu = React.forwardRef<HTMLUListElement, MenuProps>(
       renderSectionLabel = true,
 
       itemInitialIndent: initialIndent = 0,
-      groupSelfIndent: selfIndent = 4,
       itemSizePerIndent: sizePerIndent = 0.25,
-      groupExpandedIcon: expandedIcon = "caret-down",
-      groupCollapsedIcon: collapsedIcon = "caret-right",
-
-      itemExpandedIds,
-      setItemExpandedIds,
-
-      expandedKeys,
-      onExpandedChange,
-      onAction,
 
       ...rest
-    }: MenuProps,
+    }: ListBoxProps,
     ref
   ) => {
     const innerRef = useRef<HTMLUListElement>(null);
     useImperativeHandle(ref, () => innerRef.current as HTMLUListElement);
 
-    const [expandedIds, setExpandedIds] = useState<Set<React.Key>>(itemExpandedIds ?? new Set([]));
+    const state = useListState({ ...rest });
 
-    const state = useTreeState({
-      expandedKeys: expandedIds,
-      onExpandedChange: lexpandedIds => setExpandedIds(lexpandedIds),
-      ...rest,
-    });
-
-    const { menuProps } = useMenu({ onAction, ...rest }, state, innerRef);
+    const { listBoxProps } = useListBox({ ...rest }, state, innerRef);
 
     const layoutClassName = layoutStyleBuilder({
       layout: "flex",
@@ -102,50 +75,34 @@ export const Menu = React.forwardRef<HTMLUListElement, MenuProps>(
 
     const typographyClassName = typographyListStyleRemoval();
 
-    useEffect(() => {
-      if (!!expandedIds && !!setItemExpandedIds) {
-        // console.log("Menu expanded ids :");
-        // console.log(expandedIds);
-        setItemExpandedIds(expandedIds);
-      }
-    }, [expandedIds]);
-
     return (
       <ul
         ref={innerRef}
         className={`${layoutClassName} ${geometryClassName} ${typographyClassName}`}
-        {...menuProps}
+        {...listBoxProps}
       >
         {[...state.collection].map(item => (
           <React.Fragment key={item.key}>
             {item.type === "section" && (
-              <MenuSection
+              <ListBoxSection
                 renderLabel={renderSectionLabel}
                 interactive={interactive}
                 darkMode={darkMode}
                 minimal={minimal}
                 intent={intent}
                 intentAtDefaultState={intentAtDefaultState}
-                applyIntentOnGroup={applyIntentOnGroup}
                 sectionOpacity={sectionOpacity}
-                groupOpacity={groupOpacity}
                 forceLowGrayBackgroundAtHoverState={forceLowGrayBackgroundAtHoverState}
                 forceLowBrandBackgroundAtHoverState={forceLowBrandBackgroundAtHoverState}
                 cursor={cursor}
                 gapBetweenItems={gapBetweenItems}
                 marginBetweenItemsAndSection={marginBetweenItemsAndSection}
-                marginBetweenLeavesAndGroup={marginBetweenLeavesAndGroup}
                 itemBackgroundverticalPadding={itemBackgroundverticalPadding}
                 leafFontHeight={leafFontHeight}
                 leafFontSize={leafFontSize}
                 leafFontWeight={leafFontWeight}
                 leafLetterSpacing={leafLetterSpacing}
                 leafUseDarkGrayAsDefaultIntent={leafUseDarkGrayAsDefaultIntent}
-                groupFontHeight={groupFontHeight}
-                groupFontSize={groupFontSize}
-                groupFontWeight={groupFontWeight}
-                groupLetterSpacing={groupLetterSpacing}
-                groupUseDarkGrayAsDefaultIntent={groupUseDarkGrayAsDefaultIntent}
                 sectionFontHeight={sectionFontHeight}
                 sectionFontSize={sectionFontSize}
                 sectionFontWeight={sectionFontWeight}
@@ -155,47 +112,30 @@ export const Menu = React.forwardRef<HTMLUListElement, MenuProps>(
                 section={item}
                 state={state}
                 initialIndent={initialIndent}
-                selfIndent={selfIndent}
                 sizePerIndent={sizePerIndent}
-                expandedIcon={expandedIcon}
-                collapsedIcon={collapsedIcon}
-                onAction={onAction}
               />
             )}
             {item.type === "item" && (
-              <MenuItem
+              <ListBoxItem
                 interactive={interactive}
                 minimal={minimal}
                 intent={intent}
                 intentAtDefaultState={intentAtDefaultState}
-                applyIntentOnGroup={applyIntentOnGroup}
-                groupOpacity={groupOpacity}
                 forceLowGrayBackgroundAtHoverState={forceLowGrayBackgroundAtHoverState}
                 forceLowBrandBackgroundAtHoverState={forceLowBrandBackgroundAtHoverState}
                 cursor={cursor}
-                gapBetweenItems={gapBetweenItems}
-                marginBetweenLeavesAndGroup={marginBetweenLeavesAndGroup}
                 itemBackgroundverticalPadding={itemBackgroundverticalPadding}
                 leafFontHeight={leafFontHeight}
                 leafFontSize={leafFontSize}
                 leafFontWeight={leafFontWeight}
                 leafLetterSpacing={leafLetterSpacing}
                 leafUseDarkGrayAsDefaultIntent={leafUseDarkGrayAsDefaultIntent}
-                groupFontHeight={groupFontHeight}
-                groupFontSize={groupFontSize}
-                groupFontWeight={groupFontWeight}
-                groupLetterSpacing={groupLetterSpacing}
-                groupUseDarkGrayAsDefaultIntent={groupUseDarkGrayAsDefaultIntent}
                 textOverflow={textOverflow}
                 wordBreak={wordBreak}
                 item={item}
                 state={state}
                 initialIndent={initialIndent}
-                selfIndent={selfIndent}
                 sizePerIndent={sizePerIndent}
-                expandedIcon={expandedIcon}
-                collapsedIcon={collapsedIcon}
-                onAction={onAction}
               />
             )}
           </React.Fragment>

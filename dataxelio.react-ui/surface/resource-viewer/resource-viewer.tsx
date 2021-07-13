@@ -15,6 +15,8 @@ import {
   HeightType,
   MaxHeightType,
   MinHeightType,
+  BorderRadiusType,
+  BoxShadowType,
 } from "@dataxelio/react-ui.utils.prop-types";
 import { Divider } from "@dataxelio/react-ui.element.divider";
 import { Title } from "@dataxelio/react-ui.element.title";
@@ -51,6 +53,8 @@ export interface ResourceViewerProps {
   height?: HeightType;
   maxHeight?: MaxHeightType;
   minHeight?: MinHeightType;
+  borderRadius?: BorderRadiusType;
+  boxShadow?: BoxShadowType;
 }
 
 export const ResourceViewer = React.forwardRef<HTMLElement, ResourceViewerProps>(
@@ -75,6 +79,8 @@ export const ResourceViewer = React.forwardRef<HTMLElement, ResourceViewerProps>
       height,
       maxHeight,
       minHeight,
+      borderRadius = "rounded-sm",
+      boxShadow = "shadow-sm",
     }: ResourceViewerProps,
     ref
   ) => {
@@ -117,7 +123,8 @@ export const ResourceViewer = React.forwardRef<HTMLElement, ResourceViewerProps>
         height={height}
         maxHeight={maxHeight}
         minHeight={minHeight}
-        borderRadius="rounded-sm"
+        borderRadius={borderRadius}
+        boxShadow={boxShadow}
         dividerAfterHeader
       >
         <Header>

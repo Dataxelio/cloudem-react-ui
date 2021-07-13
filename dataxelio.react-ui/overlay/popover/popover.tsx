@@ -44,8 +44,13 @@ export const Popover = React.forwardRef<HTMLElement, PopoverProps>(
       isModal,
       preventScroll,
 
+      headerOrientation,
+      headerAlignment,
+      contentTextOrientation,
+      contentTextAlignment,
       contentOrientation,
       contentAlignment,
+      footerOrientation,
       footerAlignment,
 
       dividerAfterHeader,
@@ -58,7 +63,11 @@ export const Popover = React.forwardRef<HTMLElement, PopoverProps>(
       backgroundOpacity,
       borderOpacity,
 
+      headerGap,
       contentGap,
+      contentTextGap,
+      footerGap,
+      overflow,
       leftMargin,
       rightMargin,
       horizontalMargin,
@@ -67,9 +76,13 @@ export const Popover = React.forwardRef<HTMLElement, PopoverProps>(
       bottomMargin,
       verticalMargin,
       internalVerticalMargin,
+      footerInternalTopMargin,
+      footerInternalBottomMargin,
       debugMode,
       debugIntent,
 
+      fixed,
+      fluid,
       width,
       maxWidth,
       minWidth,
@@ -122,8 +135,13 @@ export const Popover = React.forwardRef<HTMLElement, PopoverProps>(
       <FocusScope contain={contain} restoreFocus={restoreFocus} autoFocus={autoFocus}>
         <Card
           ref={innerRef}
+          headerOrientation={headerOrientation}
+          headerAlignment={headerAlignment}
+          contentTextOrientation={contentTextOrientation}
+          contentTextAlignment={contentTextAlignment}
           contentOrientation={contentOrientation}
           contentAlignment={contentAlignment}
+          footerOrientation={footerOrientation}
           footerAlignment={footerAlignment}
           dividerAfterHeader={dividerAfterHeader}
           dividerAfterContentText={dividerAfterContentText}
@@ -133,7 +151,11 @@ export const Popover = React.forwardRef<HTMLElement, PopoverProps>(
           intent={intent}
           backgroundOpacity={backgroundOpacity}
           borderOpacity={borderOpacity}
+          headerGap={headerGap}
           contentGap={contentGap}
+          contentTextGap={contentTextGap}
+          footerGap={footerGap}
+          overflow={overflow}
           leftMargin={leftMargin}
           rightMargin={rightMargin}
           horizontalMargin={horizontalMargin}
@@ -142,8 +164,12 @@ export const Popover = React.forwardRef<HTMLElement, PopoverProps>(
           bottomMargin={bottomMargin}
           verticalMargin={verticalMargin}
           internalVerticalMargin={internalVerticalMargin}
+          footerInternalTopMargin={footerInternalTopMargin}
+          footerInternalBottomMargin={footerInternalBottomMargin}
           debugMode={debugMode}
           debugIntent={debugIntent}
+          fixed={fixed}
+          fluid={fluid}
           width={width}
           maxWidth={maxWidth}
           minWidth={minWidth}

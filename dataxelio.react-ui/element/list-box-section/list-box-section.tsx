@@ -1,9 +1,7 @@
 import React from "react";
-import { IconName } from "@fortawesome/fontawesome-svg-core";
 
 import { useMenuSection } from "@react-aria/menu";
-import { TreeState } from "@react-stately/tree";
-import { TreeNode } from "@react-stately/data";
+import { ListState } from "@react-stately/list";
 import { Node } from "@react-types/shared";
 
 import {
@@ -26,9 +24,9 @@ import { geometryStyleBuilder } from "@dataxelio/react-ui.utils.geometry-style-b
 import { typographyListStyleRemoval } from "@dataxelio/react-ui.utils.typography-style-builder";
 import { Divider } from "@dataxelio/react-ui.element.divider";
 import { Text } from "@dataxelio/react-ui.element.text";
-import { MenuItem } from "@dataxelio/react-ui.element.menu-item";
+import { ListBoxItem } from "@dataxelio/react-ui.element.list-box-item";
 
-export interface MenuSectionProps {
+export interface ListBoxSectionProps {
   renderLabel: boolean;
 
   // Intent Style
@@ -37,9 +35,7 @@ export interface MenuSectionProps {
   minimal: boolean;
   intent: IntentColor;
   intentAtDefaultState: boolean;
-  applyIntentOnGroup: boolean;
   sectionOpacity: ForegroundOpacityType;
-  groupOpacity: ForegroundOpacityType;
   forceLowGrayBackgroundAtHoverState: boolean;
   forceLowBrandBackgroundAtHoverState: boolean;
   cursor: CursorType;
@@ -47,7 +43,6 @@ export interface MenuSectionProps {
   // Layout Style
   gapBetweenItems: FlexGridGapType;
   marginBetweenItemsAndSection: TopMarginType;
-  marginBetweenLeavesAndGroup: TopMarginType;
 
   // Geometry Style
   itemBackgroundverticalPadding: VerticalPaddingType;
@@ -58,11 +53,6 @@ export interface MenuSectionProps {
   leafFontWeight: FontWeightType;
   leafLetterSpacing: LetterSpacingType;
   leafUseDarkGrayAsDefaultIntent: boolean;
-  groupFontHeight: LineHeightType;
-  groupFontSize: FontSizeType;
-  groupFontWeight: FontWeightType;
-  groupLetterSpacing: LetterSpacingType;
-  groupUseDarkGrayAsDefaultIntent: boolean;
   sectionFontHeight: LineHeightType;
   sectionFontSize: FontSizeType;
   sectionFontWeight: FontWeightType;
@@ -71,21 +61,15 @@ export interface MenuSectionProps {
   wordBreak: WordBreakType;
 
   // Collection
-  section: Node<TreeNode<TreeItem>>;
-  state: TreeState<TreeNode<TreeItem>>;
+  section: Node<TreeItem>;
+  state: ListState<TreeItem>;
 
-  // Tree
+  // List
   initialIndent: number;
-  selfIndent: number;
   sizePerIndent: number;
-  expandedIcon: IconName;
-  collapsedIcon: IconName;
-
-  // Action
-  onAction?: (key: React.Key) => void;
 }
 
-export const MenuSection = ({
+export const ListBoxSection = ({
   renderLabel,
 
   interactive,
@@ -93,16 +77,13 @@ export const MenuSection = ({
   minimal,
   intent,
   intentAtDefaultState,
-  applyIntentOnGroup,
   sectionOpacity,
-  groupOpacity,
   forceLowGrayBackgroundAtHoverState,
   forceLowBrandBackgroundAtHoverState,
   cursor,
 
   gapBetweenItems,
   marginBetweenItemsAndSection,
-  marginBetweenLeavesAndGroup,
 
   itemBackgroundverticalPadding,
 
@@ -111,11 +92,6 @@ export const MenuSection = ({
   leafFontWeight,
   leafLetterSpacing,
   leafUseDarkGrayAsDefaultIntent,
-  groupFontHeight,
-  groupFontSize,
-  groupFontWeight,
-  groupLetterSpacing,
-  groupUseDarkGrayAsDefaultIntent,
   sectionFontHeight,
   sectionFontSize,
   sectionFontWeight,
@@ -127,13 +103,8 @@ export const MenuSection = ({
   state,
 
   initialIndent,
-  selfIndent,
   sizePerIndent,
-  expandedIcon,
-  collapsedIcon,
-
-  onAction,
-}: MenuSectionProps) => {
+}: ListBoxSectionProps) => {
   const initialLeftPadding = `${initialIndent * sizePerIndent}rem`;
 
   const { itemProps, headingProps, groupProps } = useMenuSection({
@@ -189,40 +160,27 @@ export const MenuSection = ({
           {...groupProps}
         >
           {[...section.childNodes].map(node => (
-            <MenuItem
+            <ListBoxItem
               key={node.key}
               interactive={interactive}
               minimal={minimal}
               intent={intent}
               intentAtDefaultState={intentAtDefaultState}
-              applyIntentOnGroup={applyIntentOnGroup}
-              groupOpacity={groupOpacity}
               forceLowGrayBackgroundAtHoverState={forceLowGrayBackgroundAtHoverState}
               forceLowBrandBackgroundAtHoverState={forceLowBrandBackgroundAtHoverState}
               cursor={cursor}
-              gapBetweenItems={gapBetweenItems}
-              marginBetweenLeavesAndGroup={marginBetweenLeavesAndGroup}
               itemBackgroundverticalPadding={itemBackgroundverticalPadding}
               leafFontHeight={leafFontHeight}
               leafFontSize={leafFontSize}
               leafFontWeight={leafFontWeight}
               leafLetterSpacing={leafLetterSpacing}
               leafUseDarkGrayAsDefaultIntent={leafUseDarkGrayAsDefaultIntent}
-              groupFontHeight={groupFontHeight}
-              groupFontSize={groupFontSize}
-              groupFontWeight={groupFontWeight}
-              groupLetterSpacing={groupLetterSpacing}
-              groupUseDarkGrayAsDefaultIntent={groupUseDarkGrayAsDefaultIntent}
               textOverflow={textOverflow}
               wordBreak={wordBreak}
               item={node}
               state={state}
               initialIndent={initialIndent}
-              selfIndent={selfIndent}
               sizePerIndent={sizePerIndent}
-              expandedIcon={expandedIcon}
-              collapsedIcon={collapsedIcon}
-              onAction={onAction}
             />
           ))}
         </ul>

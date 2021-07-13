@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
 
-// import { useRouter } from "next/router";
-
 import { IconName } from "@fortawesome/fontawesome-svg-core";
 
 import { Placement } from "@react-types/overlays";
@@ -45,8 +43,13 @@ import { PopoverTrigger } from "@dataxelio/react-ui.overlay.popover-trigger";
 export interface MenuButtonProps extends ButtonTriggerStyleProps {
   label: string;
   useLabelAsButtonText?: boolean;
+
+  onFocus?: () => void;
+  onBlur?: () => void;
+
   isDisabled?: boolean;
   menuItems: ListItem[];
+  menuItemsVersion?: number;
   menuSortSections?: boolean;
   menuSortGroups?: boolean;
   menuSortItems?: boolean;
@@ -64,8 +67,8 @@ export interface MenuButtonProps extends ButtonTriggerStyleProps {
   isMenuVirtualized?: boolean;
   menuAutoFocus?: boolean | "first" | "last";
   shouldMenuFocusWrap?: boolean;
-  defaultSelectedMenuItemLabel?: string;
-  selectedMenuItem?: TreeItem;
+  selectedMenuItemCustomId?: string;
+  selectedMenuItemLabel?: string;
   setSelectedMenuItem?: (selectedItem?: TreeItem) => void;
 
   // Popover
@@ -117,8 +120,13 @@ export interface MenuButtonProps extends ButtonTriggerStyleProps {
 export const MenuButton = ({
   label,
   useLabelAsButtonText = true,
+
+  onFocus,
+  onBlur,
+
   isDisabled,
   menuItems,
+  menuItemsVersion = 1,
   menuSortSections = true,
   menuSortGroups = true,
   menuSortItems = true,
@@ -127,11 +135,11 @@ export const MenuButton = ({
   closedIcon = "caret-down",
 
   intentAtDefaultState,
-  // width = "w-40",
+  width = "w-auto",
   horizontalPadding = "px-4",
   verticalPadding = "py-1.5",
   fontSize = "text-sm",
-  fontWeight = "font-semibold",
+  fontWeight = "font-normal",
   rightIcon,
 
   syncButtonWithSelectedItem,
@@ -143,14 +151,14 @@ export const MenuButton = ({
   isMenuVirtualized,
   menuAutoFocus,
   shouldMenuFocusWrap,
-  defaultSelectedMenuItemLabel,
-  selectedMenuItem,
+  selectedMenuItemCustomId,
+  selectedMenuItemLabel,
   setSelectedMenuItem,
 
   popoverBackgroundOpacity,
   popoverBorderOpacity,
   popoverWidth,
-  popoverMaxWidth = "max-w-xs",
+  popoverMaxWidth,
   popoverMinWidth,
   popoverHeight,
   popoverMaxHeight,
@@ -194,33 +202,31 @@ export const MenuButton = ({
 }: MenuButtonProps) => {
   const { haveSection: menuHaveSection, treeItems: menuTreeItems } = useBuildTree({
     items: menuItems,
+    itemsVersion: menuItemsVersion,
     sortSections: menuSortSections,
     sortGroups: menuSortGroups,
     sortItems: menuSortItems,
   });
 
-  const defaultSelectedMenuItem = useSelectedMenuItem({
+  const selectedMenuItem = useSelectedMenuItem({
     active: true,
     items: menuTreeItems,
-    label: defaultSelectedMenuItemLabel,
+    itemsVersion: menuItemsVersion,
+    customId: selectedMenuItemCustomId,
+    label: selectedMenuItemLabel,
   });
 
   const [popoverOpen, setPopoverOpen] = useState<boolean>(false);
-  const [selectedItem, setSelectedItem] = useState<TreeItem | undefined>(
-    selectedMenuItem ?? defaultSelectedMenuItem
+
+  const [internalSelectedMenuItem, setInternalSelectedMenuItem] = useState<TreeItem | undefined>(
+    undefined
   );
 
-  // const router = useRouter();
-
   useEffect(() => {
-    // if (!!selectedItem && !selectedItem.children && selectedItem.name.length > 0) {
-    //   router.push(selectedItem.name);
-    // }
-
-    if (!!selectedItem && !!setSelectedMenuItem) {
-      setSelectedMenuItem(selectedItem);
+    if (!!internalSelectedMenuItem && !!setSelectedMenuItem) {
+      setSelectedMenuItem(internalSelectedMenuItem);
     }
-  }, [menuItems, selectedItem?.id]);
+  }, [menuItemsVersion, internalSelectedMenuItem?.id]);
 
   return (
     <PopoverTrigger
@@ -241,7 +247,7 @@ export const MenuButton = ({
       internalVerticalMargin={popoverInternalVerticalMargin}
       debugMode={popoverDebugMode}
       debugIntent={popoverDebugIntent}
-      width={popoverWidth}
+      width={popoverWidth ?? width}
       maxWidth={popoverMaxWidth}
       minWidth={popoverMinWidth}
       height={popoverHeight}
@@ -280,22 +286,26 @@ export const MenuButton = ({
       isMenuVirtualized={isMenuVirtualized}
       menuAutoFocus={menuAutoFocus}
       shouldMenuFocusWrap={shouldMenuFocusWrap}
-      menuInitialItems={menuTreeItems}
-      menuInitialSelectedItemId={!!defaultSelectedMenuItem ? defaultSelectedMenuItem.id : undefined}
+      menuItems={menuTreeItems}
+      menuItemsVersion={menuItemsVersion}
+      selectedMenuItem={selectedMenuItem ?? internalSelectedMenuItem}
+      setSelectedMenuItem={selectedItem => setInternalSelectedMenuItem(selectedItem)}
       onMenuItemAction={() => setPopoverOpen(false)}
-      selectedMenuItem={selectedItem}
-      setSelectedMenuItem={selectedItem => setSelectedItem(selectedItem)}
     >
       <Button
         isDisabled={isDisabled}
-        intentAtDefaultState={!!selectedItem ? true : intentAtDefaultState}
-        // width={width}
+        intentAtDefaultState={
+          !!internalSelectedMenuItem && syncButtonWithSelectedItem ? true : intentAtDefaultState
+        }
+        width={width}
         horizontalPadding={horizontalPadding}
         verticalPadding={verticalPadding}
         fontSize={fontSize}
         fontWeight={fontWeight}
         rightIcon={!withHandler ? rightIcon : popoverOpen ? openedIcon : closedIcon}
         onPress={() => setPopoverOpen(!popoverOpen)}
+        onFocus={() => !!onFocus && onFocus()}
+        onBlur={() => !!onBlur && onBlur()}
         {...rest}
       >
         {useLabelAsButtonText && label}

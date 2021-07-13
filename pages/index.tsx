@@ -1,19 +1,21 @@
 import React from "react";
+
 import Link from "next/link";
 import Head from "next/head";
 import Image from "next/image";
 import { useRouter } from "next/router";
+
+import { useIsSSR } from "@react-aria/ssr";
+
 import logoPic from "../public/Cloudem_Logo_Complet_75x15.png";
 import logoPic1 from "../public/Cloudem_Logo_Unitary_50x54.png";
-
-import { useForm } from "react-hook-form";
 
 import Joi from "joi";
 
 import { Item, Section } from "@react-stately/collections";
 import { useTreeData, TreeNode } from "@react-stately/data";
 
-import { TreeItem } from "@dataxelio/react-ui.utils.prop-types";
+import { TreeItem, FormInputEntry } from "@dataxelio/react-ui.utils.prop-types";
 import { Button } from "@dataxelio/react-ui.input.button";
 import { AnchorButton } from "@dataxelio/react-ui.input.anchor-button";
 import { LinkButton } from "@dataxelio/react-ui.input.link-button";
@@ -46,20 +48,18 @@ import { GridLayout } from "@dataxelio/react-ui.layout.grid-layout";
 import { Label } from "@dataxelio/react-ui.element.label";
 import { Dialog } from "@dataxelio/react-ui.overlay.dialog";
 import { Menu } from "@dataxelio/react-ui.element.menu";
+import { ListBox } from "@dataxelio/react-ui.element.list-box";
 import { PopoverTrigger } from "@dataxelio/react-ui.overlay.popover-trigger";
+import { Select } from "@dataxelio/react-ui.input.select";
 import { PickerSelect } from "@dataxelio/react-ui.input.picker-select";
 import { MenuButton } from "@dataxelio/react-ui.navigation.menu-button";
 import { PropertyEditorButton } from "@dataxelio/react-ui.input.property-editor-button";
 import { NavbarGroup } from "@dataxelio/react-ui.element.navbar-group";
 import { Navbar } from "@dataxelio/react-ui.navigation.navbar";
 import { Sidebar } from "@dataxelio/react-ui.navigation.sidebar";
-import { useIsSSR } from "@react-aria/ssr";
-
-type FormSchema = {
-  account: string;
-  email: string;
-  password: string;
-};
+import { ListView } from "@dataxelio/react-ui.surface.list-view";
+import { TreeView } from "@dataxelio/react-ui.surface.tree-view";
+import { FormBuilder } from "@dataxelio/react-ui.surface.form-builder";
 
 const Index = () => {
   const [openDialog, setOpenDialog] = React.useState(false);
@@ -80,8 +80,30 @@ const Index = () => {
     new Set(["00", "01", "02", "03", "04"])
   );
 
+  const [expandedTreeIds, setExpandedTreeIds] = React.useState<Set<React.Key> | undefined>(
+    new Set(["01", "03"])
+  );
+
+  const [selectedListItemCustomId, setSelectedListItemCustomId] = React.useState<
+    string | undefined
+  >("02");
+  const [selectedListItem, setSelectedListItem] = React.useState<TreeItem | undefined>(undefined);
+
+  const [selectedTreeItem, setSelectedTreeItem] = React.useState<TreeItem | undefined>(undefined);
+
+  const [selectedListBoxItemLabel, setSelectedListBoxItemLabel] = React.useState<
+    string | undefined
+  >("Google");
+
   const [inputValues, setInputValues] = React.useState<string[]>(["", "", ""]);
-  const [inputErrors, setInputErrors] = React.useState<string[]>(["", "", ""]);
+
+  const [inputResults, setInputResults] = React.useState(new Map<string, string>([]));
+
+  const [inputErrors, setInputErrors] = React.useState(new Map<string, string>([]));
+
+  const [havingErrorResult, setHavingErrorResult] = React.useState<boolean>(true);
+
+  const [itemIdValue, setItemIdValue] = React.useState<string>("");
 
   const menuItems1: TreeItem[] = [
     {
@@ -251,8 +273,43 @@ const Index = () => {
   }, [selectedResourceItem]);
 
   React.useEffect(() => {
+    if (!!selectedListItem) {
+      console.log(`Selected List Item = ${selectedListItem.label}`);
+
+      if (!selectedListItem.children && selectedListItem.path.length > 0) {
+        router.push(selectedListItem.path);
+      }
+    }
+  }, [selectedListItem]);
+
+  React.useEffect(() => {
+    if (!!selectedTreeItem) {
+      console.log(`Selected Tree Item = ${selectedTreeItem.label}`);
+
+      if (!selectedTreeItem.children && selectedTreeItem.path.length > 0) {
+        router.push(selectedTreeItem.path);
+      }
+    }
+  }, [selectedTreeItem]);
+
+  React.useEffect(() => {
     console.log(inputValues);
   }, [inputValues]);
+
+  React.useEffect(() => {
+    console.log("Input Results : ");
+    console.log(inputResults);
+  }, [inputResults]);
+
+  React.useEffect(() => {
+    console.log("Input Errors : ");
+    console.log(inputErrors);
+  }, [inputErrors]);
+
+  React.useEffect(() => {
+    console.log("HavingError Result : ");
+    console.log(havingErrorResult);
+  }, [havingErrorResult]);
 
   const inputNames = ["account", "email", "password"];
 
@@ -265,18 +322,10 @@ const Index = () => {
         .required(),
     ],
     [inputNames[2], Joi.string().required()],
+    ["toto", Joi.string().allow("")],
   ]);
 
   const schema = Joi.object().keys(Object.fromEntries(schemaMap));
-
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    setFocus,
-    formState: { errors },
-    watch,
-  } = useForm<FormSchema>();
 
   return (
     <div>
@@ -306,10 +355,11 @@ const Index = () => {
                 intent={IntentColor.BRAND}
                 intentAtDefaultState={false}
                 useDarkGrayAsDefaultIntent
-                // width="w-36"
+                width="w-36"
                 height="h-10"
                 fontWeight="font-normal"
                 // gapBetweenElements="gap-3"
+                // popoverWidth="w-20"
                 popoverInternalVerticalMargin="my-3"
                 menuForceItemLowGrayBackgroundAtHoverState
                 menuGapBetweenItems="gap-3"
@@ -367,7 +417,8 @@ const Index = () => {
                 height="h-10"
                 fontWeight="font-normal"
                 // gapBetweenElements="gap-2"
-                popoverPlacement="bottom end"
+                popoverPlacement="bottom start"
+                popoverMaxWidth="max-w-max"
                 popoverInternalVerticalMargin="my-3"
                 menuForceItemLowGrayBackgroundAtHoverState
                 menuGapBetweenItems="gap-2"
@@ -409,44 +460,106 @@ const Index = () => {
 
           <Sidebar
             // menuItemUseDarkGrayAsDefaultIntent={false}
-            defaultSelectedMenuItemLabel="Elastic IPs"
             menuItems={[
-              { label: "Dashboard", path: "/dashboard" },
+              { label: "Dashboard", path: "/dashboard", customId: "rsrc1" },
               {
                 group: "VIRTUAL PRIVATE CLOUD",
                 label: "Your VPCs",
                 path: "/account",
+                customId: "rsrc2",
               },
-              { group: "VIRTUAL PRIVATE CLOUD", label: "Subnets", path: "/dashboard" },
-              { group: "VIRTUAL PRIVATE CLOUD", label: "Route Tables", path: "/organization" },
-              { group: "VIRTUAL PRIVATE CLOUD", label: "Internet Gateways", path: "/about" },
+              {
+                group: "VIRTUAL PRIVATE CLOUD",
+                label: "Subnets",
+                path: "/dashboard",
+                customId: "rsrc3",
+              },
+              {
+                group: "VIRTUAL PRIVATE CLOUD",
+                label: "Route Tables",
+                path: "/organization",
+                customId: "rsrc4",
+              },
+              {
+                group: "VIRTUAL PRIVATE CLOUD",
+                label: "Internet Gateways",
+                path: "/about",
+                customId: "rsrc5",
+              },
               {
                 group: "VIRTUAL PRIVATE CLOUD",
                 label: "Egress Only Internet Gateways",
                 path: "/about",
+                customId: "rsrc6",
               },
-              { group: "VIRTUAL PRIVATE CLOUD", label: "DHCP Options Sets", path: "" },
-              { group: "VIRTUAL PRIVATE CLOUD", label: "Elastic IPs", path: "/" },
-              { group: "VIRTUAL PRIVATE CLOUD", label: "Managed Prefix", path: "/" },
-              { group: "VIRTUAL PRIVATE CLOUD", label: "Lists", path: "/about" },
-              { group: "VIRTUAL PRIVATE CLOUD", label: "Endpoints", path: "/about" },
-              { group: "VIRTUAL PRIVATE CLOUD", label: "Endpoint Services", path: "/about" },
-              { group: "VIRTUAL PRIVATE CLOUD", label: "NAT Gateways", path: "/about" },
-              { group: "VIRTUAL PRIVATE CLOUD", label: "Peering Connections", path: "/about" },
-              { group: "SECURITY", label: "Network ACLs", path: "/about" },
-              { group: "SECURITY", label: "Security Groups", path: "/about" },
-              { group: "REACHABILITY", label: "Reachability Analyzer", path: "/about" },
-              { group: "DNS FIREWALL", label: "Rule Groups", path: "/about" },
-              { group: "DNS FIREWALL", label: "Domain Lists", path: "/about" },
+              {
+                group: "VIRTUAL PRIVATE CLOUD",
+                label: "DHCP Options Sets",
+                path: "",
+                customId: "rsrc7",
+              },
+              {
+                group: "VIRTUAL PRIVATE CLOUD",
+                label: "Elastic IPs",
+                path: "/",
+                customId: "rsrc8",
+              },
+              {
+                group: "VIRTUAL PRIVATE CLOUD",
+                label: "Managed Prefix",
+                path: "/",
+                customId: "rsrc9",
+              },
+              {
+                group: "VIRTUAL PRIVATE CLOUD",
+                label: "Lists",
+                path: "/about",
+                customId: "rsrc10",
+              },
+              {
+                group: "VIRTUAL PRIVATE CLOUD",
+                label: "Endpoints",
+                path: "/about",
+                customId: "rsrc11",
+              },
+              {
+                group: "VIRTUAL PRIVATE CLOUD",
+                label: "Endpoint Services",
+                path: "/about",
+                customId: "rsrc12",
+              },
+              {
+                group: "VIRTUAL PRIVATE CLOUD",
+                label: "NAT Gateways",
+                path: "/about",
+                customId: "rsrc13",
+              },
+              {
+                group: "VIRTUAL PRIVATE CLOUD",
+                label: "Peering Connections",
+                path: "/about",
+                customId: "rsrc14",
+              },
+              { group: "SECURITY", label: "Network ACLs", path: "/about", customId: "rsrc15" },
+              { group: "SECURITY", label: "Security Groups", path: "/about", customId: "rsrc16" },
+              {
+                group: "REACHABILITY",
+                label: "Reachability Analyzer",
+                path: "/about",
+                customId: "rsrc17",
+              },
+              { group: "DNS FIREWALL", label: "Rule Groups", path: "/about", customId: "rsrc18" },
+              { group: "DNS FIREWALL", label: "Domain Lists", path: "/about", customId: "rsrc19" },
             ]}
+            selectedMenuItemCustomId="rsrc7"
+            // defaultSelectedMenuItemLabel="Elastic IPs"
+            setSelectedMenuItem={selectedItem => setSelectedResourceItem(selectedItem)}
             menuItemExpandedIds={expandedIds}
             setMenuItemExpandedIds={lexpandedIds => {
               // console.log("Index expanded ids :");
               // console.log(lexpandedIds);
               setExpandedIds(lexpandedIds);
             }}
-            selectedMenuItem={selectedResourceItem}
-            setSelectedMenuItem={selectedItem => setSelectedResourceItem(selectedItem)}
           >
             <SearchBar
               fill
@@ -613,11 +726,55 @@ const Index = () => {
               flexDirection="flex-row"
               flexGap="gap-2"
             >
+              <Select
+                listBoxRenderSectionLabel={false}
+                defaultButtonText="Pick an option"
+                label="Favorite Brand"
+                // gapBetweenLabelAndButton="gap-2"
+                outlined
+                selectedListBoxItemLabel={selectedListBoxItemLabel}
+                setSelectedListBoxItem={selectedItem =>
+                  setSelectedListBoxItemLabel(selectedItem?.label)
+                }
+                // intent={IntentColor.BRAND}
+                listBoxItems={[
+                  { label: "Microsoft" },
+                  { label: "Apple" },
+                  { label: "Google" },
+                  { label: "Amazon" },
+                  { label: "Facebook" },
+                ]}
+              />
+              <Select
+                listBoxRenderSectionLabel={false}
+                defaultButtonText="Pick a person"
+                label="Favorite Person"
+                width="w-48"
+                outlined
+                // intent={IntentColor.BRAND}
+                listBoxItems={[
+                  { section: "People", label: "Danni" },
+                  { section: "People", label: "Devon" },
+                  { section: "People", label: "Ross" },
+                  { section: "Children", label: "Edem" },
+                  { section: "Children", label: "Femi", disabled: true },
+                  { section: "Children", label: "Irfane", disabled: true },
+                  { section: "Children", label: "Ibath" },
+                ]}
+              />
+            </FlexLayout>
+            <FlexLayout
+              leftMargin="ml-5"
+              topMargin="mt-5"
+              rightMargin="mr-5"
+              flexDirection="flex-row"
+              flexGap="gap-2"
+            >
               <PickerSelect
                 menuRenderSectionLabel={false}
                 label="Pick an option"
                 outlined
-                defaultSelectedMenuItemLabel="Gogle"
+                selectedMenuItemLabel="Gogle"
                 menuItems={[
                   { label: "Microsoft" },
                   { label: "Apple" },
@@ -654,6 +811,7 @@ const Index = () => {
                 syncButtonWithSelectedItem
                 outlined
                 intent={IntentColor.PRIMARY}
+                width="w-32"
                 menuItems={[
                   { label: "Account", path: "/account" },
                   { label: "Dashboard", path: "/dashboard" },
@@ -668,8 +826,13 @@ const Index = () => {
                 label="Action List"
                 syncButtonWithSelectedItem
                 outlined
-                intent={IntentColor.PRIMARY}
-                defaultSelectedMenuItemLabel="Devon"
+                intent={IntentColor.GRAY_DARK}
+                menuForceItemLowGrayBackgroundAtHoverState
+                // selectedMenuItemLabel="Devon"
+                width="w-44"
+                popoverOffset={5}
+                popoverBorderRadius="rounded-md"
+                popoverBorderOpacity="border-opacity-50"
                 menuItems={[
                   { section: "People", label: "Danni", path: "/account" },
                   { section: "People", label: "Devon", path: "/dashboard" },
@@ -1034,6 +1197,182 @@ const Index = () => {
               boxShadow="shadow-md"
               borderRadius="rounded-sm"
               maxWidth="max-w-xl"
+              contentOrientation="portrait"
+              contentAlignment="left"
+              contentTextAlignment="center"
+              footerAlignment="right"
+              footerInternalTopMargin="mt-8"
+              footerInternalBottomMargin="mb-6"
+              dividerAfterHeader
+              onSubmit={e => {
+                e.preventDefault();
+
+                if (havingErrorResult) {
+                  alert("Form Builder cannot be submitted : There are some errors");
+                } else {
+                  const message = `Submitting Form Builder... 
+                  Account = ${inputResults.get("Account") ?? ""}
+                  Email = ${inputResults.get("Email") ?? ""}
+                  Password = ${inputResults.get("Password") ?? ""}
+                  Accept = ${inputResults.get("Accept") ?? "false"}
+                  Country = ${inputResults.get("Country") ?? ""}
+                  Town = ${inputResults.get("Town") ?? ""}
+                  Message = ${inputResults.get("Message") ?? ""}
+                  `;
+                  alert(`Form Builder is submitted :
+                  ${message}`);
+                }
+              }}
+            >
+              <Header>
+                <Title>Form Builder Card</Title>
+              </Header>
+              <ContentText>
+                <Paragraph fontSize="text-xs" intentColor={IntentColor.DANGER}>
+                  Sign in your account
+                </Paragraph>
+              </ContentText>
+              <Content>
+                <FormBuilder
+                  setInputValues={inValues => setInputResults(inValues)}
+                  setInputErrors={inErrors => setInputErrors(inErrors)}
+                  setHavingErrorResult={havingError => setHavingErrorResult(havingError)}
+                  inputEntries={[
+                    {
+                      type: "text",
+                      id: "Maccount",
+                      name: "Account",
+                      label: "Account",
+                      labelInfo: "(required)",
+                      placeholder: "Enter your account",
+                      validationRule: Joi.string().required(),
+                    },
+                    {
+                      type: "email",
+                      id: "Memail",
+                      name: "Email",
+                      label: "Email",
+                      labelInfo: "(required)",
+                      placeholder: "Enter your email",
+                      validationRule: Joi.string()
+                        .email({ tlds: { allow: false } })
+                        .required(),
+                    },
+                    {
+                      type: "password",
+                      id: "Mpassword",
+                      name: "Password",
+                      label: "Password",
+                      labelInfo: "(required)",
+                      placeholder: "Enter your password",
+                      validationRule: Joi.string().required(),
+                    },
+                    {
+                      type: "checkbox",
+                      id: "Maccept",
+                      name: "Accept",
+                      label: "Accept terms",
+                    },
+                    {
+                      type: "select",
+                      id: "Mcountry",
+                      name: "Country",
+                      label: "Country",
+                      placeholder: "Pick a country",
+                      validationRule: Joi.string().required(),
+                      selectItems: [
+                        { label: "Ghana" },
+                        { label: "Benin" },
+                        { label: "France" },
+                        { label: "Andorre" },
+                        { label: "Burkina Faso" },
+                        { label: "Japon" },
+                        { label: "Russie" },
+                      ],
+                    },
+                    {
+                      type: "select",
+                      id: "Mtown",
+                      name: "Town",
+                      label: "Town",
+                      placeholder: "Pick a town",
+                      validationRule: Joi.string().required(),
+                      dependencyName: "Country",
+                      selectItems: [
+                        { label: "Accra", filterGroupLabel: "Ghana" },
+                        { label: "Kumasi", filterGroupLabel: "Ghana" },
+                        { label: "Tamale", filterGroupLabel: "Ghana" },
+                        { label: "Ashaiman", filterGroupLabel: "Ghana" },
+                        { label: "Techiman", filterGroupLabel: "Ghana" },
+                        { label: "Cotonou", filterGroupLabel: "Benin" },
+                        { label: "Porto-Novo", filterGroupLabel: "Benin" },
+                        { label: "Parakou", filterGroupLabel: "Benin" },
+                        { label: "Natitingou", filterGroupLabel: "Benin" },
+                        { label: "Ouidah", filterGroupLabel: "Benin" },
+                        { label: "Paris", filterGroupLabel: "France" },
+                        { label: "Lyon", filterGroupLabel: "France" },
+                        { label: "La Rochelle", filterGroupLabel: "France" },
+                        { label: "Bordeaux", filterGroupLabel: "France" },
+                        { label: "Nice", filterGroupLabel: "France" },
+                        { label: "Canillo", filterGroupLabel: "Andorre" },
+                        { label: "El Forn", filterGroupLabel: "Andorre" },
+                        { label: "Meritxell", filterGroupLabel: "Andorre" },
+                        { label: "Encamp", filterGroupLabel: "Andorre" },
+                        { label: "Ansalonga", filterGroupLabel: "Andorre" },
+                        { label: "Ouagadougou", filterGroupLabel: "Burkina Faso" },
+                        { label: "Bobo-Dioulasso", filterGroupLabel: "Burkina Faso" },
+                        { label: "Koudougou", filterGroupLabel: "Burkina Faso" },
+                        { label: "Banfora", filterGroupLabel: "Burkina Faso" },
+                        { label: "Pissila", filterGroupLabel: "Burkina Faso" },
+                        { label: "Tokyo", filterGroupLabel: "Japon" },
+                        { label: "Saitama", filterGroupLabel: "Japon" },
+                        { label: "Shiga", filterGroupLabel: "Japon" },
+                        { label: "Tochigi", filterGroupLabel: "Japon" },
+                        { label: "Nagasaki", filterGroupLabel: "Japon" },
+                        { label: "Moscou", filterGroupLabel: "Russie" },
+                        { label: "Mourmansk", filterGroupLabel: "Russie" },
+                        { label: "Léningrad", filterGroupLabel: "Russie" },
+                        { label: "Kemerovo", filterGroupLabel: "Russie" },
+                        { label: "Tcheliabinsk", filterGroupLabel: "Russie" },
+                      ],
+                    },
+                    {
+                      type: "textarea",
+                      id: "Mmessage",
+                      name: "Message",
+                      label: "Message",
+                      placeholder: "Enter your message here",
+                      validationRule: Joi.string().required(),
+                    },
+                  ]}
+                />
+              </Content>
+              <Footer>
+                <Button
+                  type="submit"
+                  intent={IntentColor.BRAND}
+                  gapBetweenElements="gap-2"
+                  borderRadius="rounded-xl"
+                  horizontalPadding="px-6"
+                  verticalPadding="py-1.5"
+                  fontSize="text-sm"
+                  fontWeight="font-semibold"
+                  rightIcon="lock"
+                  rightIconTransform={{ size: 14 }}
+                  fill
+                >
+                  Submit
+                </Button>
+              </Footer>
+            </Card>
+            <Card
+              asForm
+              leftMargin="ml-5"
+              topMargin="mt-5"
+              rightMargin="mr-5"
+              boxShadow="shadow-md"
+              borderRadius="rounded-sm"
+              maxWidth="max-w-xl"
               contentTextAlignment="center"
               footerAlignment="right"
               dividerAfterHeader
@@ -1075,20 +1414,25 @@ const Index = () => {
                       currentInputValues[0] = value;
                       setInputValues(currentInputValues);
                     }}
-                    onBlur={() => {
-                      const valueMap = new Map<string, string>([
-                        [inputNames[0], inputValues[0]],
-                        [inputNames[1], inputValues[1]],
-                        [inputNames[2], inputValues[2]],
-                      ]);
-                      const { value, error } = schema.validate(Object.fromEntries(valueMap), {
-                        abortEarly: false,
-                      });
-                      console.log("Account Input Value = ");
-                      console.log(value);
-                      console.log("Account Input Error = ");
-                      console.log(error);
-                    }}
+                    // onBlur={() => {
+                    //   const valueMap = new Map<string, string>([
+                    //     [inputNames[0], inputValues[0]],
+                    //     [inputNames[1], inputValues[1]],
+                    //     [inputNames[2], inputValues[2]],
+                    //     ["toto", "titi"],
+                    //   ]);
+                    //   const { value, error } = schema.validate(Object.fromEntries(valueMap), {
+                    //     abortEarly: false,
+                    //     errors: { label: "key", wrap: { label: false } },
+                    //   });
+                    //   console.log("Stable value object");
+                    //   console.log(value);
+                    //   console.log("Stable value map");
+                    //   const stableValueMap = new Map<string, string>(Object.entries(value));
+                    //   console.log(stableValueMap);
+                    //   console.log("Account Input Error = ");
+                    //   console.log(error?.details);
+                    // }}
                     // {...register("uAccount", { required: true })}
                   />
                   <TextField
@@ -1107,20 +1451,25 @@ const Index = () => {
                       currentInputValues[1] = value;
                       setInputValues(currentInputValues);
                     }}
-                    onBlur={() => {
-                      const valueMap = new Map<string, string>([
-                        [inputNames[0], inputValues[0]],
-                        [inputNames[1], inputValues[1]],
-                        [inputNames[2], inputValues[2]],
-                      ]);
-                      const { value, error } = schema.validate(Object.fromEntries(valueMap), {
-                        abortEarly: false,
-                      });
-                      console.log("Email Input Value = ");
-                      console.log(value);
-                      console.log("Email Input Error = ");
-                      console.log(error);
-                    }}
+                    // onBlur={() => {
+                    //   const valueMap = new Map<string, string>([
+                    //     [inputNames[0], inputValues[0]],
+                    //     [inputNames[1], inputValues[1]],
+                    //     [inputNames[2], inputValues[2]],
+                    //     ["toto", ""],
+                    //   ]);
+                    //   const { value, error } = schema.validate(Object.fromEntries(valueMap), {
+                    //     abortEarly: false,
+                    //     errors: { label: "key", wrap: { label: false } },
+                    //   });
+                    //   console.log("Stable value object");
+                    //   console.log(value);
+                    //   console.log("Stable value map");
+                    //   const stableValueMap = new Map<string, string>(Object.entries(value));
+                    //   console.log(stableValueMap);
+                    //   console.log("Email Input Error = ");
+                    //   console.log(error?.details);
+                    // }}
                     // {...register("uEmail", { required: true })}
                   />
                   <TextField
@@ -1139,20 +1488,25 @@ const Index = () => {
                       currentInputValues[2] = value;
                       setInputValues(currentInputValues);
                     }}
-                    onBlur={() => {
-                      const valueMap = new Map<string, string>([
-                        [inputNames[0], inputValues[0]],
-                        [inputNames[1], inputValues[1]],
-                        [inputNames[2], inputValues[2]],
-                      ]);
-                      const { value, error } = schema.validate(Object.fromEntries(valueMap), {
-                        abortEarly: false,
-                      });
-                      console.log("Password Input Value = ");
-                      console.log(value);
-                      console.log("Password Input Error = ");
-                      console.log(error);
-                    }}
+                    // onBlur={() => {
+                    //   const valueMap = new Map<string, string>([
+                    //     [inputNames[0], inputValues[0]],
+                    //     [inputNames[1], inputValues[1]],
+                    //     [inputNames[2], inputValues[2]],
+                    //     ["toto", "taitai"],
+                    //   ]);
+                    //   const { value, error } = schema.validate(Object.fromEntries(valueMap), {
+                    //     abortEarly: false,
+                    //     errors: { label: "key", wrap: { label: false } },
+                    //   });
+                    //   console.log("Stable value object");
+                    //   console.log(value);
+                    //   console.log("Stable value map");
+                    //   const stableValueMap = new Map<string, string>(Object.entries(value));
+                    //   console.log(stableValueMap);
+                    //   console.log("Password Input Error = ");
+                    //   console.log(error?.details);
+                    // }}
                     // {...register("uPassword", { required: true })}
                   />
                   <CheckBox aria-label="terms" intent={IntentColor.PRIMARY}>
@@ -1335,6 +1689,7 @@ const Index = () => {
               leftMargin="ml-5"
               rightMargin="mr-5"
               topMargin="mt-5"
+              boxShadow="shadow-md"
               // maxWidth="max-w-5xl"
               properties={[
                 {
@@ -1401,6 +1756,33 @@ const Index = () => {
               dividerAfterContent
             >
               <Header>
+                <Title>Static - Simple ListBox</Title>
+              </Header>
+              <Content>
+                <ListBox
+                  aria-label="Actions"
+                  selectionMode="single"
+                  disallowEmptySelection
+                  interactive={false}
+                  // onAction={key => alert(`Item with key ${key} is selected`)}
+                >
+                  <Item key="one">One</Item>
+                  <Item key="two">Two</Item>
+                  <Item key="three">Three</Item>
+                </ListBox>
+              </Content>
+            </Card>
+            <Card
+              leftMargin="ml-5"
+              topMargin="mt-5"
+              rightMargin="mr-5"
+              boxShadow="shadow-md"
+              borderRadius="rounded-sm"
+              maxWidth="max-w-sm"
+              footerAlignment="center"
+              dividerAfterContent
+            >
+              <Header>
                 <Title>Static - Simple Menu</Title>
               </Header>
               <Content>
@@ -1414,6 +1796,39 @@ const Index = () => {
                   <Item key="two">Two</Item>
                   <Item key="three">Three</Item>
                 </Menu>
+              </Content>
+            </Card>
+            <Card
+              leftMargin="ml-5"
+              topMargin="mt-5"
+              rightMargin="mr-5"
+              boxShadow="shadow-md"
+              borderRadius="rounded-sm"
+              maxWidth="max-w-sm"
+              footerAlignment="center"
+              dividerAfterContent
+            >
+              <Header>
+                <Title>Static - Simple ListBox with sections</Title>
+              </Header>
+              <Content>
+                <ListBox
+                  aria-label="Actions"
+                  selectionMode="single"
+                  disallowEmptySelection
+                  // onAction={key => alert(`Item with key ${key} is selected`)}
+                >
+                  <Section title="Section 1">
+                    <Item key="section1-item1">One</Item>
+                    <Item key="section1-item2">Two</Item>
+                    <Item key="section1-item3">Three</Item>
+                  </Section>
+                  <Section title="Section 2">
+                    <Item key="section2-item1">One</Item>
+                    <Item key="section2-item2">Two</Item>
+                    <Item key="section2-item3">Three</Item>
+                  </Section>
+                </ListBox>
               </Content>
             </Card>
             <Card
@@ -1468,6 +1883,7 @@ const Index = () => {
                   selectionMode="single"
                   disallowEmptySelection
                   items={tree1.items}
+                  interactive={false}
                   forceItemLowBrandBackgroundAtHoverState
                   // onAction={key => alert(`Item with key ${key} is selected`)}
                 >
@@ -1540,6 +1956,210 @@ const Index = () => {
                 </Menu>
               </Content>
             </Card>
+            <Card
+              leftMargin="ml-5"
+              topMargin="mt-5"
+              rightMargin="mr-5"
+              boxShadow="shadow-md"
+              borderRadius="rounded-sm"
+              maxWidth="max-w-sm"
+              footerAlignment="center"
+              horizontalPadding="px-0"
+            >
+              <Header>
+                <Title>Simple ListView</Title>
+              </Header>
+              <Content>
+                <ListView
+                  // interactive={false}
+                  selectedItemCustomId={selectedListItemCustomId}
+                  // selectedItem={selectedListItem}
+                  setSelectedItem={lselectedItem => {
+                    console.log(`setSelectedListItemCustomId with ${lselectedItem?.customId}`);
+                    setSelectedListItemCustomId(lselectedItem?.customId);
+                    setSelectedListItem(lselectedItem);
+                  }}
+                  forceItemLowGrayBackgroundAtHoverState
+                  itemInitialIndent={4}
+                  items={[
+                    { label: "H+ Closure - AWS (China)", path: "", customId: "01" },
+                    { label: "B2B Commerce - AWS (Paris)", path: "", customId: "02" },
+                    { label: "Pulse - AWS (Ireland)", path: "", customId: "03" },
+                    { label: "Promocash - GCP (Frankfurt)", path: "", customId: "04" },
+                    { label: "H+ Market - GCP (Berlin)", path: "", customId: "05" },
+                  ]}
+                  // filter={nodes =>
+                  //   Array.from(nodes).filter(
+                  //     node => !!node.value && node.value.label.startsWith("P")
+                  //   )
+                  // }
+                />
+                <TextField
+                  inputType="text"
+                  id="ItemId"
+                  name="Item Id"
+                  label="Item Id"
+                  labelInfo="(required)"
+                  intent={IntentColor.BRAND}
+                  placeholder="Enter item id"
+                  intentAtDefaultState={false}
+                  value={itemIdValue}
+                  onChange={value => setItemIdValue(value)}
+                  fill
+                />
+              </Content>
+              <Footer>
+                <Button
+                  intent={IntentColor.BRAND}
+                  borderRadius="rounded-lg"
+                  horizontalPadding="px-6"
+                  verticalPadding="py-1.5"
+                  fontSize="text-sm"
+                  fontWeight="font-semibold"
+                  onPress={() => setSelectedListItemCustomId(itemIdValue)}
+                >
+                  Select
+                </Button>
+              </Footer>
+            </Card>
+            <Card
+              leftMargin="ml-5"
+              topMargin="mt-5"
+              rightMargin="mr-5"
+              boxShadow="shadow-md"
+              borderRadius="rounded-sm"
+              maxWidth="max-w-sm"
+              footerAlignment="center"
+              horizontalPadding="px-0"
+            >
+              <Header>
+                <Title>Simple TreeView</Title>
+              </Header>
+              <Content>
+                <TreeView
+                  // interactive={false}
+                  sortSections={false}
+                  sortGroups={false}
+                  sortItems={false}
+                  selectedItemCustomId="rsrc16"
+                  setSelectedItem={lselectedItem => setSelectedTreeItem(lselectedItem)}
+                  itemExpandedIds={expandedTreeIds}
+                  setItemExpandedIds={setExpandedTreeIds}
+                  forceItemLowGrayBackgroundAtHoverState
+                  itemInitialIndent={4}
+                  items={[
+                    {
+                      group: "VIRTUAL PRIVATE CLOUD",
+                      label: "Your VPCs",
+                      path: "/account",
+                      customId: "rsrc2",
+                    },
+                    {
+                      group: "VIRTUAL PRIVATE CLOUD",
+                      label: "Subnets",
+                      path: "/dashboard",
+                      customId: "rsrc3",
+                    },
+                    {
+                      group: "VIRTUAL PRIVATE CLOUD",
+                      label: "Route Tables",
+                      path: "/organization",
+                      customId: "rsrc4",
+                    },
+                    {
+                      group: "VIRTUAL PRIVATE CLOUD",
+                      label: "Internet Gateways",
+                      path: "/about",
+                      customId: "rsrc5",
+                    },
+                    {
+                      group: "VIRTUAL PRIVATE CLOUD",
+                      label: "Egress Only Internet Gateways",
+                      path: "/about",
+                      customId: "rsrc6",
+                    },
+                    {
+                      group: "VIRTUAL PRIVATE CLOUD",
+                      label: "DHCP Options Sets",
+                      path: "",
+                      customId: "rsrc7",
+                    },
+                    {
+                      group: "VIRTUAL PRIVATE CLOUD",
+                      label: "Elastic IPs",
+                      path: "/",
+                      customId: "rsrc8",
+                    },
+                    {
+                      group: "VIRTUAL PRIVATE CLOUD",
+                      label: "Managed Prefix",
+                      path: "/",
+                      customId: "rsrc9",
+                    },
+                    {
+                      group: "VIRTUAL PRIVATE CLOUD",
+                      label: "Lists",
+                      path: "/about",
+                      customId: "rsrc10",
+                    },
+                    {
+                      group: "VIRTUAL PRIVATE CLOUD",
+                      label: "Endpoints",
+                      path: "/about",
+                      customId: "rsrc11",
+                    },
+                    {
+                      group: "VIRTUAL PRIVATE CLOUD",
+                      label: "Endpoint Services",
+                      path: "/about",
+                      customId: "rsrc12",
+                    },
+                    {
+                      group: "VIRTUAL PRIVATE CLOUD",
+                      label: "NAT Gateways",
+                      path: "/about",
+                      customId: "rsrc13",
+                    },
+                    {
+                      group: "VIRTUAL PRIVATE CLOUD",
+                      label: "Peering Connections",
+                      path: "/about",
+                      customId: "rsrc14",
+                    },
+                    {
+                      group: "SECURITY",
+                      label: "Network ACLs",
+                      path: "",
+                      customId: "rsrc15",
+                    },
+                    {
+                      group: "SECURITY",
+                      label: "Security Groups",
+                      path: "",
+                      customId: "rsrc16",
+                    },
+                    {
+                      group: "REACHABILITY",
+                      label: "Reachability Analyzer",
+                      path: "",
+                      customId: "rsrc17",
+                    },
+                    {
+                      group: "DNS FIREWALL",
+                      label: "Rule Groups",
+                      path: "",
+                      customId: "rsrc18",
+                    },
+                    {
+                      group: "DNS FIREWALL",
+                      label: "Domain Lists",
+                      path: "",
+                      customId: "rsrc19",
+                    },
+                  ]}
+                />
+              </Content>
+            </Card>
             <BasicLayout leftMargin="ml-5" topMargin="mt-5" rightMargin="mr-5">
               <BasicLayout fluid>
                 <PopoverTrigger
@@ -1549,7 +2169,7 @@ const Index = () => {
                   menuHaveSection
                   forceItemLowGrayBackgroundAtHoverState
                   syncTriggerLabelWithSelectedItem
-                  menuInitialItems={menuItems3}
+                  menuItems={menuItems3}
                   placement="bottom start"
                   onMenuItemAction={() => {
                     setOpenMenu(false);
@@ -1584,7 +2204,7 @@ const Index = () => {
                   menuHaveSection
                   forceItemLowGrayBackgroundAtHoverState
                   syncTriggerLabelWithSelectedItem
-                  menuInitialItems={menuItems3}
+                  menuItems={menuItems3}
                   placement="bottom start"
                   onMenuItemAction={() => {
                     setOpenMenu2(false);

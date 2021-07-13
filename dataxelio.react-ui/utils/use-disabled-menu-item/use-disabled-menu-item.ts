@@ -18,8 +18,8 @@ export function getDisabledMenuItemIds(items: TreeItem[]): string[] {
   return res;
 }
 
-export function useDisabledMenuItem(items: TreeItem[]): string[] {
-  const res = useMemo(() => getDisabledMenuItemIds(items), [items]);
+export function useDisabledMenuItem(items: TreeItem[], itemsVersion: number): string[] {
+  const res = useMemo(() => getDisabledMenuItemIds(items), [itemsVersion]);
 
   return res;
 }

@@ -1,6 +1,9 @@
 import React from "react";
+
+import Joi from "joi";
+
 import { IconName } from "@fortawesome/fontawesome-svg-core";
-import { FocusEvents } from "@react-types/shared";
+import { FocusEvents, Node } from "@react-types/shared";
 import { HoverProps, PressProps } from "@react-aria/interactions";
 import { Placement, PlacementAxis } from "@react-types/overlays";
 
@@ -236,29 +239,47 @@ export type PopoverStyleProps = {
 export type PopoverTriggerStyleProps = {
   syncTriggerLabelWithSelectedItem?: boolean;
   type: PopoverType;
-  // isPopoverOpen?: boolean;
   onOpenChange?: (isOpen: boolean) => void;
   placement?: Placement;
   offset?: number;
   withArrow?: boolean;
   arrowSize?: number;
+
   menuHaveSection?: boolean;
   isMenuVirtualized?: boolean;
   menuAutoFocus?: boolean | "first" | "last";
   shouldMenuFocusWrap?: boolean;
-  menuInitialItems: TreeItem[];
-  menuInitialSelectedItemId?: React.Key;
-  // menuItemSelectedIds?: Iterable<string>;
-  // menuItemDisabledIds?: Iterable<string>;
+  menuItems?: TreeItem[];
+  menuItemsVersion?: number;
   menuItemExpandedIds?: Set<React.Key>;
-  onMenuItemAction?: (key: React.Key) => void;
   setMenuItemExpandedIds?: (expandedIds: Set<React.Key>) => void;
-  // onMenuItemSelectionChange?: (keys: "all" | Set<React.Key>) => any;
   selectedMenuItem?: TreeItem;
   setSelectedMenuItem?: (selectedItem: TreeItem | undefined) => void;
+  onMenuItemAction?: (key: React.Key) => void;
+
+  listBoxHaveSection?: boolean;
+  isListBoxVirtualized?: boolean;
+  listBoxAutoFocus?: boolean | "first" | "last";
+  shouldListBoxFocusWrap?: boolean;
+  listBoxItems?: TreeItem[];
+  listBoxItemsVersion?: number;
+  selectedListBoxItem?: TreeItem;
+  setSelectedListBoxItem?: (selectedItem: TreeItem | undefined) => void;
 
   customDialogContent?: React.ReactNode;
   customDialogFooter?: React.ReactNode;
+
+  parentIsASelect?: boolean;
+  parentFilter?: (nodes: Iterable<Node<TreeItem>>) => Node<TreeItem>[];
+  parentLabel?: string;
+  parentLabelInline?: boolean;
+  parentHelperText?: string;
+  parentHelperTextIntent?: IntentColor;
+  parentLabelFontSize?: FontSizeType;
+  parentLabelFontWeight?: FontWeightType;
+  parentLabelLetterSpacing?: LetterSpacingType;
+  parentLabelFontHeight?: LineHeightType;
+  parentGapBetweenLabelAndButton?: FlexGridGapType;
 
   "aria-label"?: string;
   "aria-labelledby"?: string;
@@ -267,11 +288,57 @@ export type PopoverTriggerStyleProps = {
 };
 
 /******************************************************
+ * ListBox Types
+ ******************************************************/
+
+export type ListBoxStyleProps = {
+  // Intent Style
+  interactive?: boolean;
+  darkMode?: boolean;
+  minimal?: boolean;
+  intent?: IntentColor;
+  itemIntentAtDefaultState?: boolean;
+  sectionOpacity?: ForegroundOpacityType;
+  forceItemLowGrayBackgroundAtHoverState?: boolean;
+  forceItemLowBrandBackgroundAtHoverState?: boolean;
+  itemCursor?: CursorType;
+
+  // Layout Style
+  gapBetweenItems?: FlexGridGapType;
+  marginBetweenItemsAndSection?: TopMarginType;
+
+  // Geometry Style
+  fill?: boolean;
+  itemBackgroundverticalPadding?: VerticalPaddingType;
+
+  // Typography Style
+  leafFontHeight?: LineHeightType;
+  leafFontSize?: FontSizeType;
+  leafFontWeight?: FontWeightType;
+  leafLetterSpacing?: LetterSpacingType;
+  leafUseDarkGrayAsDefaultIntent?: boolean;
+  sectionFontHeight?: LineHeightType;
+  sectionFontSize?: FontSizeType;
+  sectionFontWeight?: FontWeightType;
+  sectionLetterSpacing?: LetterSpacingType;
+  itemTextOverflow?: TextOverflowType;
+  itemWordBreak?: WordBreakType;
+
+  // Section
+  renderSectionLabel?: boolean;
+
+  // List
+  itemInitialIndent?: number;
+  itemSizePerIndent?: number;
+};
+
+/******************************************************
  * Menu Types
  ******************************************************/
 
 export type MenuStyleProps = {
   // Intent Style
+  interactive?: boolean;
   darkMode?: boolean;
   minimal?: boolean;
   intent?: IntentColor;
@@ -2107,6 +2174,22 @@ export type ResourceProperty = {
  * Item Types
  ********************************************************/
 
+export type FormInputEntry = {
+  type: InputType | "checkbox" | "select" | "textarea";
+  id: string;
+  name: string;
+  label: string;
+  labelInfo?: string;
+  helperText?: string;
+  placeholder?: string;
+  validationRule?: Joi.StringSchema;
+  initialValue?: string;
+  selectItems?: ListItem[];
+  selectWidth?: WidthType;
+  dependencyName?: string;
+  dependencyValue?: string;
+};
+
 export type ListItem = {
   section?: string;
   group?: string;
@@ -2121,6 +2204,7 @@ export type ListItem = {
   rightIconStyle?: IconStyle;
   customId?: string;
   customName?: string;
+  filterGroupLabel?: string;
 };
 
 export type TreeItem = {
@@ -2142,6 +2226,9 @@ export type TreeItem = {
   // Custom
   customId?: string;
   customName?: string;
+
+  // Filter
+  filterGroupLabel?: string;
 
   // Children
   children?: TreeItem[];

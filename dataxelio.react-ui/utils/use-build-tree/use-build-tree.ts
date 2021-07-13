@@ -4,6 +4,7 @@ import { ListItem, TreeItem } from "@dataxelio/react-ui.utils.prop-types";
 
 export type buildInput = {
   items: ListItem[];
+  itemsVersion: number;
   sortSections: boolean;
   sortGroups: boolean;
   sortItems: boolean;
@@ -72,6 +73,7 @@ export function buildTree(input: buildInput): NodeReturn {
       rightIconStyle: item.rightIconStyle,
       customId: item.customId,
       customName: item.customName,
+      filterGroupLabel: item.filterGroupLabel,
     });
   });
 
@@ -148,7 +150,7 @@ export function buildTree(input: buildInput): NodeReturn {
 export function useBuildTree(input: buildInput): NodeReturn {
   const res = useMemo(
     () => buildTree(input),
-    [input.items, input.sortSections, input.sortGroups, input.sortItems]
+    [input.itemsVersion, input.sortSections, input.sortGroups, input.sortItems]
   );
 
   return res;

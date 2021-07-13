@@ -137,7 +137,6 @@ export const PropertyEditorButton = ({
       offset={popoverOffset}
       withArrow={popoverWithArrow}
       arrowSize={popoverArrowSize}
-      menuInitialItems={[]}
       customDialogContent={
         <Content>
           <TextField

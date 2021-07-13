@@ -247,7 +247,7 @@ export const FlexLayout = React.forwardRef<HTMLElement, FlexLayoutProps>(
     });
 
     const layoutClassName = layoutStyleBuilder({
-      layout: "flex",
+      layout: display === "inline" ? "inline-flex" : "flex",
       display,
       overflow,
       overscrollBehavior,

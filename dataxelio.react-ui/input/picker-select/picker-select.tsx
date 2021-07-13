@@ -44,6 +44,7 @@ export interface PickerSelectProps extends ButtonTriggerStyleProps {
   label: string;
   isDisabled?: boolean;
   menuItems: ListItem[];
+  menuItemsVersion?: number;
   menuSortSections?: boolean;
   menuSortGroups?: boolean;
   menuSortItems?: boolean;
@@ -59,8 +60,8 @@ export interface PickerSelectProps extends ButtonTriggerStyleProps {
   isMenuVirtualized?: boolean;
   menuAutoFocus?: boolean | "first" | "last";
   shouldMenuFocusWrap?: boolean;
-  defaultSelectedMenuItemLabel?: string;
-  selectedMenuItem?: TreeItem;
+  selectedMenuItemCustomId?: string;
+  selectedMenuItemLabel?: string;
   setSelectedMenuItem?: (selectedItem?: TreeItem) => void;
 
   // Popover
@@ -113,17 +114,18 @@ export const PickerSelect = ({
   label,
   isDisabled,
   menuItems,
+  menuItemsVersion = 1,
   menuSortSections = true,
   menuSortGroups = true,
   menuSortItems = true,
   openedIcon = "caret-up",
   closedIcon = "caret-down",
 
-  // width = "w-40",
+  width = "w-auto",
   horizontalPadding = "px-4",
   verticalPadding = "py-1.5",
   fontSize = "text-sm",
-  fontWeight = "font-semibold",
+  fontWeight = "font-normal",
 
   onPopoverOpenChange,
   popoverPlacement = "bottom start",
@@ -133,8 +135,8 @@ export const PickerSelect = ({
   isMenuVirtualized,
   menuAutoFocus,
   shouldMenuFocusWrap,
-  defaultSelectedMenuItemLabel,
-  selectedMenuItem,
+  selectedMenuItemCustomId,
+  selectedMenuItemLabel,
   setSelectedMenuItem,
 
   popoverBackgroundOpacity,
@@ -184,27 +186,31 @@ export const PickerSelect = ({
 }: PickerSelectProps) => {
   const { haveSection: menuHaveSection, treeItems: menuTreeItems } = useBuildTree({
     items: menuItems,
+    itemsVersion: menuItemsVersion,
     sortSections: menuSortSections,
     sortGroups: menuSortGroups,
     sortItems: menuSortItems,
   });
 
-  const defaultSelectedMenuItem = useSelectedMenuItem({
+  const selectedMenuItem = useSelectedMenuItem({
     active: true,
     items: menuTreeItems,
-    label: defaultSelectedMenuItemLabel,
+    itemsVersion: menuItemsVersion,
+    customId: selectedMenuItemCustomId,
+    label: selectedMenuItemLabel,
   });
 
   const [popoverOpen, setPopoverOpen] = useState<boolean>(false);
-  const [selectedItem, setSelectedItem] = useState<TreeItem | undefined>(
-    selectedMenuItem ?? defaultSelectedMenuItem
+
+  const [internalSelectedMenuItem, setInternalSelectedMenuItem] = useState<TreeItem | undefined>(
+    undefined
   );
 
   useEffect(() => {
-    if (!!selectedItem && !!setSelectedMenuItem) {
-      setSelectedMenuItem(selectedItem);
+    if (!!internalSelectedMenuItem && !!setSelectedMenuItem) {
+      setSelectedMenuItem(internalSelectedMenuItem);
     }
-  }, [menuItems, selectedItem?.id]);
+  }, [menuItemsVersion, internalSelectedMenuItem?.id]);
 
   return (
     <PopoverTrigger
@@ -225,7 +231,7 @@ export const PickerSelect = ({
       internalVerticalMargin={popoverInternalVerticalMargin}
       debugMode={popoverDebugMode}
       debugIntent={popoverDebugIntent}
-      width={popoverWidth}
+      width={popoverWidth ?? width}
       maxWidth={popoverMaxWidth}
       minWidth={popoverMinWidth}
       height={popoverHeight}
@@ -264,15 +270,15 @@ export const PickerSelect = ({
       isMenuVirtualized={isMenuVirtualized}
       menuAutoFocus={menuAutoFocus}
       shouldMenuFocusWrap={shouldMenuFocusWrap}
-      menuInitialItems={menuTreeItems}
-      menuInitialSelectedItemId={!!defaultSelectedMenuItem ? defaultSelectedMenuItem.id : undefined}
+      menuItems={menuTreeItems}
+      menuItemsVersion={menuItemsVersion}
+      selectedMenuItem={selectedMenuItem ?? internalSelectedMenuItem}
+      setSelectedMenuItem={selectedItem => setInternalSelectedMenuItem(selectedItem)}
       onMenuItemAction={() => setPopoverOpen(false)}
-      selectedMenuItem={selectedItem}
-      setSelectedMenuItem={selectedItem => setSelectedItem(selectedItem)}
     >
       <Button
         isDisabled={isDisabled}
-        // width={width}
+        width={width}
         horizontalPadding={horizontalPadding}
         verticalPadding={verticalPadding}
         fontSize={fontSize}

@@ -37,6 +37,7 @@ import { Text } from "@dataxelio/react-ui.element.text";
 
 export interface MenuItemProps {
   // Intent Style
+  interactive: boolean;
   minimal: boolean;
   intent: IntentColor;
   intentAtDefaultState: boolean;
@@ -84,6 +85,7 @@ export interface MenuItemProps {
 }
 
 export const MenuItem = ({
+  interactive,
   minimal,
   intent,
   intentAtDefaultState,
@@ -161,7 +163,7 @@ export const MenuItem = ({
 
   const intentState = isDisabled
     ? IntentState.DISABLED
-    : isGroup && !applyIntentOnGroup
+    : !interactive || (isGroup && !applyIntentOnGroup)
     ? IntentState.DEFAULT
     : isSelected
     ? IntentState.PRESSED
@@ -177,8 +179,10 @@ export const MenuItem = ({
       ? groupUseDarkGrayAsDefaultIntent
       : leafUseDarkGrayAsDefaultIntent,
     minimal,
-    forceLowGrayBackgroundAtHoverState: forceLowGrayBackgroundAtHoverState && isHovered,
-    forceLowBrandBackgroundAtHoverState: forceLowBrandBackgroundAtHoverState && isHovered,
+    forceLowGrayBackgroundAtHoverState:
+      interactive && forceLowGrayBackgroundAtHoverState && isHovered,
+    forceLowBrandBackgroundAtHoverState:
+      interactive && forceLowBrandBackgroundAtHoverState && isHovered,
     intentAtDefaultState,
     foregroundOpacity: isGroup ? groupOpacity : "text-opacity-100",
     cursor,
@@ -209,7 +213,11 @@ export const MenuItem = ({
 
   const typographyClassName = typographyStyleBuilder({
     fontSize: isGroup ? groupFontSize : leafFontSize,
-    fontWeight: isGroup ? groupFontWeight : isSelected ? "font-bold" : leafFontWeight,
+    fontWeight: isGroup
+      ? groupFontWeight
+      : interactive && isSelected
+      ? "font-bold"
+      : leafFontWeight,
     letterSpacing: isGroup ? groupLetterSpacing : leafLetterSpacing,
     fontHeight: isGroup ? groupFontHeight : leafFontHeight,
   });
@@ -298,6 +306,7 @@ export const MenuItem = ({
           {[...item.childNodes].map(node => (
             <MenuItem
               key={node.key}
+              interactive={interactive}
               minimal={minimal}
               intent={intent}
               intentAtDefaultState={intentAtDefaultState}
